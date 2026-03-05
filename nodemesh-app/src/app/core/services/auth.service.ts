@@ -1,11 +1,6 @@
 import { Injectable } from '@angular/core';
 
-export interface UserProfile {
-    uid: string;
-    email: string;
-    displayName?: string;
-    photoURL?: string;
-}
+import { UserProfile } from '../../data/models/interfaces/user-profile.interface';
 
 @Injectable({
     providedIn: 'root'

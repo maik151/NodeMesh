@@ -37,4 +37,17 @@ describe('AuthService (TDD - AUT-01) - Refactor', () => {
 
         expect(key1).toEqual(key2);
     });
+
+    // PRUEBA 4: Inicio de Sesión con Google (OAuth 2.0)
+    it('debe conectar con Google OAuth y retornar un usuario con UID válido', async () => {
+        // Ejecutamos el método (actualmente no existe, por ende la prueba fallará - RED phase)
+        const user = await (service as any).loginWithGoogle();
+
+        // Validaciones del comportamiento esperado
+        expect(user).toBeDefined();
+        expect(user.uid).toBeTruthy();
+        expect(typeof user.uid).toBe('string');
+        // El email es un dato común de OAuth
+        expect(user.email).toBeTruthy();
+    });
 });

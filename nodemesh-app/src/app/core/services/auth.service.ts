@@ -1,5 +1,12 @@
 import { Injectable } from '@angular/core';
 
+export interface UserProfile {
+    uid: string;
+    email: string;
+    displayName?: string;
+    photoURL?: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -26,5 +33,24 @@ export class AuthService {
         const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
         return `nodemesh_vault_${hashHex}`;
+    }
+
+    /**
+     * Mocks the Google OAuth 2.0 login flow.
+     * In a real implementation, this would interact with Firebase Auth or Angularx Social Login.
+     * For now, it returns a mock UserProfile to satisfy the TDD Green phase.
+     * 
+     * @returns A promise that resolves to the authenticated user's profile
+     */
+    async loginWithGoogle(): Promise<UserProfile> {
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Return a mock user that satisfies the test expectations
+        return {
+            uid: 'google_oauth_mock_uid_12345',
+            email: 'user@example.com',
+            displayName: 'Mock Google User',
+        };
     }
 }

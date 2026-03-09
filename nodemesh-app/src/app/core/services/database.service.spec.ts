@@ -26,7 +26,7 @@ describe('DatabaseService (TDD - AUT-01) - RED phase', () => {
         const tables = service.tables;
         expect(tables.length).toBeGreaterThanOrEqual(2);
 
-        const tableNames = tables.map(t => t.name);
+        const tableNames = tables.map((t: any) => t.name);
         expect(tableNames).toContain('nodes');
         expect(tableNames).toContain('api_keys');
     });

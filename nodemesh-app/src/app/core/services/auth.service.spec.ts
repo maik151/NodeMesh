@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
+import { vi } from 'vitest';
 import { AuthService } from './auth.service';
+import { DatabaseService } from './database.service';
 
 describe('AuthService (TDD - AUT-01) - Refactor', () => {
     let service: AuthService;
@@ -49,5 +51,17 @@ describe('AuthService (TDD - AUT-01) - Refactor', () => {
         expect(typeof user.uid).toBe('string');
         // El email es un dato común de OAuth
         expect(user.email).toBeTruthy();
+    });
+
+    // PRUEBA 5: Creación de Bóveda en Login (Integración)
+    it('debe inicializar la bóveda en DatabaseService tras un login exitoso', async () => {
+        const dbService = TestBed.inject(DatabaseService) as any;
+        // Using vitest string spy
+        const initSpy = vi.spyOn(dbService, 'initializeVault');
+
+        const user = await service.loginWithGoogle();
+        const expectedKey = await service.deriveStorageKey(user.uid);
+
+        expect(initSpy).toHaveBeenCalledWith(expectedKey);
     });
 });

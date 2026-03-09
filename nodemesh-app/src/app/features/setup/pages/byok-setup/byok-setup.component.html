@@ -1,0 +1,38 @@
+<div class="byok-container">
+    <div class="glass-modal">
+        <div class="modal-header">
+            <span class="material-symbols-rounded icon-hero">security</span>
+            <h2>Bóveda BYOK</h2>
+            <p>Configura tu API Key para habilitar la simulación cognitiva. Aseguraremos la llave localmente mediante
+                AES-GCM 256 usando tu identidad aislada.</p>
+        </div>
+
+        <form class="byok-form" (ngSubmit)="onSaveKey()">
+            <div class="input-group">
+                <label for="apiKey">Proveedor: Google Gemini</label>
+                <div class="input-wrapper">
+                    <span class="material-symbols-rounded input-icon">key</span>
+                    <input type="password" id="apiKey" name="apiKey" [(ngModel)]="apiKey" placeholder="AIzaSyA..."
+                        [disabled]="isLoading || isSuccess" required spellcheck="false" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="error-msg" *ngIf="errorMessage">
+                <span class="material-symbols-rounded">error</span>
+                {{ errorMessage }}
+            </div>
+
+            <button type="submit" class="btn-primary" [disabled]="!apiKey || isLoading || isSuccess"
+                [class.is-loading]="isLoading" [class.is-success]="isSuccess">
+
+                <span class="btn-text" *ngIf="!isLoading && !isSuccess">Conectar Bóveda</span>
+                <span class="btn-text" *ngIf="isLoading">Verificando...</span>
+                <span class="btn-text" *ngIf="isSuccess">Bóveda Cifrada</span>
+
+                <span class="material-symbols-rounded btn-icon" *ngIf="isSuccess">check_circle</span>
+                <div class="spinner" *ngIf="isLoading"></div>
+            </button>
+        </form>
+    </div>
+
+</div>

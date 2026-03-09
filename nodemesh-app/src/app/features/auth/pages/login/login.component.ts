@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
@@ -15,7 +16,8 @@ export class LoginComponent implements OnInit {
 
     constructor(
         private readonly authService: AuthService,
-        private readonly cdr: ChangeDetectorRef
+        private readonly cdr: ChangeDetectorRef,
+        private readonly router: Router
     ) { }
 
     /**
@@ -38,7 +40,8 @@ export class LoginComponent implements OnInit {
             this.loginSuccess = true;
             this.cdr.detectChanges(); // Trigger success state immediately
 
-            // TODO: redirect to dashboard
+            // Redirigir al setup (la ruta /setup evaluará el AuthGuard y ByokGuard correspondientemente)
+            this.router.navigate(['/setup']);
         } catch (error) {
             console.error('Error durante el login con Google:', error);
         } finally {

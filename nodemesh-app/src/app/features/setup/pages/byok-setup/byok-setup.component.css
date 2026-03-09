@@ -1,0 +1,206 @@
+/* src/app/features/setup/pages/byok-setup/byok-setup.component.css */
+:host {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    background-color: #050505;
+    /* Void Black */
+    position: relative;
+    overflow: hidden;
+    font-family: 'Inter', 'Poppins', sans-serif;
+    color: #f1f1f1;
+}
+
+.background-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(154, 205, 50, 0.1) 0%, rgba(5, 5, 5, 0) 70%);
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* removed .byok-container base properties since it now holds the ::before/::after background */
+
+.glass-modal {
+    background: rgba(18, 18, 18, 0.6);
+    /* Slate Surface @ 60% */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Glass Border */
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.modal-header {
+    text-align: center;
+}
+
+.icon-hero {
+    font-size: 3rem;
+    color: #9ACD32;
+    /* Active Node */
+    margin-bottom: 0.5rem;
+}
+
+.modal-header h2 {
+    margin: 0 0 0.5rem;
+    font-weight: 600;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+}
+
+.modal-header p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #A0A0A0;
+    line-height: 1.5;
+}
+
+.byok-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #A0A0A0;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    color: #555;
+    font-size: 1.25rem;
+    pointer-events: none;
+}
+
+.input-wrapper input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    color: #ffffff;
+    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+    /* Mono font for keys */
+    font-size: 0.875rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.input-wrapper input:focus {
+    border-color: #9ACD32;
+    box-shadow: 0 0 0 2px rgba(154, 205, 50, 0.2);
+}
+
+.input-wrapper input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #9ACD32, #C5E100);
+    color: #050505;
+    border: none;
+    border-radius: 8px;
+    /* Strict box model */
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px -4px rgba(154, 205, 50, 0.3);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btn-primary.is-success {
+    background: rgba(154, 205, 50, 0.15);
+    color: #9ACD32;
+    border: 1px solid rgba(154, 205, 50, 0.3);
+}
+
+.error-msg {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #ff4b4b;
+    font-size: 0.875rem;
+    background: rgba(255, 75, 75, 0.1);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 75, 75, 0.2);
+    animation: fadeIn 0.2s ease;
+}
+
+.error-msg .material-symbols-rounded {
+    font-size: 1.125rem;
+}
+
+/* Spinner Animation */
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(5, 5, 5, 0.2);
+    border-top-color: #050505;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -36,4 +36,15 @@ export class DatabaseService {
             }
         });
     }
+
+    async saveApiKey(provider: string, encryptedKey: string): Promise<void> {
+        if (!this.db) throw new Error('Database not initialized');
+        await this.db.table('api_keys').put({ provider, key: encryptedKey });
+    }
+
+    async getApiKey(provider: string): Promise<string | null> {
+        if (!this.db) throw new Error('Database not initialized');
+        const record = await this.db.table('api_keys').where('provider').equals(provider).first();
+        return record ? record.key : null;
+    }
 }

@@ -1,20 +1,30 @@
 <div class="byok-container">
     <div class="glass-modal">
+        <button type="button" class="btn-back" (click)="goBack()" title="Regresar al Login">
+            <span class="material-symbols-rounded">arrow_back</span>
+        </button>
+
         <div class="modal-header">
-            <span class="material-symbols-rounded icon-hero">security</span>
-            <h2>Bóveda BYOK</h2>
-            <p>Configura tu API Key para habilitar la simulación cognitiva. Aseguraremos la llave localmente mediante
-                AES-GCM 256 usando tu identidad aislada.</p>
+            <img src="/Images/nodeMesh_white.png" alt="NodeMesh" class="logo-hero">
+            <span class="sub-label">Herramienta de Estudio</span>
+            <p style="margin-top: 0.5rem;">Configura tu API Key para habilitar la simulación cognitiva. Aseguraremos la
+                llave localmente mediante AES-GCM 256.</p>
         </div>
 
         <form class="byok-form" (ngSubmit)="onSaveKey()">
             <div class="input-group">
                 <label for="apiKey">Proveedor: Google Gemini</label>
-                <div class="input-wrapper">
-                    <span class="material-symbols-rounded input-icon">key</span>
-                    <input type="password" id="apiKey" name="apiKey" [(ngModel)]="apiKey" placeholder="AIzaSy..."
-                        [disabled]="isTestLoading || isSaveLoading || apiTestedSuccessfully" required spellcheck="false"
-                        autocomplete="off" />
+                <div class="input-wrapper" [class.is-focused]="isInputFocused">
+                    <div class="input-addon">
+                        <span class="material-symbols-rounded">key</span>
+                    </div>
+                    <input [type]="showApiKey ? 'text' : 'password'" id="apiKey" name="apiKey" [(ngModel)]="apiKey"
+                        [disabled]="isTestLoading || isSaveLoading || apiTestedSuccessfully"
+                        (focus)="isInputFocused = true" (blur)="isInputFocused = false"
+                        placeholder="AIzaSy... o sk-ant-..." required autocomplete="off" />
+                    <button type="button" class="btn-toggle-view" (click)="toggleApiKeyVisibility()" tabindex="-1">
+                        <span class="material-symbols-rounded">{{ showApiKey ? 'visibility_off' : 'visibility' }}</span>
+                    </button>
                 </div>
             </div>
 

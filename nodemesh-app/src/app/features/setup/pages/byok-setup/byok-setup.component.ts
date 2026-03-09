@@ -15,6 +15,9 @@ import { Router } from '@angular/router';
 })
 export class ByokSetupComponent {
     apiKey: string = '';
+    showApiKey: boolean = false;
+    isInputFocused: boolean = false;
+
     isTestLoading: boolean = false;
     apiTestedSuccessfully: boolean = false;
 
@@ -97,6 +100,14 @@ export class ByokSetupComponent {
 
     onSkipSetup() {
         this.router.navigate(['/simulador']);
+    }
+
+    goBack() {
+        this.router.navigate(['/login']);
+    }
+
+    toggleApiKeyVisibility() {
+        this.showApiKey = !this.showApiKey;
     }
 
     /**

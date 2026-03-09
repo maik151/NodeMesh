@@ -253,7 +253,7 @@
     bottom: 1.25rem;
     left: 1.25rem;
     z-index: 20;
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
     align-items: flex-start;
 }
@@ -265,12 +265,14 @@
     color: #9FFF22;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    margin-bottom: 3px;
-    opacity: 0.75;
+    margin-bottom: 4px;
+    opacity: 0.8;
+    width: 100%;
 }
 
 .watermark-logo {
     height: 22px;
+    display: block;
     width: auto;
     object-fit: contain;
     opacity: 0.80;
@@ -287,3 +289,4 @@
     color: rgba(255, 255, 255, 0.25);
     letter-spacing: 0.18em;
 }
+

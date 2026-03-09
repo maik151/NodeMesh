@@ -148,6 +148,15 @@ export class AuthService {
             const vaultKey = await this.deriveStorageKey(user.uid);
             this.dbService.initializeVault(vaultKey);
 
+            // RNF-SEG-01: Guardar la sesión de forma segura en el cliente (sessionStorage)
+            // Usamos sessionStorage provisionalmente para cumplir con la validación de sesión activa
+            // sin exponer un JWT decodificado permanentemente en localStorage.
+            sessionStorage.setItem('nodemesh_session', JSON.stringify({
+                user,
+                token: accessToken,
+                expiresAt: Date.now() + 3600 * 1000 // 1 hour approx validity
+            }));
+
             this.pendingResolve?.(user);
 
         } catch (error) {
@@ -174,6 +183,48 @@ export class AuthService {
         const hashBuffer = await crypto.subtle.digest('SHA-256', data);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         return `nodemesh_vault_${hashArray.map(b => b.toString(16).padStart(2, '0')).join('')}`;
+    }
+
+    /**
+     * Checks if a valid session exists in sessionStorage.
+     * This fulfills RNF-SEG-01's client-side validation requirement.
+     */
+    isAuthenticated(): boolean {
+        const sessionStr = sessionStorage.getItem('nodemesh_session');
+        if (!sessionStr) return false;
+
+        try {
+            const session = JSON.parse(sessionStr);
+            // Verify if token is theoretically expired (1 hr validity max)
+            if (Date.now() > session.expiresAt) {
+                this.logout();
+                return false;
+            }
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * Returns the currently logged in UserProfile if available.
+     */
+    getCurrentUser(): UserProfile | null {
+        if (!this.isAuthenticated()) return null;
+        try {
+            const session = JSON.parse(sessionStorage.getItem('nodemesh_session')!);
+            return session.user as UserProfile;
+        } catch {
+            return null;
+        }
+    }
+
+    /**
+     * Clears the current session and vault connection.
+     */
+    logout(): void {
+        sessionStorage.removeItem('nodemesh_session');
+        this.dbService.db?.close();
     }
 
     private resetPending(): void {

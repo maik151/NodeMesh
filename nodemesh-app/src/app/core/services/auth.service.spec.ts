@@ -57,6 +57,7 @@ describe('AuthService (TDD - AUT-01) - Refactor Implicit Flow', () => {
         delete (window as any).google;
         mockCallback = null;
         global.fetch = globalFetchBackup;
+        sessionStorage.clear();
     });
 
     // ---- PRUEBA 1: Generación de Identidad Local (con Hash) ----
@@ -115,5 +116,37 @@ describe('AuthService (TDD - AUT-01) - Refactor Implicit Flow', () => {
                 client_id: expect.stringContaining('.apps.googleusercontent.com')
             })
         );
+    });
+
+    // ---- PRUEBA 7: RNF-SEG-01 Persistencia de Sesión ----
+    it('debe guardar la sesión en sessionStorage tras un login exitoso', async () => {
+        await service.loginWithGoogle();
+        const session = JSON.parse(sessionStorage.getItem('nodemesh_session')!);
+
+        expect(session).toBeDefined();
+        expect(session.user.uid).toBe(MOCK_UID);
+        expect(session.token).toBe(MOCK_ACCESS_TOKEN);
+        expect(session.expiresAt).toBeGreaterThan(Date.now());
+    });
+
+    // ---- PRUEBA 8: Validación de Sesión Activa ----
+    it('debe reconocer una sesión activa válida mediante isAuthenticated()', async () => {
+        expect(service.isAuthenticated()).toBe(false); // Antes del login
+
+        await service.loginWithGoogle();
+        expect(service.isAuthenticated()).toBe(true); // Después del login
+
+        const currentUser = service.getCurrentUser();
+        expect(currentUser?.email).toBe(MOCK_EMAIL);
+    });
+
+    // ---- PRUEBA 9: Cierre de Sesión ----
+    it('debe limpiar el sessionStorage al hacer logout()', async () => {
+        await service.loginWithGoogle();
+        expect(service.isAuthenticated()).toBe(true);
+
+        service.logout();
+        expect(service.isAuthenticated()).toBe(false);
+        expect(sessionStorage.getItem('nodemesh_session')).toBeNull();
     });
 });

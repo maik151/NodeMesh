@@ -27,6 +27,7 @@
     --theme-brand-neon-alt: #C5E100;
     --theme-brand-accent: #9FFF22;
     --theme-brand-accent-alt: #C5E100;
+    --theme-brand-btn-text: #000000;
     --theme-glow-color-1: rgba(159, 255, 34, 0.90);
     --theme-glow-color-2: rgba(154, 205, 50, 0.55);
     --theme-glow-color-3: rgba(11, 77, 34, 0.30);
@@ -42,16 +43,17 @@
     --theme-border: rgba(0, 0, 0, 0.08);
     --theme-text: #1a1a1a;
     --theme-text-secondary: #555555;
-    --theme-text-muted: rgba(0, 0, 0, 0.4);
+    --theme-text-muted: rgba(0, 0, 0, 0.35);
     --theme-input-bg: rgba(0, 0, 0, 0.05);
-    --theme-brand-neon: #5a9e00;
-    --theme-brand-neon-alt: #4a8a00;
-    --theme-brand-accent: #FF8C42;
-    --theme-brand-accent-alt: #FF6B1A;
+    --theme-brand-neon: #3d8c00;
+    --theme-brand-neon-alt: #2e7000;
+    --theme-brand-accent: #3d8c00;
+    --theme-brand-accent-alt: #2e7000;
+    --theme-brand-btn-text: #ffffff;
     --theme-glow-color-1: rgba(90, 158, 0, 0.40);
     --theme-glow-color-2: rgba(74, 138, 0, 0.20);
     --theme-glow-color-3: rgba(50, 100, 30, 0.10);
-    --theme-glow-opacity: 0.4;
+    --theme-glow-opacity: 0;
     --theme-logo: url('/Images/nodemesh_dark.png');
     color-scheme: light;
 }

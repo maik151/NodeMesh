@@ -9,6 +9,8 @@ interface GisNotificationReason { getMomentType(): string; }
 interface GisAccountsId {
     initialize(params: {
         client_id: string;
+        use_fedcm_for_prompt?: boolean;
+        auto_select?: boolean;
         callback: (response: GisCredentialResponse) => void;
         error_callback?: (reason: GisNotificationReason) => void;
     }): void;
@@ -50,6 +52,8 @@ export class AuthService {
         console.log('✅ window.google.accounts.id disponible. Llamando initialize()...');
         gisId.initialize({
             client_id: environment.googleClientId,
+            use_fedcm_for_prompt: true,
+            auto_select: false,
             callback: async (response: GisCredentialResponse) => {
                 console.log('[AuthService] 🎉 Callback de Google recibido. Credential (primeros 30 chars):', response.credential?.slice(0, 30));
                 try {

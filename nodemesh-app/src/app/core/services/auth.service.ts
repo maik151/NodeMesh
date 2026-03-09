@@ -52,46 +52,45 @@ export class AuthService {
      */
     initializeGis(): void {
         console.group('[AuthService] initializeGis() - Token Flow');
-        console.log('🔑 Client ID en uso:', environment.googleClientId);
+        console.log('Client ID en uso:', environment.googleClientId);
 
         if (this.gisReady) {
-            console.warn('⚠️  GIS ya estaba inicializado.');
+            console.warn('GIS ya estaba inicializado.');
             console.groupEnd();
             return;
         }
 
         const oauth2 = (window as unknown as GisWindow).google?.accounts?.oauth2;
         if (!oauth2) {
-            console.error('❌ window.google.accounts.oauth2 NO disponible. Revisa index.html.');
+            console.error('window.google.accounts.oauth2 NO disponible. Revisa index.html.');
             console.groupEnd();
             return;
         }
 
-        console.log('✅ Inicializando Token Client (Implicit Flow)...');
+        console.log('Inicializando Token Client (Implicit Flow)...');
         this.tokenClient = oauth2.initTokenClient({
             client_id: environment.googleClientId,
-            // Pedimos acceso a la info básica del perfil (OpenID Connect scopes)
             scope: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid',
             callback: (response: GisTokenResponse) => {
                 if (response.error) {
-                    console.error('[AuthService] ❌ Error en callback OAuth:', response.error);
+                    console.error('[AuthService] Error en callback OAuth:', response.error);
                     this.pendingReject?.(new Error(`Error OAuth: ${response.error}`));
                     this.resetPending();
                     return;
                 }
 
-                console.log('[AuthService] 🎉 Access Token recibido:', response.access_token.slice(0, 15) + '...');
+                console.log('[AuthService] Access Token recibido:', response.access_token.slice(0, 15) + '...');
                 this.fetchGoogleUserProfile(response.access_token);
             },
             error_callback: (err: any) => {
-                console.error('[AuthService] ❌ Error al abrir popup:', err);
+                console.error('[AuthService] Error al abrir popup:', err);
                 this.pendingReject?.(new Error('No se pudo abrir la ventana de Google SignIn.'));
                 this.resetPending();
             }
         });
 
         this.gisReady = true;
-        console.log('✅ GIS Token Client listo. gisReady = true');
+        console.log('GIS Token Client listo. gisReady = true');
         console.groupEnd();
     }
 
@@ -102,7 +101,7 @@ export class AuthService {
         console.group('[AuthService] loginWithGoogle()');
 
         if (!this.gisReady || !this.tokenClient) {
-            console.warn('⚠️  Intentando lazy init de OAuth2 Client...');
+            console.warn('Intentando lazy init de OAuth2 Client...');
             this.initializeGis();
         }
 
@@ -111,7 +110,7 @@ export class AuthService {
             throw new Error('[AuthService] No se pudo inicializar el cliente GIS. Verifica index.html.');
         }
 
-        console.log('📣 Abriendo popup de Google Authentication...');
+        console.log('Abriendo popup de Google Authentication...');
         console.groupEnd();
 
         return new Promise<UserProfile>((resolve, reject) => {
@@ -126,7 +125,7 @@ export class AuthService {
      */
     private async fetchGoogleUserProfile(accessToken: string): Promise<void> {
         try {
-            console.log('🔍 Solicitando info de usuario a la API de Google...');
+            console.log('Solicitando info de usuario a la API de Google...');
             const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
@@ -136,10 +135,9 @@ export class AuthService {
             }
 
             const data = await res.json();
-            console.log('👤 Perfil recibido:', data.email);
+            console.log('Perfil recibido:', data.email);
 
             const user: UserProfile = {
-                // 'sub' es el Identificador Único Universal del usuario en Google
                 uid: data.sub,
                 email: data.email,
                 displayName: data.name
@@ -148,9 +146,6 @@ export class AuthService {
             const vaultKey = await this.deriveStorageKey(user.uid);
             this.dbService.initializeVault(vaultKey);
 
-            // RNF-SEG-01: Guardar la sesión de forma segura en el cliente (sessionStorage)
-            // Usamos sessionStorage provisionalmente para cumplir con la validación de sesión activa
-            // sin exponer un JWT decodificado permanentemente en localStorage.
             sessionStorage.setItem('nodemesh_session', JSON.stringify({
                 user,
                 token: accessToken,
@@ -160,11 +155,10 @@ export class AuthService {
             this.pendingResolve?.(user);
 
         } catch (error) {
-            console.error('[AuthService] ❌ Falla al obtener perfil:', error);
+            console.error('[AuthService] Falla al obtener perfil:', error);
 
-            // Si todo falla en desarrollo, usamos el mockup para que la app no quede bloqueada
             if (!environment.production) {
-                console.warn('🛠️ [DEV MODE] Usando perfil MOCK de emergencia');
+                console.warn('[DEV MODE] Usando perfil MOCK de emergencia');
                 const mockUser: UserProfile = { uid: 'mock_123', email: 'dev@local', displayName: 'Dev User' };
                 const vKey = await this.deriveStorageKey(mockUser.uid);
                 this.dbService.initializeVault(vKey);

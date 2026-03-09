@@ -1,4 +1,146 @@
-/* Sombra interior de la tarjeta (Neomorfismo técnico) */
-.card-shadow {
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 24px 48px -12px rgba(0,0,0,0.5);
+/* =========================================
+   LOGIN PAGE - NodeMesh | The Modern Forge
+   ========================================= */
+
+/* ---- Contenedor de fondo principal ---- */
+.login-bg {
+    background: #050505;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ---- Glow animado con pseudo-elementos (esto SÍ funciona) ---- */
+.login-bg::before {
+    content: '';
+    position: absolute;
+    bottom: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 900px;
+    height: 900px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(154, 205, 50, 0.45) 0%, rgba(11, 77, 34, 0.25) 35%, transparent 70%);
+    animation: pulseGlow 5s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Segundo foco de luz más pequeño y rápido para más dinamismo */
+.login-bg::after {
+    content: '';
+    position: absolute;
+    bottom: -300px;
+    left: 40%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(197, 225, 0, 0.25) 0%, transparent 65%);
+    animation: pulseGlow 7s ease-in-out infinite 2s;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes pulseGlow {
+    0% {
+        opacity: 0.5;
+        transform: translateX(-50%) scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.12);
+    }
+
+    100% {
+        opacity: 0.5;
+        transform: translateX(-50%) scale(1);
+    }
+}
+
+/* ---- Tarjeta de Login - Liquid Glass ---- */
+.login-card {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 460px;
+    margin: 1rem;
+    padding: 2.5rem;
+    border-radius: 16px;
+
+    /* Liquid Glass Effect */
+    background: rgba(18, 18, 18, 0.55);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    /* Deep shadow for depth */
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 32px 64px -16px rgba(0, 0, 0, 0.7),
+        0 0 60px rgba(154, 205, 50, 0.06);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ---- Botón de Login ---- */
+.btn-google {
+    width: 100%;
+    background: #9ACD32;
+    color: #050505;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.btn-google:hover {
+    background: #C5E100;
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(154, 205, 50, 0.4);
+}
+
+.btn-google:active {
+    transform: scale(0.98);
+}
+
+/* ---- Watermark inferior izquierdo ---- */
+.watermark {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    opacity: 0.85;
+}
+
+/* ---- Version Tag ---- */
+.version-tag {
+    position: fixed;
+    bottom: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 0.1em;
 }

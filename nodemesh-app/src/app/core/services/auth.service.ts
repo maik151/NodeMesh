@@ -4,137 +4,168 @@ import { UserProfile } from '../../data/models/interfaces/user-profile.interface
 import { DatabaseService } from './database.service';
 import { environment } from '../../../environments/environment';
 
-interface GisCredentialResponse { credential: string; }
-interface GisNotificationReason { getMomentType(): string; }
-interface GisAccountsId {
-    initialize(params: {
-        client_id: string;
-        use_fedcm_for_prompt?: boolean;
-        auto_select?: boolean;
-        callback: (response: GisCredentialResponse) => void;
-        error_callback?: (reason: GisNotificationReason) => void;
-    }): void;
-    prompt(momentListener?: (notification: any) => void): void;
-    cancel(): void;
+// ---------------------------------------------------------------------------
+// Local GIS type declarations for OAuth2 Implicit Flow
+// ---------------------------------------------------------------------------
+interface GisTokenResponse {
+    access_token: string;
+    expires_in: number;
+    scope: string;
+    token_type: string;
+    error?: string;
 }
-interface GisWindow { google?: { accounts?: { id?: GisAccountsId; }; }; }
+
+interface GisTokenClient {
+    requestAccessToken(overrideConfig?: any): void;
+}
+
+interface GisOAuth2 {
+    initTokenClient(config: {
+        client_id: string;
+        scope: string;
+        callback: (response: GisTokenResponse) => void;
+        error_callback?: (err: any) => void;
+    }): GisTokenClient;
+}
+
+interface GisWindow {
+    google?: {
+        accounts?: {
+            oauth2?: GisOAuth2;
+        };
+    };
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
+    private tokenClient: GisTokenClient | null = null;
     private gisReady = false;
     private pendingResolve: ((user: UserProfile) => void) | null = null;
     private pendingReject: ((err: Error) => void) | null = null;
 
     constructor(private readonly dbService: DatabaseService) { }
 
+    /**
+     * Initializes the Google Identity Services OAuth2 Token Client.
+     * Uses the Token Flow (popup) which bypasses One Tap's strict iframe/FedCM CORS issues.
+     */
     initializeGis(): void {
-        // --- DEBUG ---
-        console.group('[AuthService] initializeGis()');
+        console.group('[AuthService] initializeGis() - Token Flow');
         console.log('🔑 Client ID en uso:', environment.googleClientId);
-        console.log('🌐 Origen del navegador:', window.location.origin);
-        console.log('📦 window.google disponible:', !!(window as unknown as GisWindow).google);
-        console.log('🔄 gisReady ya era:', this.gisReady);
 
         if (this.gisReady) {
-            console.warn('⚠️  GIS ya estaba inicializado. Saliendo sin reinicializar.');
+            console.warn('⚠️  GIS ya estaba inicializado.');
             console.groupEnd();
             return;
         }
 
-        const gisId = (window as unknown as GisWindow).google?.accounts?.id;
-        if (!gisId) {
-            console.error('❌ window.google.accounts.id NO está disponible. El script GIS aún no cargó.');
+        const oauth2 = (window as unknown as GisWindow).google?.accounts?.oauth2;
+        if (!oauth2) {
+            console.error('❌ window.google.accounts.oauth2 NO disponible. Revisa index.html.');
             console.groupEnd();
             return;
         }
 
-        console.log('✅ window.google.accounts.id disponible. Llamando initialize()...');
-        gisId.initialize({
+        console.log('✅ Inicializando Token Client (Implicit Flow)...');
+        this.tokenClient = oauth2.initTokenClient({
             client_id: environment.googleClientId,
-            use_fedcm_for_prompt: true,
-            auto_select: false,
-            callback: async (response: GisCredentialResponse) => {
-                console.log('[AuthService] 🎉 Callback de Google recibido. Credential (primeros 30 chars):', response.credential?.slice(0, 30));
-                try {
-                    const payload = this.decodeJwtPayload(response.credential);
-                    console.log('[AuthService] 👤 Payload decodificado:', payload);
-                    const user: UserProfile = { uid: payload.sub, email: payload.email, displayName: payload.name };
-                    const vaultKey = await this.deriveStorageKey(user.uid);
-                    this.dbService.initializeVault(vaultKey);
-                    this.pendingResolve?.(user);
-                } catch (err) {
-                    console.error('[AuthService] ❌ Error procesando credential:', err);
-                    this.pendingReject?.(err as Error);
-                } finally {
-                    this.pendingResolve = null;
-                    this.pendingReject = null;
+            // Pedimos acceso a la info básica del perfil (OpenID Connect scopes)
+            scope: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid',
+            callback: (response: GisTokenResponse) => {
+                if (response.error) {
+                    console.error('[AuthService] ❌ Error en callback OAuth:', response.error);
+                    this.pendingReject?.(new Error(`Error OAuth: ${response.error}`));
+                    this.resetPending();
+                    return;
                 }
+
+                console.log('[AuthService] 🎉 Access Token recibido:', response.access_token.slice(0, 15) + '...');
+                this.fetchGoogleUserProfile(response.access_token);
             },
-            error_callback: (reason: GisNotificationReason) => {
-                const msg = reason?.getMomentType?.() ?? 'unknown';
-                console.error('[AuthService] ❌ error_callback de GIS:', msg);
-                this.pendingReject?.(new Error(`[AuthService] Google Sign-In falló: ${msg}`));
-                this.pendingResolve = null;
-                this.pendingReject = null;
+            error_callback: (err: any) => {
+                console.error('[AuthService] ❌ Error al abrir popup:', err);
+                this.pendingReject?.(new Error('No se pudo abrir la ventana de Google SignIn.'));
+                this.resetPending();
             }
         });
 
         this.gisReady = true;
-        console.log('✅ GIS inicializado correctamente. gisReady = true');
+        console.log('✅ GIS Token Client listo. gisReady = true');
         console.groupEnd();
     }
 
+    /**
+     * Triggers the OAuth2 popup flow.
+     */
     async loginWithGoogle(): Promise<UserProfile> {
-        // --- DEBUG ---
         console.group('[AuthService] loginWithGoogle()');
-        console.log('🔑 Client ID:', environment.googleClientId);
-        console.log('🌐 Origen:', window.location.origin);
-        console.log('🔄 gisReady:', this.gisReady);
 
-        if (!this.gisReady) {
-            console.warn('⚠️  gisReady era false. Intentando lazy init...');
+        if (!this.gisReady || !this.tokenClient) {
+            console.warn('⚠️  Intentando lazy init de OAuth2 Client...');
             this.initializeGis();
         }
 
-        const gisId = (window as unknown as GisWindow).google?.accounts?.id;
-        if (!gisId) {
-            console.error('❌ gisId no disponible antes de prompt()');
+        if (!this.tokenClient) {
             console.groupEnd();
-            throw new Error('[AuthService] Google Identity Services SDK no disponible.');
+            throw new Error('[AuthService] No se pudo inicializar el cliente GIS. Verifica index.html.');
         }
 
-        console.log('📣 Llamando gisId.prompt()...');
+        console.log('📣 Abriendo popup de Google Authentication...');
         console.groupEnd();
 
         return new Promise<UserProfile>((resolve, reject) => {
             this.pendingResolve = resolve;
             this.pendingReject = reject;
-
-            // Pass a notification callback to prompt() to detect if the popup fails
-            gisId.prompt((notification: any) => {
-                if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                    const reason = notification.getNotDisplayedReason?.() || notification.getSkippedReason?.() || 'unknown_reason';
-                    console.warn(`[AuthService] El popup de Google One Tap no se mostró: ${reason}`);
-
-                    if (!environment.production) {
-                        console.info('🛠️ [DEV MODE] GIS falló (probablemente por propagación de CORS/Adblocker). Usando Fallback MOCK para continuar.');
-                        const mockUser: UserProfile = {
-                            uid: 'mock_dev_uid_123',
-                            email: 'dev@localhost.test',
-                            displayName: 'Developer Fallback'
-                        };
-
-                        this.deriveStorageKey(mockUser.uid).then(vaultKey => {
-                            this.dbService.initializeVault(vaultKey);
-                            resolve(mockUser);
-                        }).catch(reject);
-                    } else {
-                        reject(new Error(`No se pudo mostrar el inicio de sesión de Google (${reason}).`));
-                    }
-                }
-            });
+            this.tokenClient!.requestAccessToken();
         });
+    }
+
+    /**
+     * Usa el Access Token para obtener el perfil real desde la API de Google
+     */
+    private async fetchGoogleUserProfile(accessToken: string): Promise<void> {
+        try {
+            console.log('🔍 Solicitando info de usuario a la API de Google...');
+            const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+
+            if (!res.ok) {
+                throw new Error(`Google API respondió con status ${res.status}`);
+            }
+
+            const data = await res.json();
+            console.log('👤 Perfil recibido:', data.email);
+
+            const user: UserProfile = {
+                // 'sub' es el Identificador Único Universal del usuario en Google
+                uid: data.sub,
+                email: data.email,
+                displayName: data.name
+            };
+
+            const vaultKey = await this.deriveStorageKey(user.uid);
+            this.dbService.initializeVault(vaultKey);
+
+            this.pendingResolve?.(user);
+
+        } catch (error) {
+            console.error('[AuthService] ❌ Falla al obtener perfil:', error);
+
+            // Si todo falla en desarrollo, usamos el mockup para que la app no quede bloqueada
+            if (!environment.production) {
+                console.warn('🛠️ [DEV MODE] Usando perfil MOCK de emergencia');
+                const mockUser: UserProfile = { uid: 'mock_123', email: 'dev@local', displayName: 'Dev User' };
+                const vKey = await this.deriveStorageKey(mockUser.uid);
+                this.dbService.initializeVault(vKey);
+                this.pendingResolve?.(mockUser);
+            } else {
+                this.pendingReject?.(error as Error);
+            }
+        } finally {
+            this.resetPending();
+        }
     }
 
     async deriveStorageKey(uid: string): Promise<string> {
@@ -145,13 +176,8 @@ export class AuthService {
         return `nodemesh_vault_${hashArray.map(b => b.toString(16).padStart(2, '0')).join('')}`;
     }
 
-    private decodeJwtPayload(token: string): { sub: string; email: string; name: string } {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        return JSON.parse(
-            decodeURIComponent(
-                atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
-            )
-        );
+    private resetPending(): void {
+        this.pendingResolve = null;
+        this.pendingReject = null;
     }
 }

@@ -1,8 +1,7 @@
-/* =========================================
+﻿/* =========================================
    LOGIN PAGE - NodeMesh | The Modern Forge
    ========================================= */
 
-/* ---- Contenedor de fondo principal ---- */
 .login-bg {
     background: #050505;
     min-height: 100vh;
@@ -15,90 +14,130 @@
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
-/* ---- Glow animado con pseudo-elementos (esto SÍ funciona) ---- */
+/* === BIG NEON GLOW via pseudo-elements === */
 .login-bg::before {
     content: '';
     position: absolute;
-    bottom: -200px;
+    bottom: -120px;
     left: 50%;
     transform: translateX(-50%);
-    width: 900px;
-    height: 900px;
+    /* Large enough to fill full width */
+    width: 110vw;
+    height: 60vh;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(154, 205, 50, 0.45) 0%, rgba(11, 77, 34, 0.25) 35%, transparent 70%);
-    animation: pulseGlow 5s ease-in-out infinite;
+    background: radial-gradient(
+        ellipse at center bottom,
+        rgba(154, 205, 50, 0.85) 0%,
+        rgba(154, 205, 50, 0.45) 20%,
+        rgba(11, 77, 34, 0.25) 50%,
+        transparent 75%
+    );
+    filter: blur(60px);
+    animation: pulseGlow 4s ease-in-out infinite;
     pointer-events: none;
     z-index: 0;
 }
 
-/* Segundo foco de luz más pequeño y rápido para más dinamismo */
+/* Secondary glow shifted left for depth */
 .login-bg::after {
     content: '';
     position: absolute;
-    bottom: -300px;
-    left: 40%;
+    bottom: -180px;
+    left: 35%;
     transform: translateX(-50%);
-    width: 600px;
-    height: 600px;
+    width: 70vw;
+    height: 50vh;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(197, 225, 0, 0.25) 0%, transparent 65%);
-    animation: pulseGlow 7s ease-in-out infinite 2s;
+    background: radial-gradient(
+        ellipse at center bottom,
+        rgba(197, 225, 0, 0.6) 0%,
+        rgba(154, 205, 50, 0.2) 40%,
+        transparent 70%
+    );
+    filter: blur(80px);
+    animation: pulseGlow 6s ease-in-out infinite 1.5s;
     pointer-events: none;
     z-index: 0;
 }
 
 @keyframes pulseGlow {
-    0% {
-        opacity: 0.5;
-        transform: translateX(-50%) scale(1);
-    }
-
-    50% {
-        opacity: 1;
-        transform: translateX(-50%) scale(1.12);
-    }
-
-    100% {
-        opacity: 0.5;
-        transform: translateX(-50%) scale(1);
-    }
+    0%   { opacity: 0.6; transform: translateX(-50%) scaleY(1); }
+    50%  { opacity: 1;   transform: translateX(-50%) scaleY(1.15); }
+    100% { opacity: 0.6; transform: translateX(-50%) scaleY(1); }
 }
 
-/* ---- Tarjeta de Login - Liquid Glass ---- */
+/* === LOGIN CARD - Liquid Glass === */
 .login-card {
     position: relative;
     z-index: 10;
     width: 100%;
-    max-width: 460px;
+    max-width: 390px;
     margin: 1rem;
-    padding: 2.5rem;
-    border-radius: 16px;
+    padding: 2rem 2.25rem;
+    border-radius: 18px;
 
-    /* Liquid Glass Effect */
-    background: rgba(18, 18, 18, 0.55);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    /* Liquid Glass Base */
+    background: rgba(15, 15, 15, 0.45);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    
+    /* Glass border */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
 
-    /* Deep shadow for depth */
+    /* Depth shadow */
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.06),
-        0 32px 64px -16px rgba(0, 0, 0, 0.7),
-        0 0 60px rgba(154, 205, 50, 0.06);
+        0 40px 80px -20px rgba(0, 0, 0, 0.8),
+        0 0 40px rgba(154, 205, 50, 0.08),
+        inset 0 0 30px rgba(255, 255, 255, 0.02);
 
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    /* Glass shimmer highlight at top */
+    overflow: hidden;
 }
 
-/* ---- Botón de Login ---- */
+/* Glass shimmer: bright strip at the very top of the card */
+.login-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -30%;
+    width: 160%;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.0) 20%,
+        rgba(255, 255, 255, 0.55) 50%,
+        rgba(255, 255, 255, 0.0) 80%,
+        transparent 100%
+    );
+}
+
+/* Internal shimmer light at top-left */
+.login-card::after {
+    content: '';
+    position: absolute;
+    top: -60px;
+    left: -60px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 65%);
+    pointer-events: none;
+}
+
+/* === Google Button === */
 .btn-google {
     width: 100%;
     background: #9ACD32;
     color: #050505;
     font-weight: 700;
     font-family: 'JetBrains Mono', monospace;
-    padding: 1rem 1.5rem;
+    padding: 0.85rem 1.5rem;
     border-radius: 8px;
     border: none;
     cursor: pointer;
@@ -106,21 +145,21 @@
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    font-size: 1rem;
+    font-size: 0.9rem;
     transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
 }
 
 .btn-google:hover {
     background: #C5E100;
     transform: scale(1.02);
-    box-shadow: 0 0 20px rgba(154, 205, 50, 0.4);
+    box-shadow: 0 0 24px rgba(154, 205, 50, 0.5);
 }
 
 .btn-google:active {
     transform: scale(0.98);
 }
 
-/* ---- Watermark inferior izquierdo ---- */
+/* === Bottom-left Watermark === */
 .watermark {
     position: fixed;
     bottom: 1.5rem;
@@ -129,18 +168,33 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    opacity: 0.85;
 }
 
-/* ---- Version Tag ---- */
+.watermark-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    color: #9ACD32;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.watermark-logo {
+    height: 28px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* === Version Tag === */
 .version-tag {
     position: fixed;
-    bottom: 0.75rem;
+    bottom: 0.6rem;
     left: 50%;
     transform: translateX(-50%);
     z-index: 20;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.4);
-    letter-spacing: 0.1em;
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.15em;
 }

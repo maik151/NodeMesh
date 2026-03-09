@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CryptoService } from '../../../../core/services/crypto.service';
 import { DatabaseService } from '../../../../core/services/database.service';
+import { ThemeService } from '../../../../core/services/theme.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -30,9 +31,14 @@ export class ByokSetupComponent {
         private authService: AuthService,
         private cryptoService: CryptoService,
         private dbService: DatabaseService,
+        public themeService: ThemeService,
         private cdr: ChangeDetectorRef,
         private router: Router
     ) { }
+
+    get logoSrc(): string {
+        return this.themeService.isDark ? '/Images/nodeMesh_white.png' : '/Images/nodemesh_dark.png';
+    }
 
     async onTestKey() {
         if (!this.apiKey.trim()) return;

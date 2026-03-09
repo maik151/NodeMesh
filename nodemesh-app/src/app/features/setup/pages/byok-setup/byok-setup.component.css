@@ -55,9 +55,9 @@
     height: 65vh;
     border-radius: 50%;
     background: radial-gradient(ellipse at center bottom,
-            rgba(159, 255, 34, 0.90) 0%,
-            rgba(154, 205, 50, 0.55) 18%,
-            rgba(11, 77, 34, 0.30) 45%,
+            var(--theme-glow-color-1) 0%,
+            var(--theme-glow-color-2) 18%,
+            var(--theme-glow-color-3) 45%,
             transparent 70%);
     filter: blur(65px);
     animation: bgBreath 5s ease-in-out infinite;
@@ -76,8 +76,8 @@
     height: 55vh;
     border-radius: 50%;
     background: radial-gradient(ellipse at center,
-            rgba(197, 225, 0, 0.70) 0%,
-            rgba(154, 205, 50, 0.28) 38%,
+            var(--theme-glow-color-1) 0%,
+            var(--theme-glow-color-2) 38%,
             transparent 68%);
     filter: blur(80px);
     animation: bgBreath 7s ease-in-out infinite 2s;
@@ -306,7 +306,7 @@
 
 /* Primary Button (Neon gradient) */
 .btn-primary {
-    background: linear-gradient(135deg, var(--color-brand-neon), var(--color-brand-neon-alt));
+    background: linear-gradient(135deg, var(--theme-brand-accent), var(--theme-brand-accent-alt));
     color: #000000;
     border: none;
 }

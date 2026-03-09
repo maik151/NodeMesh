@@ -125,7 +125,7 @@
 }
 
 .btn-ingest {
-    background: linear-gradient(135deg, var(--color-brand-neon), var(--color-brand-neon-alt));
+    background: linear-gradient(135deg, var(--theme-brand-accent), var(--theme-brand-accent-alt));
     color: #000;
     border: none;
     border-radius: 8px;

@@ -6,6 +6,7 @@ import { DatabaseService } from '../../../../core/services/database.service';
 import { CryptoService } from '../../../../core/services/crypto.service';
 import { NodeChallenge } from '../../../../core/models/node.model';
 import { IngestModalComponent } from '../../components/ingest-modal/ingest-modal.component';
+import { ThemeService } from '../../../../core/services/theme.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -24,9 +25,14 @@ export class DashboardComponent implements OnInit {
         private authService: AuthService,
         private dbService: DatabaseService,
         private cryptoService: CryptoService,
+        public themeService: ThemeService,
         private cdr: ChangeDetectorRef,
         private router: Router
     ) { }
+
+    get logoSrc(): string {
+        return this.themeService.isDark ? '/Images/nodeMesh_white.png' : '/Images/nodemesh_dark.png';
+    }
 
     async ngOnInit() {
         const user = this.authService.getCurrentUser();

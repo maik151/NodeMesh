@@ -1,6 +1,6 @@
-﻿/* =========================================
-   LOGIN PAGE - NodeMesh | The Modern Forge
-   ========================================= */
+﻿/* ==============================================
+   LOGIN - NodeMesh | Liquid Glass + Neon Forge
+   ============================================== */
 
 .login-bg {
     background: #050505;
@@ -14,120 +14,211 @@
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
-/* === BIG NEON GLOW via pseudo-elements === */
+/* === PRIMARY NEON GLOW - Massive & Intense === */
 .login-bg::before {
     content: '';
     position: absolute;
-    bottom: -120px;
+    bottom: -80px;
     left: 50%;
     transform: translateX(-50%);
-    /* Large enough to fill full width */
-    width: 110vw;
-    height: 60vh;
+    width: 120vw;
+    height: 70vh;
     border-radius: 50%;
     background: radial-gradient(
         ellipse at center bottom,
-        rgba(154, 205, 50, 0.85) 0%,
-        rgba(154, 205, 50, 0.45) 20%,
-        rgba(11, 77, 34, 0.25) 50%,
-        transparent 75%
+        rgba(154, 205, 50, 1.0) 0%,
+        rgba(154, 205, 50, 0.7) 15%,
+        rgba(11, 77, 34, 0.4) 45%,
+        transparent 72%
     );
-    filter: blur(60px);
-    animation: pulseGlow 4s ease-in-out infinite;
+    filter: blur(55px);
+    animation: pulseGlow 5s ease-in-out infinite;
     pointer-events: none;
     z-index: 0;
 }
 
-/* Secondary glow shifted left for depth */
+/* === SECONDARY GLOW - shifted for depth === */
 .login-bg::after {
     content: '';
     position: absolute;
-    bottom: -180px;
-    left: 35%;
+    bottom: -150px;
+    left: 38%;
     transform: translateX(-50%);
-    width: 70vw;
-    height: 50vh;
+    width: 80vw;
+    height: 55vh;
     border-radius: 50%;
     background: radial-gradient(
-        ellipse at center bottom,
-        rgba(197, 225, 0, 0.6) 0%,
-        rgba(154, 205, 50, 0.2) 40%,
-        transparent 70%
+        ellipse at center,
+        rgba(197, 225, 0, 0.85) 0%,
+        rgba(154, 205, 50, 0.35) 35%,
+        transparent 65%
     );
-    filter: blur(80px);
-    animation: pulseGlow 6s ease-in-out infinite 1.5s;
+    filter: blur(70px);
+    animation: pulseGlow 7s ease-in-out infinite 2s;
     pointer-events: none;
     z-index: 0;
 }
 
 @keyframes pulseGlow {
-    0%   { opacity: 0.6; transform: translateX(-50%) scaleY(1); }
-    50%  { opacity: 1;   transform: translateX(-50%) scaleY(1.15); }
-    100% { opacity: 0.6; transform: translateX(-50%) scaleY(1); }
+    0%   { opacity: 0.65; transform: translateX(-50%) scaleY(1.0); }
+    50%  { opacity: 1.0;  transform: translateX(-50%) scaleY(1.18); }
+    100% { opacity: 0.65; transform: translateX(-50%) scaleY(1.0); }
 }
 
-/* === LOGIN CARD - Liquid Glass === */
+/* === AMBIENT NEON ORBS (floating dots) === */
+.neon-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    pointer-events: none;
+    z-index: 0;
+    animation: floatOrb 12s ease-in-out infinite;
+}
+
+.neon-orb-1 {
+    width: 180px;
+    height: 180px;
+    background: rgba(154, 205, 50, 0.35);
+    top: 15%;
+    left: 8%;
+    animation-delay: 0s;
+}
+
+.neon-orb-2 {
+    width: 120px;
+    height: 120px;
+    background: rgba(197, 225, 0, 0.3);
+    top: 25%;
+    right: 10%;
+    animation-delay: 3s;
+    animation-duration: 9s;
+}
+
+.neon-orb-3 {
+    width: 200px;
+    height: 200px;
+    background: rgba(11, 77, 34, 0.45);
+    top: 60%;
+    right: 5%;
+    animation-delay: 1.5s;
+    animation-duration: 14s;
+}
+
+@keyframes floatOrb {
+    0%   { transform: translateY(0px) translateX(0px); opacity: 0.4; }
+    33%  { transform: translateY(-25px) translateX(15px); opacity: 0.7; }
+    66%  { transform: translateY(12px) translateX(-10px); opacity: 0.5; }
+    100% { transform: translateY(0px) translateX(0px); opacity: 0.4; }
+}
+
+/* =============================================
+   CARD - Liquid Glass with Shimmer Highlights
+   ============================================= */
 .login-card {
     position: relative;
     z-index: 10;
     width: 100%;
     max-width: 390px;
     margin: 1rem;
-    padding: 2rem 2.25rem;
-    border-radius: 18px;
+    padding: 2rem 2.25rem 1.75rem;
+    border-radius: 20px;
 
-    /* Liquid Glass Base */
-    background: rgba(15, 15, 15, 0.45);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    
-    /* Glass border */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    /* Glass */
+    background: rgba(12, 12, 12, 0.4);
+    backdrop-filter: blur(28px) saturate(200%);
+    -webkit-backdrop-filter: blur(28px) saturate(200%);
 
-    /* Depth shadow */
+    /* Border - top brighter to simulate glass edge */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-top-color: rgba(255, 255, 255, 0.20);
+    border-left-color: rgba(255, 255, 255, 0.12);
+
+    /* Shadow for depth */
     box-shadow:
-        0 40px 80px -20px rgba(0, 0, 0, 0.8),
-        0 0 40px rgba(154, 205, 50, 0.08),
-        inset 0 0 30px rgba(255, 255, 255, 0.02);
+        0 48px 80px -20px rgba(0, 0, 0, 0.85),
+        0 0 60px rgba(154, 205, 50, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.03);
 
     display: flex;
     flex-direction: column;
     align-items: center;
 
-    /* Glass shimmer highlight at top */
+    /* Needed for shimmer clip */
     overflow: hidden;
 }
 
-/* Glass shimmer: bright strip at the very top of the card */
+/* ---- SHIMMER LINE: bright thin highlight at top edge ---- */
 .login-card::before {
     content: '';
     position: absolute;
     top: 0;
-    left: -30%;
-    width: 160%;
+    left: 0;
+    right: 0;
     height: 1px;
     background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.0) 20%,
-        rgba(255, 255, 255, 0.55) 50%,
-        rgba(255, 255, 255, 0.0) 80%,
+        rgba(255, 255, 255, 0.08) 10%,
+        rgba(255, 255, 255, 0.65) 35%,
+        rgba(197, 225, 0, 0.45) 50%,
+        rgba(255, 255, 255, 0.65) 65%,
+        rgba(255, 255, 255, 0.08) 90%,
         transparent 100%
     );
+    animation: shimmerLine 4s ease-in-out infinite;
 }
 
-/* Internal shimmer light at top-left */
+@keyframes shimmerLine {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1.0; }
+}
+
+/* ---- TOP-LEFT Corner iridescent glow (as in reference image) ---- */
 .login-card::after {
     content: '';
     position: absolute;
-    top: -60px;
-    left: -60px;
-    width: 200px;
-    height: 200px;
+    top: -80px;
+    left: -80px;
+    width: 220px;
+    height: 220px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 65%);
+    background: radial-gradient(
+        circle,
+        rgba(154, 205, 50, 0.22) 0%,
+        rgba(197, 225, 0, 0.10) 40%,
+        transparent 70%
+    );
     pointer-events: none;
+    animation: cornerGlow 6s ease-in-out infinite;
+}
+
+@keyframes cornerGlow {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50%       { opacity: 1.0; transform: scale(1.15); }
+}
+
+/* ---- Internal glass reflection streak ---- */
+.glass-streak {
+    position: absolute;
+    top: 10%;
+    left: -10%;
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.18) 50%,
+        transparent
+    );
+    transform: rotate(-30deg);
+    pointer-events: none;
+    animation: streakPulse 5s ease-in-out infinite 1s;
+}
+
+@keyframes streakPulse {
+    0%, 100% { opacity: 0.0; }
+    50%       { opacity: 1.0; }
 }
 
 /* === Google Button === */
@@ -145,25 +236,23 @@
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    font-size: 0.9rem;
-    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    font-size: 0.875rem;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
 
 .btn-google:hover {
     background: #C5E100;
-    transform: scale(1.02);
-    box-shadow: 0 0 24px rgba(154, 205, 50, 0.5);
+    transform: scale(1.025);
+    box-shadow: 0 0 28px rgba(154, 205, 50, 0.55);
 }
 
-.btn-google:active {
-    transform: scale(0.98);
-}
+.btn-google:active { transform: scale(0.98); }
 
-/* === Bottom-left Watermark === */
+/* === Watermark (fixed bottom-left, small) === */
 .watermark {
     position: fixed;
-    bottom: 1.5rem;
-    left: 1.5rem;
+    bottom: 1.25rem;
+    left: 1.25rem;
     z-index: 20;
     display: flex;
     flex-direction: column;
@@ -172,29 +261,31 @@
 
 .watermark-label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 700;
     color: #9ACD32;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
+    opacity: 0.8;
 }
 
 .watermark-logo {
-    height: 28px;
+    height: 22px;
     width: auto;
     object-fit: contain;
+    opacity: 0.85;
 }
 
-/* === Version Tag === */
+/* === Version tag === */
 .version-tag {
     position: fixed;
-    bottom: 0.6rem;
+    bottom: 0.5rem;
     left: 50%;
     transform: translateX(-50%);
     z-index: 20;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.35);
-    letter-spacing: 0.15em;
+    font-size: 0.6rem;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 0.18em;
 }

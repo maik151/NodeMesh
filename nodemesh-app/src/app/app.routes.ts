@@ -16,7 +16,7 @@ export const routes: Routes = [
     {
         path: 'simulador',
         canActivate: [authGuard, byokGuard],
-        loadComponent: () => import('./features/setup/pages/byok-setup/byok-setup.component').then(m => m.ByokSetupComponent) // TBD later
+        loadComponent: () => import('./features/forge/pages/dashboard/dashboard.component').then(m => m.DashboardComponent)
     },
     { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];

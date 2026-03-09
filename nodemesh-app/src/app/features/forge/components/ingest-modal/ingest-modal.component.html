@@ -1,0 +1,84 @@
+<div class="ingest-container">
+    <!-- Header -->
+    <div class="ingest-header">
+        <span class="material-symbols-rounded header-icon">neurology</span>
+        <h2>Ingerir Conocimiento</h2>
+        <p>Alimenta a la IA con tu material de estudio para generar los 9 tipos de retos cognitivos.</p>
+    </div>
+
+    <!-- Topic Name -->
+    <div class="input-group">
+        <label for="topicName">Nombre del Tema</label>
+        <input type="text" id="topicName" [(ngModel)]="topicName"
+            placeholder="Ej: Estructuras de Datos, Derecho Penal..." [disabled]="isProcessing" autocomplete="off" />
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+        <button class="tab" [class.active]="activeTab === 'text'" (click)="selectTab('text')" [disabled]="isProcessing">
+            <span class="material-symbols-rounded">edit_note</span>
+            Texto
+        </button>
+        <button class="tab" [class.active]="activeTab === 'pdf'" (click)="selectTab('pdf')" [disabled]="isProcessing">
+            <span class="material-symbols-rounded">picture_as_pdf</span>
+            PDF
+        </button>
+    </div>
+
+    <!-- Text Tab -->
+    <div class="tab-content" *ngIf="activeTab === 'text'">
+        <textarea [(ngModel)]="rawText" placeholder="Pega aquí el contenido teórico que quieres estudiar..." rows="10"
+            [disabled]="isProcessing" spellcheck="false"></textarea>
+        <div class="char-counter" [class.over-limit]="isOverLimit">
+            {{ charCount | number }} / {{ MAX_CHARS | number }} caracteres
+        </div>
+    </div>
+
+    <!-- PDF Tab -->
+    <div class="tab-content" *ngIf="activeTab === 'pdf'">
+        <div class="drop-zone" (dragover)="onDragOver($event)" (drop)="onDrop($event)" [class.has-file]="selectedFile">
+            <ng-container *ngIf="!selectedFile">
+                <span class="material-symbols-rounded drop-icon">cloud_upload</span>
+                <p>Arrastra tu PDF aquí</p>
+                <span class="drop-sub">o</span>
+                <label class="btn-file-select">
+                    Seleccionar archivo
+                    <input type="file" accept=".pdf" (change)="onFileSelected($event)" hidden />
+                </label>
+            </ng-container>
+            <ng-container *ngIf="selectedFile">
+                <span class="material-symbols-rounded drop-icon file-ready">description</span>
+                <p class="file-name">{{ selectedFileName }}</p>
+            </ng-container>
+        </div>
+    </div>
+
+    <!-- Error -->
+    <div class="error-msg" *ngIf="errorMessage">
+        <span class="material-symbols-rounded">error</span>
+        {{ errorMessage }}
+    </div>
+
+    <!-- Success -->
+    <div class="success-msg" *ngIf="isSuccess">
+        <span class="material-symbols-rounded">check_circle</span>
+        {{ generatedCount }} nodos forjados exitosamente.
+    </div>
+
+    <!-- Action -->
+    <button class="btn-forge" [disabled]="!canSubmit" [class.is-processing]="isProcessing"
+        [class.is-success]="isSuccess" (click)="onForge()">
+        <ng-container *ngIf="!isProcessing && !isSuccess">
+            <span class="material-symbols-rounded">auto_awesome</span>
+            Forjar Nodos
+        </ng-container>
+        <ng-container *ngIf="isProcessing">
+            <div class="spinner"></div>
+            La IA está procesando...
+        </ng-container>
+        <ng-container *ngIf="isSuccess">
+            <span class="material-symbols-rounded">verified</span>
+            Nodos Forjados
+        </ng-container>
+    </button>
+</div>

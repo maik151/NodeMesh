@@ -1,17 +1,25 @@
 ﻿/* ================================================
-   LOGIN - NodeMesh | Orbital Neon + Liquid Glass
+   LOGIN COMPONENT  NodeMesh Design System
+   Tokens: DesignSpecs.md / UX Spec v1
    ================================================ */
 
-/* Custom property for animating gradient angle */
-@property --sheen-angle {
-    syntax: '<angle>';
-    initial-value: 135deg;
-    inherits: false;
+/* ---- Design Tokens ---- */
+:host {
+    --color-brand-neon:     #9FFF22;
+    --color-brand-neon-alt: #C5E100;
+    --color-surface-card:   rgba(17, 20, 17, 0.85);
+    --color-surface-border: rgba(255, 255, 255, 0.05);
+    --color-text-muted:     rgba(255, 255, 255, 0.4);
+    --color-void:           #050505;
+    --radius-card:          16px;
+    --radius-button:        8px;
 }
 
-/* ---------- page background ---------- */
+/* ============================================
+   PAGE BACKGROUND
+   ============================================ */
 .login-bg {
-    background: #050505;
+    background: var(--color-void);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -22,164 +30,96 @@
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
-/* Main ambient neon glow - bottom center */
+/* ---------- Ambient neon glow (bottom) ---------- */
 .login-bg::before {
     content: '';
     position: absolute;
-    bottom: -100px;
+    bottom: -80px;
     left: 50%;
     transform: translateX(-50%);
-    width: 130vw;
-    height: 75vh;
+    width: 120vw;
+    height: 65vh;
     border-radius: 50%;
     background: radial-gradient(
         ellipse at center bottom,
-        rgba(154, 205, 50, 1.0)  0%,
-        rgba(154, 205, 50, 0.65) 18%,
-        rgba( 11,  77, 34, 0.35) 48%,
-        transparent 72%
+        rgba(159, 255,  34, 0.90) 0%,
+        rgba(154, 205,  50, 0.55) 18%,
+        rgba( 11,  77,  34, 0.30) 45%,
+        transparent 70%
     );
-    filter: blur(60px);
-    animation: bgPulse 5s ease-in-out infinite;
+    filter: blur(65px);
+    animation: bgBreath 5s ease-in-out infinite;
     pointer-events: none;
     z-index: 0;
 }
 
-/* Softer secondary layer shifted right */
+/* ---------- Secondary glow (right offset) ---------- */
 .login-bg::after {
     content: '';
     position: absolute;
-    bottom: -160px;
-    left: 60%;
+    bottom: -140px;
+    left: 62%;
     transform: translateX(-50%);
-    width: 80vw;
-    height: 60vh;
+    width: 75vw;
+    height: 55vh;
     border-radius: 50%;
     background: radial-gradient(
         ellipse at center,
-        rgba(197, 225, 0, 0.7) 0%,
-        rgba(154, 205, 50, 0.3) 35%,
-        transparent 65%
+        rgba(197, 225, 0, 0.70) 0%,
+        rgba(154, 205, 50, 0.28) 38%,
+        transparent 68%
     );
     filter: blur(80px);
-    animation: bgPulse 7s ease-in-out infinite 2.5s;
+    animation: bgBreath 7s ease-in-out infinite 2s;
     pointer-events: none;
     z-index: 0;
 }
 
-@keyframes bgPulse {
-    0%   { opacity: 0.6; transform: translateX(-50%) scaleY(1.0); }
-    50%  { opacity: 1.0; transform: translateX(-50%) scaleY(1.2); }
-    100% { opacity: 0.6; transform: translateX(-50%) scaleY(1.0); }
+@keyframes bgBreath {
+    0%   { opacity: 0.65; }
+    50%  { opacity: 1.0; }
+    100% { opacity: 0.65; }
 }
 
-/* ---------- card wrapper (the orbit runs inside this) ---------- */
-.card-wrapper {
-    position: relative;
-    z-index: 10;
-    /* slightly bigger than card so orb is fully visible */
-    padding: 60px;
-    margin: -60px; /* compensate so card stays centered */
-}
-
-/* The orbiting neon light orb */
-.orbit-orb {
-    position: absolute;
-    /* orb size */
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    background: radial-gradient(
-        circle,
-        rgba(197, 225,  0, 1.0) 0%,
-        rgba(154, 205, 50, 0.7) 30%,
-        transparent 70%
-    );
-    filter: blur(22px);
-    pointer-events: none;
-    z-index: 5;
-    /* starts top-center of the card wrapper */
-    animation: orbitCard 6s linear infinite;
-    transform-origin: center center;
-    /* initial position: top-center */
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-/*
-  We animate using motion path with offset-path,
-  or we use top/left keyframes. Using top/left:
-  card is 390px wide x ~520px tall inside wrapper.
-  Orb starts at top-center, goes clockwise.
-*/
-@keyframes orbitCard {
-    0%   { top:  10px; left: 50%;           transform: translateX(-50%); }
-    25%  { top: 50%;   left: calc(100% - 10px); transform: translateY(-50%); }
-    50%  { top: calc(100% - 40px); left: 50%;   transform: translateX(-50%); }
-    75%  { top: 50%;   left:  10px;           transform: translateY(-50%); }
-    100% { top:  10px; left: 50%;           transform: translateX(-50%); }
-}
-
-/* ---------- LOGIN CARD - Liquid Glass ---------- */
+/* ============================================
+   LIQUID GLASS CARD
+   ============================================ */
 .login-card {
     position: relative;
     z-index: 10;
-    width: 390px;
-    max-width: 92vw;
-    padding: 2rem 2.25rem 1.75rem;
-    border-radius: 20px;
+    width: 380px;
+    max-width: 93vw;
+    border-radius: var(--radius-card);
 
     /* Liquid Glass */
-    background: rgba(10, 10, 10, 0.38);
-    backdrop-filter: blur(30px) saturate(180%);
-    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    background: var(--color-surface-card);
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
 
-    /* Edge definition */
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-top:  1px solid rgba(255, 255, 255, 0.18);
-    border-left: 1px solid rgba(255, 255, 255, 0.10);
+    /* Ultra-subtle glass border */
+    border: 1px solid var(--color-surface-border);
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
 
+    /* Elevation shadow  downward, not glowing */
     box-shadow:
-        0 48px 80px -20px rgba(0, 0, 0, 0.9),
-        0  0  50px rgba(154, 205, 50, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.10);
+        0 4px  8px  rgba(0, 0, 0, 0.25),
+        0 16px 32px rgba(0, 0, 0, 0.50),
+        0 40px 80px rgba(0, 0, 0, 0.70),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07);
 
+    /* Vertical rhythm: flex with 40px gap between blocks */
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 40px;
+    padding: 2.5rem 2.25rem 2rem;
+
+    /* glass shimmer at top edge */
     overflow: hidden;
 }
 
-/* Liquid glass INNER sheen - rotates as the orb orbits */
+/* Static glass sheen  top highlight line */
 .login-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        var(--sheen-angle),
-        transparent 0%,
-        rgba(255, 255, 255, 0.00) 35%,
-        rgba(255, 255, 255, 0.07) 47%,
-        rgba(197, 225,   0, 0.06) 50%,
-        rgba(255, 255, 255, 0.07) 53%,
-        rgba(255, 255, 255, 0.00) 65%,
-        transparent 100%
-    );
-    /* sync rotation with the orb orbit (same 6s) */
-    animation: sheenRotate 6s linear infinite;
-    pointer-events: none;
-    z-index: 1;
-    border-radius: inherit;
-}
-
-@keyframes sheenRotate {
-    from { --sheen-angle: 135deg; }
-    to   { --sheen-angle: 495deg; }  /* 135 + 360 */
-}
-
-/* Top glass highlight line */
-.login-card::after {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -187,58 +127,127 @@
     background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.55) 30%,
-        rgba(197, 225, 0, 0.4) 50%,
-        rgba(255, 255, 255, 0.55) 70%,
+        rgba(255, 255, 255, 0.04) 10%,
+        rgba(255, 255, 255, 0.55) 38%,
+        rgba(159, 255,  34, 0.35) 50%,
+        rgba(255, 255, 255, 0.55) 62%,
+        rgba(255, 255, 255, 0.04) 90%,
         transparent 100%
     );
-    animation: topShimmer 6s ease-in-out infinite;
+    pointer-events: none;
 }
 
-@keyframes topShimmer {
-    0%, 100% { opacity: 0.5; }
-    25%       { opacity: 1.0; }
-    75%       { opacity: 0.3; }
+/* Corner glass catch (refraction at top-left) */
+.login-card::after {
+    content: '';
+    position: absolute;
+    top: -90px;
+    left: -70px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(159, 255, 34, 0.10) 0%,
+        rgba(255, 255, 255, 0.04) 45%,
+        transparent 70%
+    );
+    pointer-events: none;
 }
 
-/* card content must sit above the pseudo sheen */
-.card-content {
-    position: relative;
-    z-index: 2;
+/* ---- Section blocks ---- */
+.card-header,
+.card-copy,
+.card-actions,
+.card-footer {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 0;
 }
 
-/* ---------- Google Button ---------- */
+/* ============================================
+   GOOGLE BUTTON  All States
+   ============================================ */
 .btn-google {
     width: 100%;
-    background: #9ACD32;
-    color: #050505;
+    background: #a3e635;    /* lime-400  AAA contrast with #000 */
+    color: #000000;
     font-weight: 700;
     font-family: 'JetBrains Mono', monospace;
-    padding: 0.85rem 1.5rem;
-    border-radius: 8px;
+    font-size: 0.875rem;
+    letter-spacing: 0.02em;
+    padding: 0.9rem 1.5rem;
+    border-radius: var(--radius-button);
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    font-size: 0.875rem;
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    gap: 0.65rem;
+    transition: background 200ms ease, transform 150ms ease, box-shadow 200ms ease, opacity 200ms ease;
 }
 
-.btn-google:hover {
-    background: #C5E100;
-    transform: scale(1.025);
-    box-shadow: 0 0 28px rgba(154, 205, 50, 0.55);
+/* Hover */
+.btn-google:hover:not(:disabled) {
+    background: #b8f048;
+    transform: scale(1.02);
+    box-shadow: 0 0 24px rgba(159, 255, 34, 0.40);
 }
 
-.btn-google:active { transform: scale(0.98); }
+/* Active / click */
+.btn-google:active:not(:disabled) {
+    transform: scale(0.98);
+    box-shadow: none;
+}
 
-/* ---------- Fixed watermark / version ---------- */
+/* Loading */
+.btn-google:disabled,
+.btn-google.is-loading {
+    opacity: 0.70;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Spinner animation */
+.spinner {
+    width: 18px;
+    height: 18px;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* Trust badge */
+.trust-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: 0.65rem;
+}
+
+/* Divider */
+.card-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.04);
+    margin: 0;
+}
+
+/* ============================================
+   WATERMARK + VERSION
+   ============================================ */
 .watermark {
     position: fixed;
     bottom: 1.25rem;
@@ -253,18 +262,18 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 8px;
     font-weight: 700;
-    color: #9ACD32;
+    color: #9FFF22;
     letter-spacing: 0.15em;
     text-transform: uppercase;
     margin-bottom: 3px;
-    opacity: 0.8;
+    opacity: 0.75;
 }
 
 .watermark-logo {
     height: 22px;
     width: auto;
     object-fit: contain;
-    opacity: 0.85;
+    opacity: 0.80;
 }
 
 .version-tag {
@@ -275,6 +284,6 @@
     z-index: 20;
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.6rem;
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.25);
     letter-spacing: 0.18em;
 }

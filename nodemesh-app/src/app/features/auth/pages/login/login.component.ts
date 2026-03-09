@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../../core/services/auth.service';
 
@@ -9,10 +9,19 @@ import { AuthService } from '../../../../core/services/auth.service';
     templateUrl: './login.component.html',
     styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
     isLoading = false;
 
     constructor(private readonly authService: AuthService) { }
+
+    /**
+     * Initialize GIS SDK as soon as the component loads and the
+     * <script src="...gsi/client"> has had a chance to run.
+     */
+    ngOnInit(): void {
+        // Brief delay to ensure the async GIS script has executed
+        setTimeout(() => this.authService.initializeGis(), 300);
+    }
 
     async onGoogleLogin() {
         if (this.isLoading) return;
@@ -20,6 +29,7 @@ export class LoginComponent {
         try {
             await this.authService.loginWithGoogle();
             console.log('Bóveda inicializada y usuario logueado exitosamente.');
+            // TODO: redirect to dashboard
         } catch (error) {
             console.error('Error durante el login con Google:', error);
         } finally {

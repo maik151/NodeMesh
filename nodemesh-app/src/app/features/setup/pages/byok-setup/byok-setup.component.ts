@@ -15,8 +15,12 @@ import { Router } from '@angular/router';
 })
 export class ByokSetupComponent {
     apiKey: string = '';
-    isLoading: boolean = false;
-    isSuccess: boolean = false;
+    isTestLoading: boolean = false;
+    apiTestedSuccessfully: boolean = false;
+
+    isSaveLoading: boolean = false;
+    isSaveSuccess: boolean = false;
+
     errorMessage: string = '';
 
     constructor(
@@ -27,51 +31,72 @@ export class ByokSetupComponent {
         private router: Router
     ) { }
 
-    async onSaveKey() {
+    async onTestKey() {
         if (!this.apiKey.trim()) return;
 
-        this.isLoading = true;
+        this.isTestLoading = true;
         this.errorMessage = '';
+        this.apiTestedSuccessfully = false;
         this.cdr.detectChanges();
 
         try {
-            // 1. Probar la API Key de Gemini con una petición de consulta de modelos (ligera)
             const isValid = await this.testGeminiKey(this.apiKey);
 
             if (!isValid) {
                 throw new Error('La API Key proporcionada no es válida o está revocada.');
             }
 
-            // 2. Obtener sesión actual para derivar la llave AES-GCM local
+            this.apiTestedSuccessfully = true;
+        } catch (error: any) {
+            console.error('[ByokSetup] Error al testear API Key:', error);
+            this.errorMessage = error.message || 'Ocurrió un error al verificar la llave.';
+        } finally {
+            this.isTestLoading = false;
+            this.cdr.detectChanges();
+        }
+    }
+
+    async onSaveKey() {
+        if (!this.apiTestedSuccessfully || !this.apiKey.trim()) return;
+
+        this.isSaveLoading = true;
+        this.errorMessage = '';
+        this.cdr.detectChanges();
+
+        try {
+            // 1. Obtener sesión actual para derivar la llave AES-GCM local
             const currentUser = this.authService.getCurrentUser();
             if (!currentUser) {
                 throw new Error('Sesión de usuario no encontrada. Vuelve a iniciar sesión.');
             }
 
-            // 3. Cifrar
+            // 2. Cifrar
             const rootKey = await this.cryptoService.deriveKeyFromUid(currentUser.uid);
             const encryptedKey = await this.cryptoService.encrypt(this.apiKey, rootKey);
 
-            // 4. Guardar en IndexedDB
+            // 3. Guardar en IndexedDB
             await this.dbService.saveApiKey('gemini', encryptedKey);
 
-            // 5. Mostrar Éxito
-            this.isSuccess = true;
-            this.isLoading = false;
+            // 4. Mostrar Éxito
+            this.isSaveSuccess = true;
+            this.isSaveLoading = false;
             this.cdr.detectChanges();
 
             // Redirigir al dashboard/simulador después de un pequeño delay visual
             setTimeout(() => {
-                // En un paso futuro esto será this.router.navigate(['/simulador'])
-                console.log('Setup completado. Redirigiendo...');
+                this.router.navigate(['/simulador']);
             }, 1500);
 
         } catch (error: any) {
-            console.error('[ByokSetup] Error al configurar API Key:', error);
-            this.errorMessage = error.message || 'Ocurrió un error al verificar la llave.';
-            this.isLoading = false;
+            console.error('[ByokSetup] Error al guardar API Key:', error);
+            this.errorMessage = error.message || 'Ocurrió un error al encriptar y guardar la llave.';
+            this.isSaveLoading = false;
             this.cdr.detectChanges();
         }
+    }
+
+    onSkipSetup() {
+        this.router.navigate(['/simulador']);
     }
 
     /**

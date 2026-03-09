@@ -56,40 +56,44 @@ describe('ByokSetupComponent (TDD - AUT-02)', () => {
         expect(component).toBeTruthy();
     });
 
-    it('debe mostrar error si testGeminiKey falla durante onSaveKey', async () => {
+    it('debe mostrar error y no activar el botón si testGeminiKey falla durante onTestKey', async () => {
         component.apiKey = 'invalid_key';
         const testSpy = vi.spyOn(component as any, 'testGeminiKey').mockResolvedValue(false);
 
-        await component.onSaveKey();
+        await component.onTestKey();
 
         expect(testSpy).toHaveBeenCalledWith('invalid_key');
         expect(component.errorMessage).toBe('La API Key proporcionada no es válida o está revocada.');
-        expect(component.isLoading).toBe(false);
-        expect(component.isSuccess).toBe(false);
-        expect(mockDbService.saveApiKey).not.toHaveBeenCalled();
+        expect(component.isTestLoading).toBe(false);
+        expect(component.apiTestedSuccessfully).toBe(false);
     });
 
-    it('debe cifrar y guardar la API Key si testGeminiKey es exitoso', async () => {
+    it('debe validar la API con onTestKey y luego permitir guardar con onSaveKey', async () => {
         vi.useFakeTimers();
 
         component.apiKey = 'valid_key_123';
         const testSpy = vi.spyOn(component as any, 'testGeminiKey').mockResolvedValue(true);
 
-        // Call without await to immediately advance the timer afterwards
-        const savePromise = component.onSaveKey();
+        // 1. Paso Test
+        await component.onTestKey();
 
-        // Resolve all microtasks (the fetch and crypto awaits)
+        expect(testSpy).toHaveBeenCalledWith('valid_key_123');
+        expect(component.apiTestedSuccessfully).toBe(true);
+        expect(component.isTestLoading).toBe(false);
+        expect(component.errorMessage).toBe('');
+
+        // 2. Paso Save
+        const savePromise = component.onSaveKey();
         await Promise.resolve();
         await savePromise;
 
-        expect(testSpy).toHaveBeenCalledWith('valid_key_123');
         expect(mockAuthService.getCurrentUser).toHaveBeenCalled();
         expect(mockCryptoService.deriveKeyFromUid).toHaveBeenCalledWith('mock_uid_123');
         expect(mockCryptoService.encrypt).toHaveBeenCalledWith('valid_key_123', expect.anything());
         expect(mockDbService.saveApiKey).toHaveBeenCalledWith('gemini', 'encrypted_mock_key');
-        expect(component.isSuccess).toBe(true);
-        expect(component.isLoading).toBe(false);
-        expect(component.errorMessage).toBe('');
+
+        expect(component.isSaveSuccess).toBe(true);
+        expect(component.isSaveLoading).toBe(false);
 
         vi.runAllTimers();
         vi.useRealTimers();

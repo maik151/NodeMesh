@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 
 import { UserProfile } from '../../data/models/interfaces/user-profile.interface';
+import { DatabaseService } from './database.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
 
-    constructor() { }
+    constructor(private readonly dbService: DatabaseService) { }
 
     /**
      * Generates a unique secure database ID based on the user's UID using SHA-256.
@@ -42,10 +43,15 @@ export class AuthService {
         await new Promise(resolve => setTimeout(resolve, 500));
 
         // Return a mock user that satisfies the test expectations
-        return {
+        const user = {
             uid: 'google_oauth_mock_uid_12345',
             email: 'user@example.com',
             displayName: 'Mock Google User',
         };
+
+        const vaultKey = await this.deriveStorageKey(user.uid);
+        this.dbService.initializeVault(vaultKey);
+
+        return user;
     }
 }

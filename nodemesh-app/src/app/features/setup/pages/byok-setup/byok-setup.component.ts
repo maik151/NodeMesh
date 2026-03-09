@@ -76,12 +76,12 @@ export class ByokSetupComponent {
 
     /**
      * Realiza un fetch a la API nativa de Gemini para comprobar que la key es válida.
-     * Hacemos un prompt mínimo (Explain AI in a few words) a gemini-flash-latest:generateContent
+     * Hacemos un prompt mínimo (Explain AI in a few words) a gemma-3-27b-it
      * para asegurar la validez real de la clave (evita 404s/403s de listado de modelos).
      */
     private async testGeminiKey(key: string): Promise<boolean> {
         try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${key}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=${key}`;
             const payload = {
                 contents: [{ parts: [{ text: "Explain how AI works in a few words" }] }]
             };

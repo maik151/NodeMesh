@@ -4,6 +4,37 @@ import { UserProfile } from '../../data/models/interfaces/user-profile.interface
 import { DatabaseService } from './database.service';
 import { environment } from '../../../environments/environment';
 
+// ---------------------------------------------------------------------------
+// Local type declarations for Google Identity Services SDK.
+// These mirror @types/google.accounts so the build works even if the tsconfig
+// `types` array changes. We keep them minimal and scoped to what we need.
+// ---------------------------------------------------------------------------
+interface GisCredentialResponse {
+    credential: string;
+}
+
+interface GisNotificationReason {
+    getMomentType(): string;
+}
+
+interface GisAccountsId {
+    initialize(params: {
+        client_id: string;
+        callback: (response: GisCredentialResponse) => void;
+        error_callback?: (reason: GisNotificationReason) => void;
+    }): void;
+    prompt(): void;
+    cancel(): void;
+}
+
+interface GisWindow {
+    google?: {
+        accounts?: {
+            id?: GisAccountsId;
+        };
+    };
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -13,10 +44,7 @@ export class AuthService {
 
     /**
      * Generates a unique secure database ID based on the user's UID using SHA-256.
-     * This ensures user data isolation (Local-First) without exposing the real UID.
-     *
-     * @param uid The user's unique identifier (e.g., from Google OAuth)
-     * @returns A promise that resolves to the derived storage key for the user's vault
+     * Guarantees Local-First data isolation without exposing the real UID.
      */
     async deriveStorageKey(uid: string): Promise<string> {
         const encoder = new TextEncoder();
@@ -30,12 +58,8 @@ export class AuthService {
     }
 
     /**
-     * Decodes the payload section of a JWT without verifying the signature.
-     * Used to extract user info from the Google ID token (credential).
-     * NOTE: Full verification must be done server-side in production.
-     *
-     * @param token The raw JWT string returned by Google Identity Services
-     * @returns The decoded payload object
+     * Decodes the payload section of a Google JWT without verifying the signature.
+     * Full server-side verification is required in production.
      */
     private decodeJwtPayload(token: string): { sub: string; email: string; name: string; picture?: string } {
         const base64Url = token.split('.')[1];
@@ -50,28 +74,30 @@ export class AuthService {
     }
 
     /**
-     * Authenticates the user via Google Identity Services (One Tap / GIS).
+     * Authenticates the user via Google Identity Services (One Tap).
      * On success:
-     *   1. Decodes the Google JWT to extract `sub` (uid), email, and name.
+     *   1. Decodes the Google JWT to extract `sub` (uid), email and name.
      *   2. Derives a secure vault key from the uid using SHA-256.
      *   3. Initializes the user's private IndexedDB vault via DatabaseService.
-     *
-     * @returns A promise that resolves to the authenticated UserProfile
      */
     async loginWithGoogle(): Promise<UserProfile> {
         return new Promise((resolve, reject) => {
-            // Safety check: GIS SDK must be loaded
-            if (!window.google?.accounts?.id) {
-                reject(new Error('[AuthService] Google Identity Services SDK no está disponible. Verifica que el script de GIS esté cargado en index.html.'));
+            // Use our typed window interface to avoid TS2339 errors
+            const gisWindow = window as unknown as GisWindow;
+            const gisId = gisWindow.google?.accounts?.id;
+
+            if (!gisId) {
+                reject(new Error(
+                    '[AuthService] Google Identity Services SDK no está disponible. ' +
+                    'Verifica que el script de GIS esté cargado en index.html.'
+                ));
                 return;
             }
 
-            // Initialize GIS with our Client ID from the environment
-            window.google.accounts.id.initialize({
+            gisId.initialize({
                 client_id: environment.googleClientId,
-                callback: async (response: google.accounts.id.CredentialResponse) => {
+                callback: async (response: GisCredentialResponse) => {
                     try {
-                        // Decode the JWT to get user info
                         const payload = this.decodeJwtPayload(response.credential);
 
                         const user: UserProfile = {
@@ -80,7 +106,6 @@ export class AuthService {
                             displayName: payload.name,
                         };
 
-                        // Derive vault key + initialize IndexedDB vault
                         const vaultKey = await this.deriveStorageKey(user.uid);
                         this.dbService.initializeVault(vaultKey);
 
@@ -89,13 +114,13 @@ export class AuthService {
                         reject(err);
                     }
                 },
-                error_callback: (error: google.accounts.id.NotificationReason | undefined) => {
-                    reject(new Error(`[AuthService] Google Sign-In falló: ${error ?? 'unknown'}`));
+                error_callback: (reason: GisNotificationReason) => {
+                    reject(new Error(`[AuthService] Google Sign-In falló: ${reason?.getMomentType() ?? 'unknown'}`));
                 }
             });
 
-            // Trigger the One Tap popup
-            window.google.accounts.id.prompt();
+            // Trigger Google One Tap popup
+            gisId.prompt();
         });
     }
 }

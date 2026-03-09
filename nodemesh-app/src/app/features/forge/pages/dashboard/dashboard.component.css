@@ -26,12 +26,12 @@
 }
 
 .dashboard-bg {
-    background: var(--color-void);
+    background: var(--theme-bg);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     font-family: 'Inter', sans-serif;
-    color: #f1f1f1;
+    color: var(--theme-text);
 }
 
 /* ============ TOP BAR ============ */
@@ -40,9 +40,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 1.5rem;
-    background: rgba(18, 18, 18, 0.7);
+    background: var(--theme-surface);
     backdrop-filter: blur(8px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--theme-border);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -237,9 +237,9 @@
 }
 
 .node-card {
-    background: rgba(18, 18, 18, 0.6);
+    background: var(--theme-surface);
     backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--theme-border);
     border-radius: var(--radius-card);
     padding: 1.25rem;
     display: flex;

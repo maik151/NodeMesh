@@ -33,7 +33,7 @@
    PAGE BACKGROUND
    ============================================ */
 .login-bg {
-    background: var(--color-void);
+    background: var(--theme-bg);
     min-height: 100vh;
     display: flex;
     flex-direction: column;

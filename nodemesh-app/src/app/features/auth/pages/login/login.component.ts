@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../../core/services/auth.service';
 
@@ -13,7 +13,10 @@ export class LoginComponent implements OnInit {
     isLoading = false;
     loginSuccess = false;
 
-    constructor(private readonly authService: AuthService) { }
+    constructor(
+        private readonly authService: AuthService,
+        private readonly cdr: ChangeDetectorRef
+    ) { }
 
     /**
      * Initialize GIS SDK as soon as the component loads and the
@@ -27,15 +30,20 @@ export class LoginComponent implements OnInit {
     async onGoogleLogin() {
         if (this.isLoading || this.loginSuccess) return;
         this.isLoading = true;
+        this.cdr.detectChanges(); // Trigger show spinner
+
         try {
             await this.authService.loginWithGoogle();
             console.log('Bóveda inicializada y usuario logueado exitosamente.');
             this.loginSuccess = true;
+            this.cdr.detectChanges(); // Trigger success state immediately
+
             // TODO: redirect to dashboard
         } catch (error) {
             console.error('Error durante el login con Google:', error);
         } finally {
             this.isLoading = false;
+            this.cdr.detectChanges(); // Stop spinner if error occurred
         }
     }
 }

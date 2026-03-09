@@ -42,7 +42,13 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
@@ -59,7 +65,11 @@
               "buildTarget": "nodemesh-app:build:production"
             },
             "development": {
-              "buildTarget": "nodemesh-app:build:development"
+              "buildTarget": "nodemesh-app:build:development",
+              "port": 5173,
+              "headers": {
+                "Cross-Origin-Opener-Policy": "same-origin-allow-popups"
+              }
             }
           },
           "defaultConfiguration": "development"

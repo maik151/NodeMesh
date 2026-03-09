@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { DatabaseService } from '../../../../core/services/database.service';
 import { ThemeService } from '../../../../core/services/theme.service';
+import { NodeMeshBgComponent } from '../../../../shared/components/node-mesh-bg/node-mesh-bg.component';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, NodeMeshBgComponent],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css'
 })

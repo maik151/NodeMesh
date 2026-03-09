@@ -40,50 +40,7 @@
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* ---------- DARK MODE: ambient neon glow ---------- */
-.login-bg::before {
-    content: '';
-    position: absolute;
-    bottom: -80px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 120vw;
-    height: 65vh;
-    border-radius: 50%;
-    background: radial-gradient(ellipse at center bottom,
-            var(--theme-glow-color-1) 0%,
-            var(--theme-glow-color-2) 18%,
-            var(--theme-glow-color-3) 45%,
-            transparent 70%);
-    filter: blur(65px);
-    opacity: var(--theme-glow-opacity);
-    animation: bgBreath 5s ease-in-out infinite;
-    pointer-events: none;
-    z-index: 0;
-    transition: opacity 0.5s ease;
-}
-
-.login-bg::after {
-    content: '';
-    position: absolute;
-    bottom: -140px;
-    left: 62%;
-    transform: translateX(-50%);
-    width: 75vw;
-    height: 55vh;
-    border-radius: 50%;
-    background: radial-gradient(ellipse at center,
-            var(--theme-glow-color-1) 0%,
-            var(--theme-glow-color-2) 38%,
-            transparent 68%);
-    filter: blur(80px);
-    opacity: var(--theme-glow-opacity);
-    animation: bgBreath 7s ease-in-out infinite 2s;
-    pointer-events: none;
-    z-index: 0;
-    transition: opacity 0.5s ease;
-}
-
+/* Background animation handled by NodeMeshBgComponent canvas */
 @keyframes bgBreath {
     0% {
         opacity: 0.65;

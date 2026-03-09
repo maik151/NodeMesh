@@ -12,8 +12,9 @@
                 <label for="apiKey">Proveedor: Google Gemini</label>
                 <div class="input-wrapper">
                     <span class="material-symbols-rounded input-icon">key</span>
-                    <input type="password" id="apiKey" name="apiKey" [(ngModel)]="apiKey" placeholder="AIzaSyA..."
-                        [disabled]="isLoading || isSuccess" required spellcheck="false" autocomplete="off" />
+                    <input type="password" id="apiKey" name="apiKey" [(ngModel)]="apiKey" placeholder="AIzaSy..."
+                        [disabled]="isTestLoading || isSaveLoading || apiTestedSuccessfully" required spellcheck="false"
+                        autocomplete="off" />
                 </div>
             </div>
 
@@ -22,16 +23,46 @@
                 {{ errorMessage }}
             </div>
 
-            <button type="submit" class="btn-primary" [disabled]="!apiKey || isLoading || isSuccess"
-                [class.is-loading]="isLoading" [class.is-success]="isSuccess">
+            <div class="actions-group">
+                <!-- Test API Button -->
+                <button type="button" class="btn-test" [class.is-success]="apiTestedSuccessfully"
+                    [disabled]="!apiKey || isTestLoading || apiTestedSuccessfully || isSaveLoading"
+                    (click)="onTestKey()">
+                    <ng-container *ngIf="!isTestLoading && !apiTestedSuccessfully">
+                        <span class="material-symbols-rounded">satellite_alt</span>
+                        Probar Conexión
+                    </ng-container>
+                    <ng-container *ngIf="isTestLoading">
+                        <div class="spinner"></div>
+                        Haciendo ping...
+                    </ng-container>
+                    <ng-container *ngIf="apiTestedSuccessfully">
+                        <span class="material-symbols-rounded">check_circle</span>
+                        Conexión Exitosa
+                    </ng-container>
+                </button>
 
-                <span class="btn-text" *ngIf="!isLoading && !isSuccess">Conectar Bóveda</span>
-                <span class="btn-text" *ngIf="isLoading">Verificando...</span>
-                <span class="btn-text" *ngIf="isSuccess">Bóveda Cifrada</span>
+                <!-- Save/Encrypt Button -->
+                <button type="submit" class="btn-primary" [class.is-success]="isSaveSuccess"
+                    [disabled]="!apiTestedSuccessfully || isSaveLoading || isSaveSuccess">
+                    <ng-container *ngIf="!isSaveLoading && !isSaveSuccess">
+                        <span class="material-symbols-rounded">lock</span>
+                        Cifrar y Guardar Bóveda
+                    </ng-container>
+                    <ng-container *ngIf="isSaveLoading">
+                        <div class="spinner"></div>
+                        Asegurando...
+                    </ng-container>
+                    <ng-container *ngIf="isSaveSuccess">
+                        <span class="material-symbols-rounded">verified_user</span>
+                        Bóveda Segura
+                    </ng-container>
+                </button>
 
-                <span class="material-symbols-rounded btn-icon" *ngIf="isSuccess">check_circle</span>
-                <div class="spinner" *ngIf="isLoading"></div>
-            </button>
+                <button type="button" class="btn-skip" (click)="onSkipSetup()">
+                    Omitir por ahora
+                </button>
+            </div>
         </form>
     </div>
 

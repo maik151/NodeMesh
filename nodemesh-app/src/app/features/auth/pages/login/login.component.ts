@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { DatabaseService } from '../../../../core/services/database.service';
+import { ThemeService } from '../../../../core/services/theme.service';
 
 @Component({
     selector: 'app-login',
@@ -18,9 +19,18 @@ export class LoginComponent implements OnInit {
     constructor(
         private readonly authService: AuthService,
         private readonly dbService: DatabaseService,
+        public readonly themeService: ThemeService,
         private readonly cdr: ChangeDetectorRef,
         private readonly router: Router
     ) { }
+
+    get logoSrc(): string {
+        return this.themeService.isDark ? '/Images/nodeMesh_white.png' : '/Images/nodemesh_dark.png';
+    }
+
+    get maikLogoSrc(): string {
+        return this.themeService.isDark ? '/Images/maikdev.png' : '/Images/maikdev_black.png';
+    }
 
     ngOnInit(): void {
         setTimeout(() => this.authService.initializeGis(), 300);

@@ -15,7 +15,7 @@ export const routes: Routes = [
     },
     {
         path: 'simulador',
-        canActivate: [authGuard, byokGuard],
+        canActivate: [authGuard],
         loadComponent: () => import('./features/forge/pages/dashboard/dashboard.component').then(m => m.DashboardComponent)
     },
     { path: '', redirectTo: 'login', pathMatch: 'full' }

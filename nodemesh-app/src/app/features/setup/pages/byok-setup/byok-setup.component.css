@@ -379,3 +379,87 @@
         transform: translateY(0);
     }
 }
+
+/* ============ INLINE SVG ICONS ============ */
+.btn-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.icon-success {
+    color: var(--color-brand-neon);
+    animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    70% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ============ PING RADAR ANIMATION ============ */
+.ping-radar {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+.ping-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    transform: translate(-50%, -50%);
+    background: var(--color-brand-neon);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--color-brand-neon);
+}
+
+.ping-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 22px;
+    height: 22px;
+    transform: translate(-50%, -50%);
+    border: 2px solid var(--color-brand-neon);
+    border-radius: 50%;
+    opacity: 0;
+    animation: pingPulse 1.4s ease-out infinite;
+}
+
+.ping-ring-2 {
+    animation-delay: 0.7s;
+}
+
+@keyframes pingPulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.3);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0;
+    }
+}
+
+/* ============ LOADING STATE FOR TEST BUTTON ============ */
+.btn-test.is-loading {
+    background: rgba(159, 255, 34, 0.05);
+    border-color: rgba(159, 255, 34, 0.2);
+    color: var(--color-brand-neon);
+}

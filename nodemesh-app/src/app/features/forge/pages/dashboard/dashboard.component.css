@@ -10,18 +10,20 @@
     --color-slate: #121212;
     --color-text-muted: rgba(255, 255, 255, 0.4);
     --radius-card: 12px;
-    animation: pageEnter 0.4s ease-out;
+    animation: pageEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes pageEnter {
     from {
         opacity: 0;
-        transform: translateY(12px);
+        transform: translateY(20px) scale(0.98);
+        filter: blur(4px);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
+        filter: blur(0);
     }
 }
 
@@ -120,7 +122,7 @@
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: #fff;
+    color: var(--theme-text);
     margin: 0;
 }
 
@@ -157,7 +159,7 @@
     justify-content: center;
     gap: 1rem;
     padding: 4rem 2rem;
-    color: var(--color-text-muted);
+    color: var(--theme-text-muted);
     font-size: 0.875rem;
 }
 
@@ -195,12 +197,12 @@
     font-size: 1.25rem;
     font-weight: 600;
     margin: 0;
-    color: #fff;
+    color: var(--theme-text);
 }
 
 .state-empty p {
     font-size: 0.875rem;
-    color: var(--color-text-muted);
+    color: var(--theme-text-muted);
     max-width: 420px;
     line-height: 1.5;
     margin: 0;
@@ -265,7 +267,7 @@
 
 .node-question {
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--theme-text);
     line-height: 1.5;
     margin: 0;
     display: -webkit-box;

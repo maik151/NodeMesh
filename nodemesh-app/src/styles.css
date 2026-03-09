@@ -36,24 +36,24 @@
 }
 
 [data-theme="light"] {
-    --theme-bg: #2a2a2e;
-    --theme-surface: rgba(60, 60, 65, 0.55);
-    --theme-surface-solid: #3a3a3f;
-    --theme-border: rgba(255, 255, 255, 0.08);
-    --theme-text: #e8e8e8;
-    --theme-text-secondary: #b0b0b0;
-    --theme-text-muted: rgba(255, 255, 255, 0.35);
-    --theme-input-bg: rgba(0, 0, 0, 0.15);
-    --theme-brand-neon: #b8d977;
-    --theme-brand-neon-alt: #a3c462;
+    --theme-bg: #f0f0f3;
+    --theme-surface: rgba(255, 255, 255, 0.55);
+    --theme-surface-solid: #ffffff;
+    --theme-border: rgba(0, 0, 0, 0.08);
+    --theme-text: #1a1a1a;
+    --theme-text-secondary: #555555;
+    --theme-text-muted: rgba(0, 0, 0, 0.4);
+    --theme-input-bg: rgba(0, 0, 0, 0.05);
+    --theme-brand-neon: #5a9e00;
+    --theme-brand-neon-alt: #4a8a00;
     --theme-brand-accent: #FF8C42;
     --theme-brand-accent-alt: #FF6B1A;
-    --theme-glow-color-1: rgba(184, 217, 119, 0.65);
-    --theme-glow-color-2: rgba(163, 196, 98, 0.35);
-    --theme-glow-color-3: rgba(80, 120, 50, 0.18);
-    --theme-glow-opacity: 0.6;
+    --theme-glow-color-1: rgba(90, 158, 0, 0.40);
+    --theme-glow-color-2: rgba(74, 138, 0, 0.20);
+    --theme-glow-color-3: rgba(50, 100, 30, 0.10);
+    --theme-glow-opacity: 0.4;
     --theme-logo: url('/Images/nodemesh_dark.png');
-    color-scheme: dark;
+    color-scheme: light;
 }
 
 /* Configuración global para el Look & Feel */

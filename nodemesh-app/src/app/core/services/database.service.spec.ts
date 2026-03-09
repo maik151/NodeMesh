@@ -50,4 +50,68 @@ describe('DatabaseService (TDD - AUT-01) - RED phase', () => {
         const result = await service.getApiKey('unknown_provider');
         expect(result).toBeNull();
     });
+
+    // --- F3: Persistencia de Nodos ---
+    it('debe guardar nodos y recuperarlos correctamente', async () => {
+        service.initializeVault('nodemesh_vault_test_nodes');
+        const nodes = [
+            {
+                type: 'definicion_inversa' as const,
+                question: 'Pregunta test 1',
+                expectedAnswer: 'Respuesta test 1',
+                difficulty: 'aprendiz' as const,
+                sourceId: 'src_001',
+                sourceName: 'Tema de Prueba',
+                createdAt: new Date(),
+                nextReviewDate: new Date()
+            },
+            {
+                type: 'caso_de_estudio' as const,
+                question: 'Pregunta test 2',
+                expectedAnswer: 'Respuesta test 2',
+                difficulty: 'intermedio' as const,
+                sourceId: 'src_001',
+                sourceName: 'Tema de Prueba',
+                createdAt: new Date(),
+                nextReviewDate: new Date()
+            }
+        ];
+
+        await service.saveNodes(nodes);
+        const result = await service.getNodes();
+        expect(result.length).toBe(2);
+        expect(result[0].question).toBe('Pregunta test 1');
+        expect(result[1].type).toBe('caso_de_estudio');
+    });
+
+    it('debe filtrar nodos por sourceId', async () => {
+        service.initializeVault('nodemesh_vault_test_filter');
+        const nodes = [
+            {
+                type: 'pregunta_socratica' as const,
+                question: 'Q from source A',
+                expectedAnswer: 'A',
+                difficulty: 'avanzado' as const,
+                sourceId: 'src_A',
+                sourceName: 'Source A',
+                createdAt: new Date(),
+                nextReviewDate: new Date()
+            },
+            {
+                type: 'analogia_forzada' as const,
+                question: 'Q from source B',
+                expectedAnswer: 'B',
+                difficulty: 'senior' as const,
+                sourceId: 'src_B',
+                sourceName: 'Source B',
+                createdAt: new Date(),
+                nextReviewDate: new Date()
+            }
+        ];
+
+        await service.saveNodes(nodes);
+        const filtered = await service.getNodesBySource('src_A');
+        expect(filtered.length).toBe(1);
+        expect(filtered[0].question).toBe('Q from source A');
+    });
 });

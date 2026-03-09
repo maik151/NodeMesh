@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import Dexie, { Table } from 'dexie';
+import { NodeChallenge } from '../models/node.model';
 
 @Injectable({
     providedIn: 'root'
@@ -46,5 +47,20 @@ export class DatabaseService {
         if (!this.db) throw new Error('Database not initialized');
         const record = await this.db.table('api_keys').where('provider').equals(provider).first();
         return record ? record.key : null;
+    }
+
+    async saveNodes(nodes: Omit<NodeChallenge, 'id'>[]): Promise<void> {
+        if (!this.db) throw new Error('Database not initialized');
+        await this.db.table('nodes').bulkAdd(nodes);
+    }
+
+    async getNodes(): Promise<NodeChallenge[]> {
+        if (!this.db) throw new Error('Database not initialized');
+        return await this.db.table('nodes').toArray();
+    }
+
+    async getNodesBySource(sourceId: string): Promise<NodeChallenge[]> {
+        if (!this.db) throw new Error('Database not initialized');
+        return await this.db.table('nodes').where('sourceId').equals(sourceId).toArray();
     }
 }

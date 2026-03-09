@@ -65,7 +65,11 @@
               "buildTarget": "nodemesh-app:build:production"
             },
             "development": {
-              "buildTarget": "nodemesh-app:build:development"
+              "buildTarget": "nodemesh-app:build:development",
+              "port": 5173,
+              "headers": {
+                "Cross-Origin-Opener-Policy": "same-origin-allow-popups"
+              }
             }
           },
           "defaultConfiguration": "development"

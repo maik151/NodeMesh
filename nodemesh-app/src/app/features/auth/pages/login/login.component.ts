@@ -11,6 +11,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 })
 export class LoginComponent implements OnInit {
     isLoading = false;
+    loginSuccess = false;
 
     constructor(private readonly authService: AuthService) { }
 
@@ -24,11 +25,12 @@ export class LoginComponent implements OnInit {
     }
 
     async onGoogleLogin() {
-        if (this.isLoading) return;
+        if (this.isLoading || this.loginSuccess) return;
         this.isLoading = true;
         try {
             await this.authService.loginWithGoogle();
             console.log('Bóveda inicializada y usuario logueado exitosamente.');
+            this.loginSuccess = true;
             // TODO: redirect to dashboard
         } catch (error) {
             console.error('Error durante el login con Google:', error);

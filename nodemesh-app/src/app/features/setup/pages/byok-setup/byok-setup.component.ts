@@ -76,15 +76,22 @@ export class ByokSetupComponent {
 
     /**
      * Realiza un fetch a la API nativa de Gemini para comprobar que la key es válida.
-     * Usamos una conexión ligera de información de un modelo específico.
-     * Esto evita errores 403 globales de lista de modelos o errores 400 de payload mal armado.
+     * Hacemos un prompt mínimo (Explain AI in a few words) a gemini-flash-latest:generateContent
+     * para asegurar la validez real de la clave (evita 404s/403s de listado de modelos).
      */
     private async testGeminiKey(key: string): Promise<boolean> {
         try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash?key=${key}`;
-            const response = await fetch(url);
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${key}`;
+            const payload = {
+                contents: [{ parts: [{ text: "Explain how AI works in a few words" }] }]
+            };
 
-            // Si el status es 400, 401 o 403, sabemos que la API Key falló
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
             if (!response.ok) {
                 console.warn('[ByokSetup] Validación de llave fallida con status:', response.status);
                 return false;

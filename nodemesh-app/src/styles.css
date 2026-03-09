@@ -45,10 +45,10 @@
     --theme-text-secondary: #555555;
     --theme-text-muted: rgba(0, 0, 0, 0.35);
     --theme-input-bg: rgba(0, 0, 0, 0.05);
-    --theme-brand-neon: #9FFF22;
-    --theme-brand-neon-alt: #C5E100;
-    --theme-brand-accent: #9FFF22;
-    --theme-brand-accent-alt: #C5E100;
+    --theme-brand-neon: #7acc00;
+    --theme-brand-neon-alt: #6bb800;
+    --theme-brand-accent: #7acc00;
+    --theme-brand-accent-alt: #6bb800;
     --theme-brand-btn-text: #000000;
     --theme-glow-color-1: transparent;
     --theme-glow-color-2: transparent;

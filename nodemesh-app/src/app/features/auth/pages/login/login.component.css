@@ -65,13 +65,17 @@
     max-width: 93vw;
     border-radius: 16px;
 
-    /* Liquid Glass — transparent in both modes */
-    background: var(--theme-surface);
+    /* Liquid Glass */
+    background: linear-gradient(135deg,
+            var(--glass-start, rgba(255, 255, 255, 0.08)) 0%,
+            var(--glass-end, rgba(255, 255, 255, 0.03)) 100%);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
 
-    border: 1px solid var(--theme-border);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
+    box-shadow:
+        0 4px 24px var(--glass-shadow, rgba(0, 0, 0, 0.15)),
+        inset 0 1px 0 var(--glass-inner, rgba(255, 255, 255, 0.06));
 
     display: flex;
     flex-direction: column;
@@ -79,7 +83,20 @@
     gap: 40px;
     padding: 2.5rem 2.25rem 2rem;
     overflow: hidden;
-    transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Light mode glass overrides — tinted frost */
+:host-context([data-theme="light"]) .login-card {
+    --glass-start: rgba(255, 255, 255, 0.50);
+    --glass-end: rgba(255, 255, 255, 0.25);
+    --glass-border: rgba(255, 255, 255, 0.65);
+    --glass-inner: rgba(255, 255, 255, 0.80);
+    --glass-shadow: rgba(0, 0, 0, 0.06);
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.06),
+        0 0 0 1px rgba(255, 255, 255, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.80);
 }
 
 /* Glass sheen — top highlight */

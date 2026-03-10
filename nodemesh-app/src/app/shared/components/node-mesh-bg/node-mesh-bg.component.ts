@@ -16,8 +16,8 @@ export class NodeMeshBgComponent implements AfterViewInit, OnDestroy {
     private ctx!: CanvasRenderingContext2D;
     private animId = 0;
     private nodes: Node[] = [];
-    private readonly NODE_COUNT = 60;
-    private readonly CONNECT_DIST = 150;
+    private readonly NODE_COUNT = 80;
+    private readonly CONNECT_DIST = 180;
 
     constructor(private zone: NgZone, public themeService: ThemeService) { }
 
@@ -85,16 +85,14 @@ export class NodeMeshBgComponent implements AfterViewInit, OnDestroy {
             // Draw dot
             ctx.beginPath();
             ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-            ctx.fillStyle = nodeColor + '0.8)';
+            ctx.fillStyle = nodeColor + '0.9)';
             ctx.fill();
 
-            // Glow (only dark mode for perf)
-            if (isDark) {
-                ctx.beginPath();
-                ctx.arc(n.x, n.y, n.r + 2, 0, Math.PI * 2);
-                ctx.fillStyle = nodeColor + '0.15)';
-                ctx.fill();
-            }
+            // Glow
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.r + 3, 0, Math.PI * 2);
+            ctx.fillStyle = nodeColor + (isDark ? '0.15)' : '0.10)');
+            ctx.fill();
         }
 
         // Draw connecting lines
@@ -110,7 +108,7 @@ export class NodeMeshBgComponent implements AfterViewInit, OnDestroy {
                     ctx.moveTo(this.nodes[i].x, this.nodes[i].y);
                     ctx.lineTo(this.nodes[j].x, this.nodes[j].y);
                     ctx.strokeStyle = lineColor + opacity + ')';
-                    ctx.lineWidth = 0.8;
+                    ctx.lineWidth = isDark ? 0.8 : 1.2;
                     ctx.stroke();
                 }
             }

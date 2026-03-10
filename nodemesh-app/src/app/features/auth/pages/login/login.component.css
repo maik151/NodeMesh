@@ -86,17 +86,17 @@
     transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
-/* Light mode glass overrides — tinted frost */
+/* Light mode glass overrides — more transparent frost */
 :host-context([data-theme="light"]) .login-card {
-    --glass-start: rgba(255, 255, 255, 0.50);
-    --glass-end: rgba(255, 255, 255, 0.25);
-    --glass-border: rgba(255, 255, 255, 0.65);
-    --glass-inner: rgba(255, 255, 255, 0.80);
-    --glass-shadow: rgba(0, 0, 0, 0.06);
+    --glass-start: rgba(255, 255, 255, 0.28);
+    --glass-end: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.45);
+    --glass-inner: rgba(255, 255, 255, 0.50);
+    --glass-shadow: rgba(0, 0, 0, 0.04);
     box-shadow:
-        0 4px 24px rgba(0, 0, 0, 0.06),
-        0 0 0 1px rgba(255, 255, 255, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.80);
+        0 4px 24px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(255, 255, 255, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.50);
 }
 
 /* Glass sheen — top highlight */

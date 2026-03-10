@@ -1,107 +1,116 @@
 <div class="byok-container">
     <app-node-mesh-bg></app-node-mesh-bg>
 
-    <app-liquid-glass class="glass-modal" [radius]="16" [depth]="5" [blur]="12" [strength]="40"
-        [chromaticAberration]="2"
-        [backgroundColor]="isLightMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(17, 20, 17, 0.85)'">
+    <app-liquid-glass [backgroundColor]="isLightMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(17, 20, 17, 0.4)'">
+        <div class="glass-modal">
 
-        <button type="button" class="btn-back" (click)="goBack()" title="Regresar al Login">
-            <span class="material-symbols-rounded">arrow_back</span>
-        </button>
+            <button type="button" class="btn-back" (click)="goBack()" title="Regresar al Login">
+                <span class="material-symbols-rounded">arrow_back</span>
+            </button>
 
-        <div class="modal-header">
-            <img [src]="logoSrc" alt="NodeMesh" class="logo-hero">
-            <span class="sub-label">Herramienta de Estudio</span>
-            <p style="margin-top: 0.5rem;">Configura tu API Key para habilitar la simulación cognitiva. Aseguraremos la
-                llave localmente mediante AES-GCM 256.</p>
-        </div>
+            <div class="modal-header">
+                <img [src]="logoSrc" alt="NodeMesh" class="logo-hero">
+                <span class="sub-label">Herramienta de Estudio</span>
+                <p style="margin-top: 0.5rem;">Configura tu API Key para habilitar la simulación cognitiva. Aseguraremos
+                    la
+                    llave localmente mediante AES-GCM 256.</p>
+            </div>
 
-        <form class="byok-form" (ngSubmit)="onSaveKey()">
-            <div class="input-group">
-                <label for="apiKey">Proveedor: Google Gemini</label>
-                <div class="input-wrapper" [class.is-focused]="isInputFocused">
-                    <div class="input-addon">
-                        <span class="material-symbols-rounded">key</span>
+            <form class="byok-form" (ngSubmit)="onSaveKey()">
+                <div class="input-group">
+                    <label for="apiKey">Proveedor: Google Gemini</label>
+                    <div class="input-wrapper" [class.is-focused]="isInputFocused">
+                        <div class="input-addon">
+                            <span class="material-symbols-rounded">key</span>
+                        </div>
+                        <input [type]="showApiKey ? 'text' : 'password'" id="apiKey" name="apiKey" [(ngModel)]="apiKey"
+                            [disabled]="isTestLoading || isSaveLoading || apiTestedSuccessfully"
+                            (focus)="isInputFocused = true" (blur)="isInputFocused = false"
+                            placeholder="AIzaSy... o sk-ant-..." required autocomplete="off" />
+                        <button type="button" class="btn-toggle-view" (click)="toggleApiKeyVisibility()" tabindex="-1">
+                            <span class="material-symbols-rounded">{{ showApiKey ? 'visibility_off' : 'visibility'
+                                }}</span>
+                        </button>
                     </div>
-                    <input [type]="showApiKey ? 'text' : 'password'" id="apiKey" name="apiKey" [(ngModel)]="apiKey"
-                        [disabled]="isTestLoading || isSaveLoading || apiTestedSuccessfully"
-                        (focus)="isInputFocused = true" (blur)="isInputFocused = false"
-                        placeholder="AIzaSy... o sk-ant-..." required autocomplete="off" />
-                    <button type="button" class="btn-toggle-view" (click)="toggleApiKeyVisibility()" tabindex="-1">
-                        <span class="material-symbols-rounded">{{ showApiKey ? 'visibility_off' : 'visibility' }}</span>
+                </div>
+
+                <div class="error-msg" *ngIf="errorMessage">
+                    <span class="material-symbols-rounded">error</span>
+                    {{ errorMessage }}
+                </div>
+
+                <div class="actions-group">
+                    <button type="button" class="btn-test" [class.is-success]="apiTestedSuccessfully"
+                        [class.is-loading]="isTestLoading"
+                        [disabled]="!apiKey || isTestLoading || apiTestedSuccessfully || isSaveLoading"
+                        (click)="onTestKey()">
+                        <ng-container *ngIf="!isTestLoading && !apiTestedSuccessfully">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M19.07 4.93A10 10 0 0 0 4.93 19.07" stroke-linecap="round" />
+                                <path d="M16.24 7.76A6 6 0 0 0 7.76 16.24" stroke-linecap="round" />
+                            </svg>
+                            Probar Conexión
+                        </ng-container>
+                        <ng-container *ngIf="isTestLoading">
+                            <div class="ping-radar">
+                                <div class="ping-dot"></div>
+                                <div class="ping-ring ping-ring-1"></div>
+                                <div class="ping-ring ping-ring-2"></div>
+                            </div>
+                            Haciendo ping...
+                        </ng-container>
+                        <ng-container *ngIf="apiTestedSuccessfully">
+                            <svg class="btn-icon icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            Conexión Exitosa
+                        </ng-container>
+                    </button>
+
+                    <button type="submit" class="btn-primary" [class.is-success]="isSaveSuccess"
+                        [disabled]="!apiTestedSuccessfully || isSaveLoading || isSaveSuccess">
+                        <ng-container *ngIf="!isSaveLoading && !isSaveSuccess">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="5" y="11" width="14" height="10" rx="2" />
+                                <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                            </svg>
+                            Cifrar y Guardar Bóveda
+                        </ng-container>
+                        <ng-container *ngIf="isSaveLoading">
+                            <div class="spinner"></div>
+                            Asegurando...
+                        </ng-container>
+                        <ng-container *ngIf="isSaveSuccess">
+                            <svg class="btn-icon icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 0-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            Bóveda Segura
+                        </ng-container>
+                    </button>
+
+                    <button type="button" class="btn-skip" (click)="onSkipSetup()">
+                        Omitir por ahora
                     </button>
                 </div>
-            </div>
-
-            <div class="error-msg" *ngIf="errorMessage">
-                <span class="material-symbols-rounded">error</span>
-                {{ errorMessage }}
-            </div>
-
-            <div class="actions-group">
-                <button type="button" class="btn-test" [class.is-success]="apiTestedSuccessfully"
-                    [class.is-loading]="isTestLoading"
-                    [disabled]="!apiKey || isTestLoading || apiTestedSuccessfully || isSaveLoading"
-                    (click)="onTestKey()">
-                    <ng-container *ngIf="!isTestLoading && !apiTestedSuccessfully">
-                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3" />
-                            <path d="M19.07 4.93A10 10 0 0 0 4.93 19.07" stroke-linecap="round" />
-                            <path d="M16.24 7.76A6 6 0 0 0 7.76 16.24" stroke-linecap="round" />
-                        </svg>
-                        Probar Conexión
-                    </ng-container>
-                    <ng-container *ngIf="isTestLoading">
-                        <div class="ping-radar">
-                            <div class="ping-dot"></div>
-                            <div class="ping-ring ping-ring-1"></div>
-                            <div class="ping-ring ping-ring-2"></div>
-                        </div>
-                        Haciendo ping...
-                    </ng-container>
-                    <ng-container *ngIf="apiTestedSuccessfully">
-                        <svg class="btn-icon icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2.5">
-                            <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        Conexión Exitosa
-                    </ng-container>
-                </button>
-
-                <button type="submit" class="btn-primary" [class.is-success]="isSaveSuccess"
-                    [disabled]="!apiTestedSuccessfully || isSaveLoading || isSaveSuccess">
-                    <ng-container *ngIf="!isSaveLoading && !isSaveSuccess">
-                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="5" y="11" width="14" height="10" rx="2" />
-                            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-                        </svg>
-                        Cifrar y Guardar Bóveda
-                    </ng-container>
-                    <ng-container *ngIf="isSaveLoading">
-                        <div class="spinner"></div>
-                        Asegurando...
-                    </ng-container>
-                    <ng-container *ngIf="isSaveSuccess">
-                        <svg class="btn-icon icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path
-                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 0-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                                stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        Bóveda Segura
-                    </ng-container>
-                </button>
-
-                <button type="button" class="btn-skip" (click)="onSkipSetup()">
-                    Omitir por ahora
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </app-liquid-glass>
 
     <!-- Watermark -->
     <div class="watermark">
         <span class="watermark-label">Desarrollado por:</span>
         <img [src]="maikLogoSrc" alt="Maik.dev" class="watermark-logo">
+    </div>
+
+    <div class="footer-info">
+        <span class="version-tag">v0.0.1</span>
+        <span class="copyright">&copy; 2026 Maik.dev. Todos los derechos reservados.</span>
     </div>
 </div>

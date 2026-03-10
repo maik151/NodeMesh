@@ -43,12 +43,13 @@
 .login-card {
     position: relative;
     z-index: 10;
-    width: 380px;
-    max-width: 93vw;
+    width: 100%;
+    max-width: 440px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 40px;
+    gap: 28px;
     padding: 2.5rem 2.25rem 2rem;
     overflow: hidden;
 }
@@ -217,9 +218,9 @@
     height: 1px;
     background: linear-gradient(90deg,
             transparent 0%,
-            var(--theme-border) 15%,
-            rgba(255, 255, 255, 0.08) 50%,
-            var(--theme-border) 85%,
+            var(--theme-border) 10%,
+            rgba(128, 128, 128, 0.4) 50%,
+            var(--theme-border) 90%,
             transparent 100%);
     margin-bottom: 25px;
     transition: background 0.4s ease;
@@ -246,8 +247,8 @@
 }
 
 .github-icon {
-    width: 22px;
-    height: 22px;
+    width: 32px;
+    height: 32px;
 }
 
 /* ============================================
@@ -284,15 +285,34 @@
     opacity: 0.80;
 }
 
-.version-tag {
+.footer-info {
     position: absolute;
-    bottom: 1.5rem;
-    right: 1.5rem;
+    bottom: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    z-index: 20;
+    text-align: center;
+}
+
+.version-tag {
     font-size: 0.70rem;
     color: var(--theme-text-muted);
     font-weight: 500;
     letter-spacing: 0.05em;
     font-family: 'Fira Code', 'JetBrains Mono', monospace;
-    z-index: 20;
+    transition: color 0.4s ease;
+}
+
+.copyright {
+    font-size: 0.65rem;
+    color: var(--theme-text-muted);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    font-family: 'Inter', 'Poppins', sans-serif;
+    opacity: 0.6;
     transition: color 0.4s ease;
 }

@@ -38,7 +38,7 @@
 
 [data-theme="light"] {
     --theme-bg: #f0f0f3;
-    --theme-surface: rgba(255, 255, 255, 0.55);
+    --theme-surface: rgba(255, 255, 255, 0.35);
     --theme-surface-solid: #ffffff;
     --theme-border: rgba(0, 0, 0, 0.08);
     --theme-text: #1a1a1a;
@@ -49,7 +49,7 @@
     --theme-brand-neon-alt: #6bb800;
     --theme-brand-accent: #7acc00;
     --theme-brand-accent-alt: #6bb800;
-    --theme-brand-btn-text: #000000;
+    --theme-brand-btn-text: #ffffff;
     --theme-glow-color-1: transparent;
     --theme-glow-color-2: transparent;
     --theme-glow-color-3: transparent;

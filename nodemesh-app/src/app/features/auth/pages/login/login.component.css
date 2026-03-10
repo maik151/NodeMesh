@@ -1,156 +1,72 @@
 ﻿/* ================================================
-   LOGIN COMPONENT — NodeMesh "The Modern Forge"
-   Fully theme-aware (dark / light)
-   Typography: Inter (titles), Fira Code (mono/accent)
+   LOGIN COMPONENT STYLE NodeMesh Design System
    ================================================ */
 
 :host {
     display: block;
-    animation: pageEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    --login-bg-color: #0d0f0d;
+    --login-container-width: 440px;
+    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes pageEnter {
+@keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(20px) scale(0.98);
-        filter: blur(4px);
+        transform: translateY(10px) scale(0.98);
     }
 
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
-        filter: blur(0);
     }
 }
 
 /* ============================================
-   PAGE BACKGROUND
+   BACKGROUND WRAPPER
    ============================================ */
 .login-bg {
     background: var(--theme-bg);
     min-height: 100vh;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     position: relative;
     overflow: hidden;
-    font-family: 'Inter', 'Poppins', sans-serif;
-    color: var(--theme-text);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-weight: 400;
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* Background animation handled by NodeMeshBgComponent canvas */
-@keyframes bgBreath {
-    0% {
-        opacity: 0.65;
-    }
-
-    50% {
-        opacity: 1.0;
-    }
-
-    100% {
-        opacity: 0.65;
-    }
-}
-
 /* ============================================
-   LIQUID GLASS CARD
+   LIQUID GLASS CARD (INNER CONTENT WRAPPER)
    ============================================ */
 .login-card {
     position: relative;
     z-index: 10;
     width: 380px;
     max-width: 93vw;
-    border-radius: 16px;
-
-    /* Liquid Glass */
-    background: linear-gradient(135deg,
-            var(--glass-start, rgba(255, 255, 255, 0.08)) 0%,
-            var(--glass-end, rgba(255, 255, 255, 0.03)) 100%);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-
-    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
-    box-shadow:
-        0 4px 24px var(--glass-shadow, rgba(0, 0, 0, 0.15)),
-        inset 0 1px 0 var(--glass-inner, rgba(255, 255, 255, 0.06));
-
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 40px;
     padding: 2.5rem 2.25rem 2rem;
     overflow: hidden;
-    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-}
-
-/* Light mode glass overrides — more transparent frost */
-:host-context([data-theme="light"]) .login-card {
-    --glass-start: rgba(255, 255, 255, 0.12);
-    --glass-end: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.30);
-    --glass-inner: rgba(255, 255, 255, 0.25);
-    --glass-shadow: rgba(0, 0, 0, 0.02);
-    box-shadow:
-        0 4px 24px rgba(0, 0, 0, 0.02),
-        0 0 0 1px rgba(255, 255, 255, 0.20),
-        inset 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-
-/* Glass sheen — top highlight */
-.login-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg,
-            transparent 0%,
-            var(--theme-border) 15%,
-            rgba(154, 205, 50, 0.2) 50%,
-            var(--theme-border) 85%,
-            transparent 100%);
-    pointer-events: none;
-}
-
-/* Corner refraction */
-.login-card::after {
-    content: '';
-    position: absolute;
-    top: -90px;
-    left: -70px;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: radial-gradient(circle,
-            rgba(154, 205, 50, 0.05) 0%,
-            transparent 70%);
-    pointer-events: none;
-}
-
-/* ---- Section blocks ---- */
-.card-header,
-.card-copy,
-.card-actions,
-.card-footer {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
 }
 
 /* ============================================
-   HEADER (logo + sublabel)
+   CARD HEADER (Logo + Sublabel)
    ============================================ */
+.card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .hero-logo {
-    height: 44px;
     width: auto;
+    height: 48px;
     object-fit: contain;
-    margin-bottom: 0.6rem;
 }
 
 .hero-sublabel {
@@ -190,7 +106,7 @@
 }
 
 /* ============================================
-   GOOGLE BUTTON — Active Node green
+   GOOGLE BUTTON
    ============================================ */
 .btn-google {
     width: 100%;
@@ -250,68 +166,83 @@
     color: var(--theme-brand-neon);
 }
 
-/* Spinner */
+/* Spinner for loading state */
 .spinner {
     width: 18px;
     height: 18px;
-    animation: spin 0.8s linear infinite;
-    flex-shrink: 0;
+    animation: spin 1s linear infinite;
+    color: currentColor;
 }
 
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-
     to {
         transform: rotate(360deg);
     }
 }
 
-/* Trust badge */
+/* ============================================
+   TRUST BADGE
+   ============================================ */
 .trust-badge {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 0.4rem;
+    margin-top: 1.25rem;
+    font-size: 0.70rem;
     color: var(--theme-text-muted);
-    font-size: 11px;
-    font-family: 'Fira Code', 'JetBrains Mono', monospace;
-    letter-spacing: 0.14em;
+    font-weight: 500;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    margin-top: 0.65rem;
+    font-family: 'Fira Code', 'JetBrains Mono', monospace;
     transition: color 0.4s ease;
 }
 
 .badge-icon {
-    width: 13px;
-    height: 13px;
-    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    opacity: 0.8;
 }
 
-/* Divider */
+/* ============================================
+   CARD FOOTER (Dividers & Links)
+   ============================================ */
+.card-footer {
+    width: 100%;
+    margin-top: 5px;
+}
+
 .card-divider {
     width: 100%;
     height: 1px;
-    background: var(--theme-border);
-    margin: 0;
-    transition: background-color 0.4s ease;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            var(--theme-border) 15%,
+            rgba(255, 255, 255, 0.08) 50%,
+            var(--theme-border) 85%,
+            transparent 100%);
+    margin-bottom: 25px;
+    transition: background 0.4s ease;
 }
 
-/* Footer links */
 .footer-links {
-    margin-top: 1.25rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
 }
 
 .github-link {
     color: var(--theme-text-muted);
+    transition: color 0.2s ease, transform 0.2s ease;
     display: flex;
     align-items: center;
-    transition: color 0.2s;
+    justify-content: center;
+    text-decoration: none;
 }
 
 .github-link:hover {
     color: var(--theme-text);
+    transform: translateY(-2px);
 }
 
 .github-icon {
@@ -320,7 +251,7 @@
 }
 
 /* ============================================
-   WATERMARK + VERSION
+   WATERMARK & VERSION TAG (Absolute positioned)
    ============================================ */
 .watermark {
     position: fixed;
@@ -354,14 +285,14 @@
 }
 
 .version-tag {
-    position: fixed;
-    bottom: 0.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-    font-family: 'Fira Code', 'JetBrains Mono', monospace;
-    font-size: 0.6rem;
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    font-size: 0.70rem;
     color: var(--theme-text-muted);
-    letter-spacing: 0.18em;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+    z-index: 20;
     transition: color 0.4s ease;
 }

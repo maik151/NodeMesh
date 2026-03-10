@@ -5,11 +5,12 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { DatabaseService } from '../../../../core/services/database.service';
 import { ThemeService } from '../../../../core/services/theme.service';
 import { NodeMeshBgComponent } from '../../../../shared/components/node-mesh-bg/node-mesh-bg.component';
+import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass/liquid-glass.component';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [CommonModule, NodeMeshBgComponent],
+    imports: [CommonModule, NodeMeshBgComponent, LiquidGlassComponent],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css'
 })
@@ -31,6 +32,10 @@ export class LoginComponent implements OnInit {
 
     get maikLogoSrc(): string {
         return this.themeService.isDark ? '/Images/maikdev.png' : '/Images/maikdev_black.png';
+    }
+
+    get isLightMode(): boolean {
+        return !this.themeService.isDark;
     }
 
     ngOnInit(): void {

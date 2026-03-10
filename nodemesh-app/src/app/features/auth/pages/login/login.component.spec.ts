@@ -3,6 +3,7 @@ import { LoginComponent } from './login.component';
 import { AuthService } from '../../../../core/services/auth.service';
 import { DatabaseService } from '../../../../core/services/database.service';
 import { ThemeService } from '../../../../core/services/theme.service';
+import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass/liquid-glass.component';
 import { vi } from 'vitest';
 
 describe('LoginComponent', () => {
@@ -27,6 +28,13 @@ describe('LoginComponent', () => {
             lineWidth: 1,
         }) as any;
 
+        class ResizeObserverMock {
+            observe = vi.fn();
+            unobserve = vi.fn();
+            disconnect = vi.fn();
+        }
+        global.ResizeObserver = ResizeObserverMock as any;
+
         mockAuthService = {
             loginWithGoogle: vi.fn().mockResolvedValue({ uid: 'test-uid' }),
             initializeGis: vi.fn(),
@@ -43,7 +51,7 @@ describe('LoginComponent', () => {
         };
 
         await TestBed.configureTestingModule({
-            imports: [LoginComponent],
+            imports: [LoginComponent, LiquidGlassComponent],
             providers: [
                 { provide: AuthService, useValue: mockAuthService },
                 { provide: DatabaseService, useValue: mockDbService },

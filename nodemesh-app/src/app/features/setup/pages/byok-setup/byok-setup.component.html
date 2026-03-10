@@ -1,7 +1,10 @@
 <div class="byok-container">
     <app-node-mesh-bg></app-node-mesh-bg>
 
-    <div class="glass-modal">
+    <app-liquid-glass class="glass-modal" [radius]="16" [depth]="5" [blur]="12" [strength]="40"
+        [chromaticAberration]="2"
+        [backgroundColor]="isLightMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(17, 20, 17, 0.85)'">
+
         <button type="button" class="btn-back" (click)="goBack()" title="Regresar al Login">
             <span class="material-symbols-rounded">arrow_back</span>
         </button>
@@ -94,7 +97,7 @@
                 </button>
             </div>
         </form>
-    </div>
+    </app-liquid-glass>
 
     <!-- Watermark -->
     <div class="watermark">

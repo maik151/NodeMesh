@@ -5,6 +5,9 @@ import { CryptoService } from '../../../../core/services/crypto.service';
 import { DatabaseService } from '../../../../core/services/database.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ThemeService } from '../../../../core/services/theme.service';
+import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass/liquid-glass.component';
+import { vi } from 'vitest';
 
 describe('ByokSetupComponent (TDD - AUT-02)', () => {
     let component: ByokSetupComponent;
@@ -16,6 +19,26 @@ describe('ByokSetupComponent (TDD - AUT-02)', () => {
     let mockRouter: any;
 
     beforeEach(async () => {
+        HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
+            clearRect: vi.fn(),
+            beginPath: vi.fn(),
+            arc: vi.fn(),
+            fill: vi.fn(),
+            moveTo: vi.fn(),
+            lineTo: vi.fn(),
+            stroke: vi.fn(),
+            fillStyle: '',
+            strokeStyle: '',
+            lineWidth: 1,
+        }) as any;
+
+        class ResizeObserverMock {
+            observe = vi.fn();
+            unobserve = vi.fn();
+            disconnect = vi.fn();
+        }
+        global.ResizeObserver = ResizeObserverMock as any;
+
         mockAuthService = {
             getCurrentUser: vi.fn().mockReturnValue({ uid: 'mock_uid_123', email: 'test@test.com', displayName: 'Mock User' })
         };
@@ -34,7 +57,7 @@ describe('ByokSetupComponent (TDD - AUT-02)', () => {
         };
 
         await TestBed.configureTestingModule({
-            imports: [ByokSetupComponent, FormsModule],
+            imports: [ByokSetupComponent, FormsModule, LiquidGlassComponent],
             providers: [
                 { provide: AuthService, useValue: mockAuthService },
                 { provide: CryptoService, useValue: mockCryptoService },

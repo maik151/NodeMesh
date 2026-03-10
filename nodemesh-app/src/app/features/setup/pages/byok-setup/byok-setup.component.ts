@@ -5,12 +5,13 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { CryptoService } from '../../../../core/services/crypto.service';
 import { DatabaseService } from '../../../../core/services/database.service';
 import { ThemeService } from '../../../../core/services/theme.service';
+import { NodeMeshBgComponent } from '../../../../shared/components/node-mesh-bg/node-mesh-bg.component';
 import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-byok-setup',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, NodeMeshBgComponent],
     templateUrl: './byok-setup.component.html',
     styleUrl: './byok-setup.component.css'
 })
@@ -38,6 +39,10 @@ export class ByokSetupComponent {
 
     get logoSrc(): string {
         return this.themeService.isDark ? '/Images/nodeMesh_white.png' : '/Images/nodemesh_dark.png';
+    }
+
+    get maikLogoSrc(): string {
+        return this.themeService.isDark ? '/Images/maikdev.png' : '/Images/maikdev_black.png';
     }
 
     async onTestKey() {

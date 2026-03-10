@@ -1,4 +1,6 @@
 <div class="byok-container">
+    <app-node-mesh-bg></app-node-mesh-bg>
+
     <div class="glass-modal">
         <button type="button" class="btn-back" (click)="goBack()" title="Regresar al Login">
             <span class="material-symbols-rounded">arrow_back</span>
@@ -94,4 +96,9 @@
         </form>
     </div>
 
+    <!-- Watermark -->
+    <div class="watermark">
+        <span class="watermark-label">Desarrollado por:</span>
+        <img [src]="maikLogoSrc" alt="Maik.dev" class="watermark-logo">
+    </div>
 </div>

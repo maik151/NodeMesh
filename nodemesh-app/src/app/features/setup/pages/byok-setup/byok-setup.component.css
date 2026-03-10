@@ -1,17 +1,10 @@
 /* ================================================
-   BYOK SETUP COMPONENT  NodeMesh Design System
+   BYOK SETUP — NodeMesh "The Modern Forge"
+   Fully theme-aware (dark / light)
    ================================================ */
 
 :host {
     display: block;
-    --color-brand-neon: #9FFF22;
-    --color-brand-neon-alt: #C5E100;
-    --color-surface-card: rgba(17, 20, 17, 0.85);
-    --color-surface-border: rgba(255, 255, 255, 0.05);
-    --color-text-muted: rgba(255, 255, 255, 0.4);
-    --color-void: #050505;
-    --radius-card: 16px;
-    --radius-button: 8px;
     animation: pageEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -41,94 +34,66 @@
     align-items: center;
     position: relative;
     overflow: hidden;
-    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-family: 'Inter', 'Poppins', sans-serif;
     color: var(--theme-text);
     padding: 1rem;
+    transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* ---------- Ambient neon glow (bottom) ---------- */
-.byok-container::before {
-    content: '';
-    position: absolute;
-    bottom: -80px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 120vw;
-    height: 65vh;
-    border-radius: 50%;
-    background: radial-gradient(ellipse at center bottom,
-            var(--theme-glow-color-1) 0%,
-            var(--theme-glow-color-2) 18%,
-            var(--theme-glow-color-3) 45%,
-            transparent 70%);
-    filter: blur(65px);
-    animation: bgBreath 5s ease-in-out infinite;
-    pointer-events: none;
-    z-index: 0;
-}
-
-/* ---------- Secondary glow (right offset) ---------- */
-.byok-container::after {
-    content: '';
-    position: absolute;
-    bottom: -140px;
-    left: 62%;
-    transform: translateX(-50%);
-    width: 75vw;
-    height: 55vh;
-    border-radius: 50%;
-    background: radial-gradient(ellipse at center,
-            var(--theme-glow-color-1) 0%,
-            var(--theme-glow-color-2) 38%,
-            transparent 68%);
-    filter: blur(80px);
-    animation: bgBreath 7s ease-in-out infinite 2s;
-    pointer-events: none;
-    z-index: 0;
-}
-
-@keyframes bgBreath {
-    0% {
-        opacity: 0.65;
-    }
-
-    50% {
-        opacity: 1.0;
-    }
-
-    100% {
-        opacity: 0.65;
-    }
-}
+/* Background animation handled by NodeMeshBgComponent canvas */
 
 /* ============================================
    LIQUID GLASS CARD
    ============================================ */
 .glass-modal {
-    background: var(--theme-surface);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--theme-border);
-    border-radius: 16px;
-    padding: 3rem 2.5rem 2.5rem;
-    /* Aumentado padding top para la flecha */
+    position: relative;
+    z-index: 10;
     width: 100%;
     max-width: 440px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border-radius: 16px;
+    padding: 3rem 2.5rem 2.5rem;
+
+    /* Liquid Glass — gradient */
+    background: linear-gradient(135deg,
+            var(--glass-start, rgba(255, 255, 255, 0.08)) 0%,
+            var(--glass-end, rgba(255, 255, 255, 0.03)) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
+    box-shadow:
+        0 4px 24px var(--glass-shadow, rgba(0, 0, 0, 0.15)),
+        inset 0 1px 0 var(--glass-inner, rgba(255, 255, 255, 0.06));
+
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    position: relative;
-    z-index: 10;
     font-family: 'Inter', sans-serif;
+    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
+/* Light mode glass */
+:host-context([data-theme="light"]) .glass-modal {
+    --glass-start: rgba(255, 255, 255, 0.12);
+    --glass-end: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.30);
+    --glass-inner: rgba(255, 255, 255, 0.25);
+    --glass-shadow: rgba(0, 0, 0, 0.02);
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.02),
+        0 0 0 1px rgba(255, 255, 255, 0.20),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* ============================================
+   BACK BUTTON
+   ============================================ */
 .btn-back {
     position: absolute;
     top: 1.25rem;
     left: 1.25rem;
     background: transparent;
-    color: var(--color-text-muted);
+    color: var(--theme-text-muted);
     border: none;
     cursor: pointer;
     border-radius: 50%;
@@ -141,10 +106,13 @@
 }
 
 .btn-back:hover {
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.05);
+    color: var(--theme-text);
+    background: var(--theme-input-bg);
 }
 
+/* ============================================
+   HEADER
+   ============================================ */
 .modal-header {
     text-align: center;
     display: flex;
@@ -160,13 +128,14 @@
 }
 
 .sub-label {
-    color: var(--color-brand-neon);
+    color: var(--theme-brand-neon);
     font-size: 9px;
     font-weight: 700;
     letter-spacing: 0.25em;
     text-transform: uppercase;
     margin-bottom: 1rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+    transition: color 0.4s ease;
 }
 
 .modal-header p {
@@ -174,8 +143,12 @@
     font-size: 0.875rem;
     color: var(--theme-text-secondary);
     line-height: 1.5;
+    transition: color 0.4s ease;
 }
 
+/* ============================================
+   FORM
+   ============================================ */
 .byok-form {
     display: flex;
     flex-direction: column;
@@ -190,6 +163,7 @@
     color: var(--theme-text-secondary);
     margin-bottom: 0.5rem;
     font-weight: 500;
+    transition: color 0.4s ease;
 }
 
 .input-wrapper {
@@ -205,8 +179,7 @@
 
 .input-wrapper.is-focused,
 .input-wrapper:focus-within {
-    border-color: var(--color-brand-neon);
-    /* #9FFF22 */
+    border-color: var(--theme-brand-neon);
     box-shadow: 0 0 0 2px rgba(159, 255, 34, 0.2);
 }
 
@@ -215,9 +188,9 @@
     align-items: center;
     justify-content: center;
     padding: 0 0.75rem;
-    color: #666;
-    background: rgba(255, 255, 255, 0.02);
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--theme-text-muted);
+    background: rgba(128, 128, 128, 0.05);
+    border-right: 1px solid var(--theme-border);
 }
 
 .input-addon .material-symbols-rounded {
@@ -243,7 +216,7 @@
 .btn-toggle-view {
     background: transparent;
     border: none;
-    color: #777;
+    color: var(--theme-text-muted);
     cursor: pointer;
     padding: 0 0.75rem;
     display: flex;
@@ -253,9 +226,12 @@
 }
 
 .btn-toggle-view:hover {
-    color: #ccc;
+    color: var(--theme-text);
 }
 
+/* ============================================
+   BUTTONS
+   ============================================ */
 .actions-group {
     display: flex;
     flex-direction: column;
@@ -263,11 +239,10 @@
     margin-top: 0.5rem;
 }
 
-/* Base button properties for alignment */
 .btn-test,
 .btn-primary,
 .btn-skip {
-    border-radius: var(--radius-button);
+    border-radius: 8px;
     padding: 0.875rem 1rem;
     font-size: 0.9375rem;
     font-weight: 600;
@@ -281,16 +256,16 @@
     font-family: 'Inter', sans-serif;
 }
 
-/* Test Button (Outline / Neutral) */
+/* Test Button */
 .btn-test {
     background: transparent;
-    color: #e0e0e0;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--theme-text);
+    border: 1px solid var(--theme-border);
 }
 
 .btn-test:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: var(--theme-input-bg);
+    border-color: var(--theme-text-muted);
 }
 
 .btn-test:disabled {
@@ -300,22 +275,21 @@
 
 .btn-test.is-success {
     background: rgba(159, 255, 34, 0.1);
-    color: var(--color-brand-neon);
+    color: var(--theme-brand-neon);
     border-color: rgba(159, 255, 34, 0.4);
     pointer-events: none;
-    /* Already success, lock it */
 }
 
 /* Primary Button (Neon gradient) */
 .btn-primary {
     background: linear-gradient(135deg, var(--theme-brand-accent), var(--theme-brand-accent-alt));
-    color: #000000;
+    color: var(--theme-brand-btn-text);
     border: none;
 }
 
 .btn-primary:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 16px -4px rgba(159, 255, 34, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.10);
 }
 
 .btn-primary:active:not(:disabled) {
@@ -330,14 +304,14 @@
 
 .btn-primary.is-success {
     background: rgba(159, 255, 34, 0.15);
-    color: var(--color-brand-neon);
+    color: var(--theme-brand-neon);
     border: 1px solid rgba(159, 255, 34, 0.3);
 }
 
-/* Skip Button (Ghost / Subtle) */
+/* Skip Button */
 .btn-skip {
     background: transparent;
-    color: var(--color-text-muted);
+    color: var(--theme-text-muted);
     border: none;
     font-size: 0.8rem;
     font-weight: 400;
@@ -346,10 +320,11 @@
 }
 
 .btn-skip:hover {
-    color: #ffffff;
+    color: var(--theme-text);
     text-decoration: underline;
 }
 
+/* Error */
 .error-msg {
     display: flex;
     align-items: center;
@@ -367,12 +342,12 @@
     font-size: 1.125rem;
 }
 
-/* Spinner Animation */
+/* Spinner */
 .spinner {
     width: 20px;
     height: 20px;
-    border: 3px solid rgba(5, 5, 5, 0.2);
-    border-top-color: #050505;
+    border: 3px solid rgba(128, 128, 128, 0.2);
+    border-top-color: currentColor;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -403,7 +378,7 @@
 }
 
 .icon-success {
-    color: var(--color-brand-neon);
+    color: var(--theme-brand-neon);
     animation: popIn 0.3s ease;
 }
 
@@ -438,9 +413,9 @@
     width: 6px;
     height: 6px;
     transform: translate(-50%, -50%);
-    background: var(--color-brand-neon);
+    background: var(--theme-brand-neon);
     border-radius: 50%;
-    box-shadow: 0 0 6px var(--color-brand-neon);
+    box-shadow: 0 0 6px var(--theme-brand-neon);
 }
 
 .ping-ring {
@@ -450,7 +425,7 @@
     width: 22px;
     height: 22px;
     transform: translate(-50%, -50%);
-    border: 2px solid var(--color-brand-neon);
+    border: 2px solid var(--theme-brand-neon);
     border-radius: 50%;
     opacity: 0;
     animation: pingPulse 1.4s ease-out infinite;
@@ -472,9 +447,42 @@
     }
 }
 
-/* ============ LOADING STATE FOR TEST BUTTON ============ */
 .btn-test.is-loading {
     background: rgba(159, 255, 34, 0.05);
     border-color: rgba(159, 255, 34, 0.2);
-    color: var(--color-brand-neon);
+    color: var(--theme-brand-neon);
+}
+
+/* ============================================
+   WATERMARK
+   ============================================ */
+.watermark {
+    position: fixed;
+    bottom: 1.25rem;
+    left: 1.25rem;
+    z-index: 20;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.watermark-label {
+    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--theme-brand-neon);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    opacity: 0.8;
+    width: 100%;
+    transition: color 0.4s ease;
+}
+
+.watermark-logo {
+    height: 22px;
+    display: block;
+    width: auto;
+    object-fit: contain;
+    opacity: 0.80;
 }

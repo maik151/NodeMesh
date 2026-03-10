@@ -88,15 +88,15 @@
 
 /* Light mode glass overrides — more transparent frost */
 :host-context([data-theme="light"]) .login-card {
-    --glass-start: rgba(255, 255, 255, 0.28);
-    --glass-end: rgba(255, 255, 255, 0.08);
-    --glass-border: rgba(255, 255, 255, 0.45);
-    --glass-inner: rgba(255, 255, 255, 0.50);
-    --glass-shadow: rgba(0, 0, 0, 0.04);
+    --glass-start: rgba(255, 255, 255, 0.12);
+    --glass-end: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.30);
+    --glass-inner: rgba(255, 255, 255, 0.25);
+    --glass-shadow: rgba(0, 0, 0, 0.02);
     box-shadow:
-        0 4px 24px rgba(0, 0, 0, 0.04),
-        0 0 0 1px rgba(255, 255, 255, 0.35),
-        inset 0 1px 0 rgba(255, 255, 255, 0.50);
+        0 4px 24px rgba(0, 0, 0, 0.02),
+        0 0 0 1px rgba(255, 255, 255, 0.20),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 /* Glass sheen — top highlight */
@@ -194,7 +194,7 @@
    ============================================ */
 .btn-google {
     width: 100%;
-    background: var(--theme-brand-accent);
+    background: linear-gradient(135deg, var(--theme-brand-accent), var(--theme-brand-accent-alt));
     color: var(--theme-brand-btn-text);
     font-weight: 700;
     font-family: 'Inter', 'Poppins', sans-serif;
@@ -212,27 +212,27 @@
 }
 
 .btn-google:hover:not(:disabled) {
-    background: var(--theme-brand-accent-alt);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.10);
+    box-shadow: 0 8px 16px -4px rgba(159, 255, 34, 0.3);
 }
 
 .btn-google:active:not(:disabled) {
-    transform: scale(0.98);
+    transform: translateY(0);
     box-shadow: none;
 }
 
 .btn-google:disabled,
 .btn-google.is-loading {
-    opacity: 0.70;
+    opacity: 0.40;
     cursor: not-allowed;
+    filter: grayscale(80%);
     transform: none;
 }
 
 .btn-google.is-success {
-    background: transparent;
+    background: rgba(159, 255, 34, 0.15);
     color: var(--theme-brand-neon);
-    border: 1px solid var(--theme-brand-neon);
+    border: 1px solid rgba(159, 255, 34, 0.3);
     opacity: 1;
 }
 

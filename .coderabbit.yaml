@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://coderabbit.ai/export/schema.json
+language: "es-LA"
+early_access: false
+reviews:
+  profile: "Senior Angular Engineer"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: true
+  review_status: true
+  collapse_walkthrough: false
+  path_instructions:
+    - path: "**/*.ts"
+      instructions: |
+        Review TypeScript code focusing on Angular best practices, type safety, and RxJS memory leak prevention. Ensure components are standalone where applicable.
+    - path: "**/*.html"
+      instructions: |
+        Review Angular templates for accessibility (a11y), structural directives efficiency, and avoiding complex logic in templates.
+    - path: "**/*.css"
+      instructions: |
+        Ensure CSS is maintainable, uses the defined CSS variables for theming, and follows the BEM or component-scoped approach. Warn against excessive `!important` flags.
+chat:
+  auto_reply: true

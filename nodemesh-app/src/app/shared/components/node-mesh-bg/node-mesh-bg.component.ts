@@ -69,9 +69,9 @@ export class NodeMeshBgComponent implements AfterViewInit, OnDestroy {
 
         ctx.clearRect(0, 0, width, height);
 
-        // Colors
-        const nodeColor = isDark ? 'rgba(159,255,34,' : 'rgba(100,160,30,';
-        const lineColor = isDark ? 'rgba(159,255,34,' : 'rgba(100,160,30,';
+        // Colors — light mode needs bolder nodes to show through glass
+        const nodeColor = isDark ? 'rgba(159,255,34,' : 'rgba(80,140,20,';
+        const lineColor = isDark ? 'rgba(159,255,34,' : 'rgba(80,140,20,';
 
         // Update & draw nodes
         for (const n of this.nodes) {
@@ -105,7 +105,7 @@ export class NodeMeshBgComponent implements AfterViewInit, OnDestroy {
                 const dist = Math.sqrt(dx * dx + dy * dy);
 
                 if (dist < this.CONNECT_DIST) {
-                    const opacity = (1 - dist / this.CONNECT_DIST) * (isDark ? 0.35 : 0.18);
+                    const opacity = (1 - dist / this.CONNECT_DIST) * (isDark ? 0.35 : 0.4);
                     ctx.beginPath();
                     ctx.moveTo(this.nodes[i].x, this.nodes[i].y);
                     ctx.lineTo(this.nodes[j].x, this.nodes[j].y);

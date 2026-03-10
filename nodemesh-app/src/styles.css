@@ -38,7 +38,7 @@
 
 [data-theme="light"] {
     --theme-bg: #f0f0f3;
-    --theme-surface: rgba(255, 255, 255, 0.35);
+    --theme-surface: rgba(255, 255, 255, 0.20);
     --theme-surface-solid: #ffffff;
     --theme-border: rgba(0, 0, 0, 0.08);
     --theme-text: #1a1a1a;

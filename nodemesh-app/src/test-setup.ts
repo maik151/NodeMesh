@@ -17,3 +17,8 @@ import { webcrypto } from 'node:crypto';
 Object.defineProperty(globalThis, 'crypto', {
     value: webcrypto,
 });
+
+// Polyfill for IndexedDB in vitest/node
+import { indexedDB, IDBKeyRange } from 'fake-indexeddb';
+Object.defineProperty(globalThis, 'indexedDB', { value: indexedDB });
+Object.defineProperty(globalThis, 'IDBKeyRange', { value: IDBKeyRange });

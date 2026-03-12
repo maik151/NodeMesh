@@ -21,12 +21,12 @@ export class DatabaseService {
 
     async initializeVault(vaultName: string): Promise<void> {
         if (this.db) {
-            await this.db.close();
+            this.db.close();
         }
         // Identificar el motor de BD disponible (compatibilidad con tests)
         const g = globalThis as any;
-        const idb = g.indexedDB || (typeof window !== 'undefined' ? (window as any).indexedDB : undefined);
-        const idbKR = g.IDBKeyRange || (typeof window !== 'undefined' ? (window as any).IDBKeyRange : undefined);
+        const idb = g.indexedDB || g.window?.indexedDB;
+        const idbKR = g.IDBKeyRange || g.window?.IDBKeyRange;
 
         this.db = new Dexie(vaultName, {
             indexedDB: idb,

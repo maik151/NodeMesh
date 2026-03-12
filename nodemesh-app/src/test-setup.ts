@@ -11,9 +11,11 @@ const polyfills = {
 
 Object.entries(polyfills).forEach(([key, value]) => {
     vi.stubGlobal(key, value);
-    (globalThis as any)[key] = value;
-    if (typeof global !== 'undefined') (global as any)[key] = value;
-    if (typeof window !== 'undefined') (window as any)[key] = value;
+    const g = globalThis as any;
+    g[key] = value;
+    // Survival for older environments if needed
+    if (g.window) g.window[key] = value;
+    if (g.global) g.global[key] = value;
 });
 
 import '@angular/compiler';

@@ -8,9 +8,15 @@ const polyfills = {
     IDBKeyRange: fIDBKR,
     crypto: webcrypto,
     ResizeObserver: class {
-        observe() {}
-        unobserve() {}
-        disconnect() {}
+        observe() {
+            // Intentionally empty: JSDOM stub for ResizeObserver.observe
+        }
+        unobserve() {
+            // Intentionally empty: JSDOM stub for ResizeObserver.unobserve
+        }
+        disconnect() {
+            // Intentionally empty: JSDOM stub for ResizeObserver.disconnect
+        }
     }
 };
 

@@ -14,14 +14,16 @@ describe('LiquidGlassComponent', () => {
 
         fixture = TestBed.createComponent(LiquidGlassComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
+        // detectChanges() se llamará en cada test según sea necesario
     });
 
     it('should create', () => {
+        fixture.detectChanges();
         expect(component).toBeTruthy();
     });
 
     it('debe reaccionar a cambios en los inputs mediante ngOnChanges', () => {
+        fixture.detectChanges();
         const spy = vi.spyOn(component as any, 'updateGlassEffect');
         
         component.ngOnChanges({
@@ -55,9 +57,13 @@ describe('LiquidGlassComponent', () => {
     });
 
     it('debe generar y aplicar efectos SVG complejos si hay soporte y tamaño suficiente', () => {
+        fixture.detectChanges();
         const element = component.glassContainer.nativeElement;
         vi.spyOn(element, 'offsetWidth', 'get').mockReturnValue(200);
         vi.spyOn(element, 'offsetHeight', 'get').mockReturnValue(100);
+        
+        // Forzamos soporte SVG para esta prueba
+        (component as any).hasSVGFilterSupport = true;
         
         // JSDOM puede fallar al parsear el string complejo de backdrop-filter,
         // así que chequeamos que intente aplicarlo.

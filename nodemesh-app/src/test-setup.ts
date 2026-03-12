@@ -1,5 +1,13 @@
+import { indexedDB, IDBKeyRange } from 'fake-indexeddb';
+import { webcrypto } from 'node:crypto';
+
+// Polyfills for tests (must be before Angular/Dexie imports)
+Object.defineProperty(globalThis, 'indexedDB', { value: indexedDB, writable: true });
+Object.defineProperty(globalThis, 'IDBKeyRange', { value: IDBKeyRange, writable: true });
+Object.defineProperty(globalThis, 'crypto', { value: webcrypto, writable: true });
+
 import '@angular/compiler';
-import 'zone.js'; // Needed if not using zoneless
+import 'zone.js';
 import 'zone.js/testing';
 import { getTestBed } from '@angular/core/testing';
 import {
@@ -11,14 +19,3 @@ getTestBed().initTestEnvironment(
     BrowserDynamicTestingModule,
     platformBrowserDynamicTesting()
 );
-
-// Polyfill for Web Crypto API in jsdom
-import { webcrypto } from 'node:crypto';
-Object.defineProperty(globalThis, 'crypto', {
-    value: webcrypto,
-});
-
-// Polyfill for IndexedDB in vitest/node
-import { indexedDB, IDBKeyRange } from 'fake-indexeddb';
-Object.defineProperty(globalThis, 'indexedDB', { value: indexedDB });
-Object.defineProperty(globalThis, 'IDBKeyRange', { value: IDBKeyRange });

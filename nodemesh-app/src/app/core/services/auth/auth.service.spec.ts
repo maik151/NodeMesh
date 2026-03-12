@@ -52,7 +52,13 @@ describe('AuthService (TDD - AUT-01) - Refactor Implicit Flow', () => {
         service = TestBed.inject(AuthService);
     });
 
-    afterEach(() => {
+    afterEach(async () => {
+        // Clean up database
+        const dbService = TestBed.inject(DatabaseService);
+        if (dbService.db) {
+            await dbService.db.close();
+        }
+
         // Clean up mocks
         delete (window as any).google;
         mockCallback = null;

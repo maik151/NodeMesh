@@ -9,6 +9,12 @@ describe('DatabaseService (TDD - AUT-01) - RED phase', () => {
         service = TestBed.inject(DatabaseService);
     });
 
+    afterEach(async () => {
+        if (service.db) {
+            await service.db.close();
+        }
+    });
+
     // PRUEBA 1: Inicialización de la Bóveda con nombre derivado
     it('debe inicializar la base de datos de Dexie con el nombre proporcionado', () => {
         const vaultName = 'nodemesh_vault_abc123';

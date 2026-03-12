@@ -4,11 +4,7 @@ import { DatabaseService } from '../storage/database.service';
 import { NodeChallenge, ChallengeType } from '../../models/node.model';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
-// Configurar el worker de PDF.js para el navegador de forma compatible con Vite
-if (typeof Worker !== 'undefined') {
-    const workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
-    pdfjsLib.GlobalWorkerOptions.workerPort = new Worker(workerSrc, { type: 'module' });
-}
+// La inicialización del worker se movió dentro de la clase para ser perezosa (lazy) y evitar SecurityErrors
 
 @Injectable({
     providedIn: 'root'
@@ -40,6 +36,7 @@ REGLAS:
     ) { }
 
     async extractTextFromPdf(file: File): Promise<string> {
+        await this.initPdfWorker();
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
@@ -94,6 +91,23 @@ REGLAS:
         const sanitized = this.cryptoService.sanitizeHtml(rawText);
 
         return this.parseAiResponse(sanitized, sourceName);
+    }
+
+    private async initPdfWorker() {
+        if (pdfjsLib.GlobalWorkerOptions.workerPort || typeof Worker === 'undefined') return;
+
+        try {
+            const workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+            const response = await fetch(workerSrc);
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            pdfjsLib.GlobalWorkerOptions.workerPort = new Worker(blobUrl, { type: 'module' });
+        } catch (error) {
+            console.error('[IngestionService] Error al inicializar PDF Worker:', error);
+            // Fallback: intentar cargarlo directamente si el fetch falla (poco probable)
+            const workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+            pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+        }
     }
 
     private parseAiResponse(rawText: string, sourceName: string): NodeChallenge[] {

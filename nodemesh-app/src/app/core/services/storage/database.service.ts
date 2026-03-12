@@ -19,8 +19,19 @@ export class DatabaseService {
         return this.db ? this.db.tables : [];
     }
 
-    initializeVault(vaultName: string): void {
-        this.db = new Dexie(vaultName);
+    async initializeVault(vaultName: string): Promise<void> {
+        if (this.db) {
+            await this.db.close();
+        }
+        // Identificar el motor de BD disponible (compatibilidad con tests)
+        const g = globalThis as any;
+        const idb = g.indexedDB || (typeof window !== 'undefined' ? (window as any).indexedDB : undefined);
+        const idbKR = g.IDBKeyRange || (typeof window !== 'undefined' ? (window as any).IDBKeyRange : undefined);
+
+        this.db = new Dexie(vaultName, {
+            indexedDB: idb,
+            IDBKeyRange: idbKR
+        });
 
         this.db.version(1).stores({
             nodes: '++id, content, sourceId, nextReviewDate',
@@ -29,13 +40,16 @@ export class DatabaseService {
             statistics: '++id, metric, value'
         });
 
-        this.db.open().catch((err: any) => {
+        try {
+            await this.db.open();
+        } catch (err: any) {
             if (err.name === 'QuotaExceededError') {
                 console.error('[DatabaseService] CRITICAL: QuotaExceededError. NodeMesh cannot save more nodes.');
             } else {
                 console.error('[DatabaseService] Error opening IndexedDB:', err);
             }
-        });
+            throw err;
+        }
     }
 
     async saveApiKey(provider: string, encryptedKey: string): Promise<void> {

@@ -1,5 +1,7 @@
+import 'fake-indexeddb/auto';
 import { TestBed } from '@angular/core/testing';
 import { DatabaseService } from './database.service';
+import Dexie from 'dexie';
 
 describe('DatabaseService (TDD - AUT-01) - RED phase', () => {
     let service: DatabaseService;
@@ -11,22 +13,22 @@ describe('DatabaseService (TDD - AUT-01) - RED phase', () => {
 
     afterEach(async () => {
         if (service.db) {
-            await service.db.close();
+            await service.db.delete(); // Borra la base de datos usando la instancia ya configurada
         }
     });
 
     // PRUEBA 1: Inicialización de la Bóveda con nombre derivado
-    it('debe inicializar la base de datos de Dexie con el nombre proporcionado', () => {
+    it('debe inicializar la base de datos de Dexie con el nombre proporcionado', async () => {
         const vaultName = 'nodemesh_vault_abc123';
-        service.initializeVault(vaultName);
+        await service.initializeVault(vaultName);
 
         // Verificamos que el servicio haya asignado el nombre (como hereda de Dexie, tendrá .name)
         expect(service.name).toBe(vaultName);
     });
 
     // PRUEBA 2: Estructura de tablas requerida
-    it('debe definir las tablas "nodes" y "api_keys" al inicializarse', () => {
-        service.initializeVault('nodemesh_vault_test');
+    it('debe definir las tablas "nodes" y "api_keys" al inicializarse', async () => {
+        await service.initializeVault('nodemesh_vault_test');
 
         // Dexie schema properties
         const tables = service.tables;
@@ -38,7 +40,7 @@ describe('DatabaseService (TDD - AUT-01) - RED phase', () => {
     });
     // PRUEBA 3: Guardar y Recuperar API Keys
     it('debe guardar una API Key y recuperarla correctamente por proveedor', async () => {
-        service.initializeVault('nodemesh_vault_test_keys');
+        await service.initializeVault('nodemesh_vault_test_keys');
         const testProvider = 'gemini';
         const testEncryptedKey = 'abc_123_encrypted_base64_string';
 
@@ -51,14 +53,14 @@ describe('DatabaseService (TDD - AUT-01) - RED phase', () => {
     });
 
     it('debe devolver null si el proveedor no existe al buscar una API Key', async () => {
-        service.initializeVault('nodemesh_vault_test_keys_empty');
+        await service.initializeVault('nodemesh_vault_test_keys_empty');
         const result = await service.getApiKey('unknown_provider');
         expect(result).toBeNull();
     });
 
     // --- F3: Persistencia de Nodos ---
     it('debe guardar nodos y recuperarlos correctamente', async () => {
-        service.initializeVault('nodemesh_vault_test_nodes');
+        await service.initializeVault('nodemesh_vault_test_nodes');
         const nodes = [
             {
                 type: 'definicion_inversa' as const,
@@ -90,7 +92,7 @@ describe('DatabaseService (TDD - AUT-01) - RED phase', () => {
     });
 
     it('debe filtrar nodos por sourceId', async () => {
-        service.initializeVault('nodemesh_vault_test_filter');
+        await service.initializeVault('nodemesh_vault_test_filter');
         const nodes = [
             {
                 type: 'pregunta_socratica' as const,

@@ -144,7 +144,7 @@ export class AuthService {
             };
 
             const vaultKey = await this.deriveStorageKey(user.uid);
-            this.dbService.initializeVault(vaultKey);
+            await this.dbService.initializeVault(vaultKey);
 
             sessionStorage.setItem('nodemesh_session', JSON.stringify({
                 user,
@@ -161,7 +161,7 @@ export class AuthService {
                 console.warn('[DEV MODE] Usando perfil MOCK de emergencia');
                 const mockUser: UserProfile = { uid: 'mock_123', email: 'dev@local', displayName: 'Dev User' };
                 const vKey = await this.deriveStorageKey(mockUser.uid);
-                this.dbService.initializeVault(vKey);
+                await this.dbService.initializeVault(vKey);
                 this.pendingResolve?.(mockUser);
             } else {
                 this.pendingReject?.(error as Error);

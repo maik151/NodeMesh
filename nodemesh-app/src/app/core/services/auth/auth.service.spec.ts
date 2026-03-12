@@ -1,7 +1,9 @@
+import 'fake-indexeddb/auto';
 import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 import { AuthService } from './auth.service';
 import { DatabaseService } from '../storage/database.service';
+import Dexie from 'dexie';
 
 // ================================================================
 // Mock the Google Identity Services OAuth2 SDK on the window object
@@ -56,7 +58,7 @@ describe('AuthService (TDD - AUT-01) - Refactor Implicit Flow', () => {
         // Clean up database
         const dbService = TestBed.inject(DatabaseService);
         if (dbService.db) {
-            await dbService.db.close();
+            await dbService.db.delete();
         }
 
         // Clean up mocks
@@ -94,15 +96,36 @@ describe('AuthService (TDD - AUT-01) - Refactor Implicit Flow', () => {
 
     // ---- PRUEBA 4: Inicio de Sesión con Google (OAuth 2.0 Implicit Flow) ----
     it('debe conectar con Google OAuth y retornar un usuario con UID válido', async () => {
+        // Usamos un UID único para evitar colisiones entre tests
+        const uniqueUid = 'uid_test_login_' + Math.random();
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({
+                sub: uniqueUid,
+                email: MOCK_EMAIL,
+                name: MOCK_NAME
+            })
+        });
+
         const user = await service.loginWithGoogle();
 
         expect(user).toBeDefined();
-        expect(user.uid).toBe(MOCK_UID);
+        expect(user.uid).toBe(uniqueUid);
         expect(user.email).toBe(MOCK_EMAIL);
     });
 
     // ---- PRUEBA 5: Creación de Bóveda en Login (Integración) ----
     it('debe inicializar la bóveda en DatabaseService tras un login exitoso', async () => {
+        const uniqueUid = 'uid_test_vault_' + Math.random();
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({
+                sub: uniqueUid,
+                email: MOCK_EMAIL,
+                name: MOCK_NAME
+            })
+        });
+
         const dbService = TestBed.inject(DatabaseService) as any;
         const initSpy = vi.spyOn(dbService, 'initializeVault');
 
@@ -126,17 +149,37 @@ describe('AuthService (TDD - AUT-01) - Refactor Implicit Flow', () => {
 
     // ---- PRUEBA 7: RNF-SEG-01 Persistencia de Sesión ----
     it('debe guardar la sesión en sessionStorage tras un login exitoso', async () => {
+        const uniqueUid = 'uid_test_session_' + Math.random();
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({
+                sub: uniqueUid,
+                email: MOCK_EMAIL,
+                name: MOCK_NAME
+            })
+        });
+
         await service.loginWithGoogle();
         const session = JSON.parse(sessionStorage.getItem('nodemesh_session')!);
 
         expect(session).toBeDefined();
-        expect(session.user.uid).toBe(MOCK_UID);
+        expect(session.user.uid).toBe(uniqueUid);
         expect(session.token).toBe(MOCK_ACCESS_TOKEN);
         expect(session.expiresAt).toBeGreaterThan(Date.now());
     });
 
     // ---- PRUEBA 8: Validación de Sesión Activa ----
     it('debe reconocer una sesión activa válida mediante isAuthenticated()', async () => {
+        const uniqueUid = 'uid_test_auth_' + Math.random();
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({
+                sub: uniqueUid,
+                email: MOCK_EMAIL,
+                name: MOCK_NAME
+            })
+        });
+
         expect(service.isAuthenticated()).toBe(false); // Antes del login
 
         await service.loginWithGoogle();
@@ -148,6 +191,16 @@ describe('AuthService (TDD - AUT-01) - Refactor Implicit Flow', () => {
 
     // ---- PRUEBA 9: Cierre de Sesión ----
     it('debe limpiar el sessionStorage al hacer logout()', async () => {
+        const uniqueUid = 'uid_test_logout_' + Math.random();
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({
+                sub: uniqueUid,
+                email: MOCK_EMAIL,
+                name: MOCK_NAME
+            })
+        });
+
         await service.loginWithGoogle();
         expect(service.isAuthenticated()).toBe(true);
 

@@ -1,10 +1,20 @@
-import { indexedDB, IDBKeyRange } from 'fake-indexeddb';
+import { vi } from 'vitest';
+import { indexedDB as fIDB, IDBKeyRange as fIDBKR } from 'fake-indexeddb';
 import { webcrypto } from 'node:crypto';
 
-// Polyfills for tests (must be before Angular/Dexie imports)
-Object.defineProperty(globalThis, 'indexedDB', { value: indexedDB, writable: true });
-Object.defineProperty(globalThis, 'IDBKeyRange', { value: IDBKeyRange, writable: true });
-Object.defineProperty(globalThis, 'crypto', { value: webcrypto, writable: true });
+// Polyfills for tests (Hyper-redundant stubbing to survive environment isolation)
+const polyfills = {
+    indexedDB: fIDB,
+    IDBKeyRange: fIDBKR,
+    crypto: webcrypto
+};
+
+Object.entries(polyfills).forEach(([key, value]) => {
+    vi.stubGlobal(key, value);
+    (globalThis as any)[key] = value;
+    if (typeof global !== 'undefined') (global as any)[key] = value;
+    if (typeof window !== 'undefined') (window as any)[key] = value;
+});
 
 import '@angular/compiler';
 import 'zone.js';

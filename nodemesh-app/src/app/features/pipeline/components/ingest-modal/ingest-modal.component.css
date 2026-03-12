@@ -105,7 +105,7 @@
 }
 
 .tab.active {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.15); /* Increased from 0.06 */
     color: #fff;
 }
 
@@ -221,12 +221,12 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #ff4b4b;
+    color: #ff3333;
     font-size: 0.8125rem;
-    background: rgba(255, 75, 75, 0.08);
+    background: rgba(255, 51, 51, 0.15);
     padding: 0.5rem 0.75rem;
     border-radius: 6px;
-    border: 1px solid rgba(255, 75, 75, 0.15);
+    border: 1px solid rgba(255, 51, 51, 0.25);
 }
 
 .success-msg {

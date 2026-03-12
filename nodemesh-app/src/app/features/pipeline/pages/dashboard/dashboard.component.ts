@@ -22,12 +22,12 @@ export class DashboardComponent implements OnInit {
     showIngestModal: boolean = false;
 
     constructor(
-        private authService: AuthService,
-        private dbService: DatabaseService,
-        private cryptoService: CryptoService,
-        public themeService: ThemeService,
-        private cdr: ChangeDetectorRef,
-        private router: Router
+        private readonly authService: AuthService,
+        private readonly dbService: DatabaseService,
+        private readonly cryptoService: CryptoService,
+        public readonly themeService: ThemeService,
+        private readonly cdr: ChangeDetectorRef,
+        private readonly router: Router
     ) { }
 
     get logoSrc(): string {

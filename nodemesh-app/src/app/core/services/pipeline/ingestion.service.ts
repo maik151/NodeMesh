@@ -35,8 +35,8 @@ REGLAS:
 - NO incluyas explicaciones fuera del JSON.`;
 
     constructor(
-        private cryptoService: CryptoService,
-        private dbService: DatabaseService
+        private readonly cryptoService: CryptoService,
+        private readonly dbService: DatabaseService
     ) { }
 
     async extractTextFromPdf(file: File): Promise<string> {

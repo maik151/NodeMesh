@@ -44,7 +44,7 @@ export class LiquidGlassComponent implements AfterViewInit, OnDestroy, OnChanges
     private hasSVGFilterSupport = true;
 
     constructor(
-        private zone: NgZone,
+        private readonly zone: NgZone,
     ) {
         this.detectSVGFilterSupport();
     }

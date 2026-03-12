@@ -55,13 +55,10 @@
     </main>
 
     <!-- Ingest Modal (overlay) -->
-    <div class="modal-overlay" *ngIf="showIngestModal" 
-         (click)="closeIngestModal()" 
-         (keydown.enter)="closeIngestModal()" 
-         role="button" 
-         tabindex="0">
+    <div class="modal-overlay" *ngIf="showIngestModal">
+        <button class="overlay-close-btn" (click)="closeIngestModal()" aria-label="Cerrar modal"></button>
         <div class="modal-content" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
-            <button class="btn-close-modal" (click)="closeIngestModal()">
+            <button class="btn-close-modal" (click)="closeIngestModal()" aria-label="Cerrar">
                 <span class="material-symbols-rounded">close</span>
             </button>
             <app-ingest-modal (nodesIngested)="onNodesIngested()" (closeModal)="closeIngestModal()">

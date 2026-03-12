@@ -5,7 +5,7 @@ import { IngestionService } from '../../../../core/services/pipeline/ingestion.s
 import { DatabaseService } from '../../../../core/services/storage/database.service';
 import { CryptoService } from '../../../../core/services/storage/crypto.service';
 import { AuthService } from '../../../../core/services/auth/auth.service';
-import { NodeChallenge } from '../../../../core/models/node.model';
+// NodeChallenge removed as it was unused here
 
 @Component({
     selector: 'app-ingest-modal',
@@ -32,11 +32,11 @@ export class IngestModalComponent {
     readonly MAX_CHARS = 15000;
 
     constructor(
-        private ingestionService: IngestionService,
-        private dbService: DatabaseService,
-        private cryptoService: CryptoService,
-        private authService: AuthService,
-        private cdr: ChangeDetectorRef
+        private readonly ingestionService: IngestionService,
+        private readonly dbService: DatabaseService,
+        private readonly cryptoService: CryptoService,
+        private readonly authService: AuthService,
+        private readonly cdr: ChangeDetectorRef
     ) { }
 
     get charCount(): number {

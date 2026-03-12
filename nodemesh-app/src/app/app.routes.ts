@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { authGuard } from './core/guards/auth.guard';
-import { byokGuard } from './core/guards/byok.guard';
+// byokGuard removed as it was unused
 
 export const routes: Routes = [
     {

@@ -98,8 +98,8 @@
 }
 
 .btn-logout:hover {
-    color: #ff4b4b;
-    background: rgba(255, 75, 75, 0.08);
+    color: #ff3333;
+    background: rgba(255, 51, 51, 0.15); /* Increased opacity for contrast */
 }
 
 /* ============ MAIN CONTENT ============ */
@@ -272,6 +272,7 @@
     margin: 0;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -326,13 +327,24 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 200;
     animation: fadeIn 0.15s ease;
+}
+
+.overlay-close-btn {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    border: none;
+    width: 100%;
+    height: 100%;
+    cursor: default;
+    z-index: -1;
 }
 
 .modal-content {
@@ -367,7 +379,7 @@
 
 .btn-close-modal:hover {
     color: #fff;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.15); /* Increased for contrast */
 }
 
 @keyframes fadeIn {

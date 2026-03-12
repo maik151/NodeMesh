@@ -34,7 +34,7 @@ export class ThemeService {
     }
 
     private applyTheme(): void {
-        document.documentElement.setAttribute('data-theme', this.currentTheme);
+        document.documentElement.dataset['theme'] = this.currentTheme;
     }
 
     private saveTheme(): void {

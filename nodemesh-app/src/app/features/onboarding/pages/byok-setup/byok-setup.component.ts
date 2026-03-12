@@ -30,12 +30,12 @@ export class ByokSetupComponent {
     errorMessage: string = '';
 
     constructor(
-        private authService: AuthService,
-        private cryptoService: CryptoService,
-        private dbService: DatabaseService,
-        public themeService: ThemeService,
-        private cdr: ChangeDetectorRef,
-        private router: Router
+        private readonly authService: AuthService,
+        private readonly cryptoService: CryptoService,
+        private readonly dbService: DatabaseService,
+        public readonly themeService: ThemeService,
+        private readonly cdr: ChangeDetectorRef,
+        private readonly router: Router
     ) { }
 
     get logoSrc(): string {

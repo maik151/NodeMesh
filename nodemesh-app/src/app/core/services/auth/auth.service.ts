@@ -60,7 +60,7 @@ export class AuthService {
             return;
         }
 
-        const oauth2 = (window as unknown as GisWindow).google?.accounts?.oauth2;
+        const oauth2 = (globalThis as unknown as GisWindow).google?.accounts?.oauth2;
         if (!oauth2) {
             console.error('window.google.accounts.oauth2 NO disponible. Revisa index.html.');
             console.groupEnd();
@@ -157,14 +157,14 @@ export class AuthService {
         } catch (error) {
             console.error('[AuthService] Falla al obtener perfil:', error);
 
-            if (!environment.production) {
+            if (environment.production) {
+                this.pendingReject?.(error as Error);
+            } else {
                 console.warn('[DEV MODE] Usando perfil MOCK de emergencia');
                 const mockUser: UserProfile = { uid: 'mock_123', email: 'dev@local', displayName: 'Dev User' };
                 const vKey = await this.deriveStorageKey(mockUser.uid);
                 await this.dbService.initializeVault(vKey);
                 this.pendingResolve?.(mockUser);
-            } else {
-                this.pendingReject?.(error as Error);
             }
         } finally {
             this.resetPending();

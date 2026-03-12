@@ -19,7 +19,7 @@ export class NodeMeshBgComponent implements AfterViewInit, OnDestroy {
     private readonly NODE_COUNT = 80;
     private readonly CONNECT_DIST = 180;
 
-    constructor(private zone: NgZone, public themeService: ThemeService) { }
+    constructor(private readonly zone: NgZone, public readonly themeService: ThemeService) { }
 
     ngAfterViewInit(): void {
         const canvas = this.canvasRef.nativeElement;
@@ -38,7 +38,7 @@ export class NodeMeshBgComponent implements AfterViewInit, OnDestroy {
         window.removeEventListener('resize', this.resizeBound);
     }
 
-    private resizeBound = () => this.resize();
+    private readonly resizeBound = () => this.resize();
 
     private resize(): void {
         const canvas = this.canvasRef.nativeElement;
@@ -67,7 +67,7 @@ export class NodeMeshBgComponent implements AfterViewInit, OnDestroy {
         }
     }
 
-    private animate = (): void => {
+    private readonly animate = (): void => {
         const canvas = this.canvasRef.nativeElement;
         const { width, height } = canvas;
         const ctx = this.ctx;
@@ -75,53 +75,55 @@ export class NodeMeshBgComponent implements AfterViewInit, OnDestroy {
 
         ctx.clearRect(0, 0, width, height);
 
-        // Colors — light mode needs bolder nodes to show through glass
+        // Colors
         const nodeColor = isDark ? 'rgba(159,255,34,' : 'rgba(80,140,20,';
         const lineColor = isDark ? 'rgba(159,255,34,' : 'rgba(80,140,20,';
 
-        // Update & draw nodes
+        this.updateAndDrawNodes(ctx, nodeColor, isDark, width, height);
+        this.drawConnections(ctx, lineColor, isDark);
+
+        this.animId = requestAnimationFrame(this.animate);
+    };
+
+    private updateAndDrawNodes(ctx: CanvasRenderingContext2D, color: string, isDark: boolean, w: number, h: number): void {
         for (const n of this.nodes) {
             n.x += n.vx;
             n.y += n.vy;
 
-            // Bounce off edges
-            if (n.x < 0 || n.x > width) n.vx *= -1;
-            if (n.y < 0 || n.y > height) n.vy *= -1;
+            if (n.x < 0 || n.x > w) n.vx *= -1;
+            if (n.y < 0 || n.y > h) n.vy *= -1;
 
-            // Draw dot
             ctx.beginPath();
             ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-            ctx.fillStyle = nodeColor + '0.9)';
+            ctx.fillStyle = color + '0.9)';
             ctx.fill();
 
-            // Glow
             ctx.beginPath();
             ctx.arc(n.x, n.y, n.r + 3, 0, Math.PI * 2);
-            ctx.fillStyle = nodeColor + (isDark ? '0.15)' : '0.10)');
+            ctx.fillStyle = color + (isDark ? '0.15)' : '0.10)');
             ctx.fill();
         }
+    }
 
-        // Draw connecting lines
+    private drawConnections(ctx: CanvasRenderingContext2D, color: string, isDark: boolean): void {
         for (let i = 0; i < this.nodes.length; i++) {
             for (let j = i + 1; j < this.nodes.length; j++) {
                 const dx = this.nodes[i].x - this.nodes[j].x;
                 const dy = this.nodes[i].y - this.nodes[j].y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
+                const dist = Math.hypot(dx, dy);
 
                 if (dist < this.CONNECT_DIST) {
                     const opacity = (1 - dist / this.CONNECT_DIST) * (isDark ? 0.35 : 0.4);
                     ctx.beginPath();
                     ctx.moveTo(this.nodes[i].x, this.nodes[i].y);
                     ctx.lineTo(this.nodes[j].x, this.nodes[j].y);
-                    ctx.strokeStyle = lineColor + opacity + ')';
+                    ctx.strokeStyle = color + opacity + ')';
                     ctx.lineWidth = isDark ? 0.8 : 1.2;
                     ctx.stroke();
                 }
             }
         }
-
-        this.animId = requestAnimationFrame(this.animate);
-    };
+    }
 }
 
 interface Node {

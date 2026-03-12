@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CryptoService } from '../storage/crypto.service';
 import { DatabaseService } from '../storage/database.service';
 import { NodeChallenge, ChallengeType } from '../../models/node.model';
-import * as pdfjsLib from 'pdfjs-dist';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 // Configurar el worker de PDF.js para el navegador
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
@@ -95,14 +95,17 @@ REGLAS:
 
     private parseAiResponse(rawText: string, sourceName: string): NodeChallenge[] {
         // Extraer el array JSON del texto (puede contener markdown backticks)
-        const jsonMatch = rawText.match(/\[[\s\S]*\]/);
-        if (!jsonMatch) {
+        const firstBracket = rawText.indexOf('[');
+        const lastBracket = rawText.lastIndexOf(']');
+
+        if (firstBracket === -1 || lastBracket === -1 || lastBracket < firstBracket) {
             throw new Error('No se pudo extraer el JSON de la respuesta de la IA.');
         }
 
         let parsed: any[];
         try {
-            parsed = JSON.parse(jsonMatch[0]);
+            const jsonText = rawText.substring(firstBracket, lastBracket + 1);
+            parsed = JSON.parse(jsonText);
         } catch {
             throw new Error('El JSON retornado por la IA no es válido.');
         }

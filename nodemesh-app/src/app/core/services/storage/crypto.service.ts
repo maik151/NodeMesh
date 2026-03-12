@@ -81,7 +81,7 @@ export class CryptoService {
         let binary = '';
         const len = buffer.byteLength;
         for (let i = 0; i < len; i++) {
-            binary += String.fromCharCode(buffer[i]);
+            binary += String.fromCodePoint(buffer[i]);
         }
         return btoa(binary);
     }
@@ -91,7 +91,7 @@ export class CryptoService {
         const len = binary_string.length;
         const bytes = new Uint8Array(len);
         for (let i = 0; i < len; i++) {
-            bytes[i] = binary_string.charCodeAt(i);
+            bytes[i] = binary_string.codePointAt(i) || 0;
         }
         return bytes;
     }

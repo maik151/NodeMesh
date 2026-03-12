@@ -34,12 +34,12 @@ export class DashboardComponent implements OnInit {
         return this.themeService.isDark ? '/Images/nodeMesh_white.png' : '/Images/nodemesh_dark.png';
     }
 
-    async ngOnInit() {
+    ngOnInit(): void {
         const user = this.authService.getCurrentUser();
         if (user) {
             this.userName = user.displayName || user.email || 'Forjador';
         }
-        await this.loadNodes();
+        this.loadNodes(); // loadNodes is async but we don't await it to keep ngOnInit: void
     }
 
     async loadNodes() {

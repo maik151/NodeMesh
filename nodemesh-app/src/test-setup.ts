@@ -22,12 +22,13 @@ import '@angular/compiler';
 import 'zone.js';
 import 'zone.js/testing';
 import { getTestBed } from '@angular/core/testing';
+// @ts-ignore
 import {
     BrowserDynamicTestingModule,
     platformBrowserDynamicTesting,
 } from '@angular/platform-browser-dynamic/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
 
+// @ts-ignore
 getTestBed().initTestEnvironment(
     BrowserDynamicTestingModule,
     platformBrowserDynamicTesting(),

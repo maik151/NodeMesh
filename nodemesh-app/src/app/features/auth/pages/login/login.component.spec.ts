@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoginComponent } from './login.component';
-import { AuthService } from '../../../../core/services/auth.service';
-import { DatabaseService } from '../../../../core/services/database.service';
-import { ThemeService } from '../../../../core/services/theme.service';
+import { AuthService } from '../../../../core/services/auth/auth.service';
+import { DatabaseService } from '../../../../core/services/storage/database.service';
+import { ThemeService } from '../../../../core/services/ui/theme.service';
 import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass/liquid-glass.component';
 import { vi } from 'vitest';
 

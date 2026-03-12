@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { DatabaseService } from '../services/database.service';
+import { DatabaseService } from '../services/storage/database.service';
 
 export const byokGuard: CanActivateFn = async (route, state) => {
     const dbService = inject(DatabaseService);

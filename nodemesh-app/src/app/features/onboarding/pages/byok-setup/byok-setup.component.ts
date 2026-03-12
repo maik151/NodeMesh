@@ -1,10 +1,10 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../../../core/services/auth.service';
-import { CryptoService } from '../../../../core/services/crypto.service';
-import { DatabaseService } from '../../../../core/services/database.service';
-import { ThemeService } from '../../../../core/services/theme.service';
+import { AuthService } from '../../../../core/services/auth/auth.service';
+import { CryptoService } from '../../../../core/services/storage/crypto.service';
+import { DatabaseService } from '../../../../core/services/storage/database.service';
+import { ThemeService } from '../../../../core/services/ui/theme.service';
 import { NodeMeshBgComponent } from '../../../../shared/components/node-mesh-bg/node-mesh-bg.component';
 import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass/liquid-glass.component';
 import { Router } from '@angular/router';

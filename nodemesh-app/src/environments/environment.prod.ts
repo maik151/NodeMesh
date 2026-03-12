@@ -1,5 +1,5 @@
 // Production environment variables
 export const environment = {
     production: true,
-    googleClientId: '220912218741-c0t2luqp91uhshf0j9bc8ojblu7f9hfh.apps.googleusercontent.com'
+    googleClientId: '847473990011-fs1cvf7i0q8fqlmn4ruja1hl8me062jd.apps.googleusercontent.com'
 };

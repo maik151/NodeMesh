@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import Dexie, { Table } from 'dexie';
-import { NodeChallenge } from '../models/node.model';
+import { NodeChallenge } from '../../models/node.model';
 
 @Injectable({
     providedIn: 'root'

@@ -1,9 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../../core/services/auth.service';
-import { DatabaseService } from '../../../../core/services/database.service';
-import { ThemeService } from '../../../../core/services/theme.service';
+import { AuthService } from '../../../../core/services/auth/auth.service';
+import { DatabaseService } from '../../../../core/services/storage/database.service';
+import { ThemeService } from '../../../../core/services/ui/theme.service';
 import { NodeMeshBgComponent } from '../../../../shared/components/node-mesh-bg/node-mesh-bg.component';
 import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass/liquid-glass.component';
 

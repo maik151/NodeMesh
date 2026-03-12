@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
-import { UserProfile } from '../../data/models/interfaces/user-profile.interface';
-import { DatabaseService } from './database.service';
-import { environment } from '../../../environments/environment';
+import { UserProfile } from '../../../data/models/interfaces/user-profile.interface';
+import { DatabaseService } from '../storage/database.service';
+import { environment } from '../../../../environments/environment';
 
 // ---------------------------------------------------------------------------
 // Local GIS type declarations for OAuth2 Implicit Flow

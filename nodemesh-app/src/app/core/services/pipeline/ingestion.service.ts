@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { CryptoService } from './crypto.service';
-import { DatabaseService } from './database.service';
-import { NodeChallenge, ChallengeType } from '../models/node.model';
+import { CryptoService } from '../storage/crypto.service';
+import { DatabaseService } from '../storage/database.service';
+import { NodeChallenge, ChallengeType } from '../../models/node.model';
 import * as pdfjsLib from 'pdfjs-dist';
 
 // Configurar el worker de PDF.js para el navegador

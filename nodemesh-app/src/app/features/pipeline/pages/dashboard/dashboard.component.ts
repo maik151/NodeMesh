@@ -1,12 +1,12 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../../core/services/auth.service';
-import { DatabaseService } from '../../../../core/services/database.service';
-import { CryptoService } from '../../../../core/services/crypto.service';
+import { AuthService } from '../../../../core/services/auth/auth.service';
+import { DatabaseService } from '../../../../core/services/storage/database.service';
+import { CryptoService } from '../../../../core/services/storage/crypto.service';
 import { NodeChallenge } from '../../../../core/models/node.model';
 import { IngestModalComponent } from '../../components/ingest-modal/ingest-modal.component';
-import { ThemeService } from '../../../../core/services/theme.service';
+import { ThemeService } from '../../../../core/services/ui/theme.service';
 
 @Component({
     selector: 'app-dashboard',

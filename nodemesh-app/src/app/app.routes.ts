@@ -11,12 +11,12 @@ export const routes: Routes = [
     {
         path: 'setup',
         canActivate: [authGuard],
-        loadComponent: () => import('./features/setup/pages/byok-setup/byok-setup.component').then(m => m.ByokSetupComponent)
+        loadComponent: () => import('./features/onboarding/pages/byok-setup/byok-setup.component').then(m => m.ByokSetupComponent)
     },
     {
         path: 'simulador',
         canActivate: [authGuard],
-        loadComponent: () => import('./features/forge/pages/dashboard/dashboard.component').then(m => m.DashboardComponent)
+        loadComponent: () => import('./features/pipeline/pages/dashboard/dashboard.component').then(m => m.DashboardComponent)
     },
     { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];

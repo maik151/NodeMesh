@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ByokSetupComponent } from './byok-setup.component';
-import { AuthService } from '../../../../core/services/auth.service';
-import { CryptoService } from '../../../../core/services/crypto.service';
-import { DatabaseService } from '../../../../core/services/database.service';
+import { AuthService } from '../../../../core/services/auth/auth.service';
+import { CryptoService } from '../../../../core/services/storage/crypto.service';
+import { DatabaseService } from '../../../../core/services/storage/database.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ThemeService } from '../../../../core/services/theme.service';
+import { ThemeService } from '../../../../core/services/ui/theme.service';
 import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass/liquid-glass.component';
 import { vi } from 'vitest';
 

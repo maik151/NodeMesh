@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IngestionService } from '../../../../core/services/ingestion.service';
-import { DatabaseService } from '../../../../core/services/database.service';
-import { CryptoService } from '../../../../core/services/crypto.service';
-import { AuthService } from '../../../../core/services/auth.service';
+import { IngestionService } from '../../../../core/services/pipeline/ingestion.service';
+import { DatabaseService } from '../../../../core/services/storage/database.service';
+import { CryptoService } from '../../../../core/services/storage/crypto.service';
+import { AuthService } from '../../../../core/services/auth/auth.service';
 import { NodeChallenge } from '../../../../core/models/node.model';
 
 @Component({

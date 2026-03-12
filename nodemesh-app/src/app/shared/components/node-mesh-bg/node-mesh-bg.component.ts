@@ -1,5 +1,5 @@
 import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, NgZone } from '@angular/core';
-import { ThemeService } from '../../../core/services/theme.service';
+import { ThemeService } from '../../../core/services/ui/theme.service';
 
 @Component({
     selector: 'app-node-mesh-bg',

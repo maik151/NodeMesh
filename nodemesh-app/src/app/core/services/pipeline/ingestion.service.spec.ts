@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { IngestionService } from './ingestion.service';
-import { CryptoService } from './crypto.service';
-import { DatabaseService } from './database.service';
+import { CryptoService } from '../storage/crypto.service';
+import { DatabaseService } from '../storage/database.service';
+import { vi } from 'vitest';
 
 describe('IngestionService (TDD - F3)', () => {
     let service: IngestionService;

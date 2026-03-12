@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 import { AuthService } from './auth.service';
-import { DatabaseService } from './database.service';
+import { DatabaseService } from '../storage/database.service';
 
 // ================================================================
 // Mock the Google Identity Services OAuth2 SDK on the window object

@@ -4,8 +4,11 @@ import { DatabaseService } from '../storage/database.service';
 import { NodeChallenge, ChallengeType } from '../../models/node.model';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
-// Configurar el worker de PDF.js para el navegador
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+// Configurar el worker de PDF.js para el navegador de forma compatible con Vite
+if (typeof Worker !== 'undefined') {
+    const workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+    pdfjsLib.GlobalWorkerOptions.workerPort = new Worker(workerSrc, { type: 'module' });
+}
 
 @Injectable({
     providedIn: 'root'

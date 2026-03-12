@@ -22,16 +22,14 @@ import '@angular/compiler';
 import 'zone.js';
 import 'zone.js/testing';
 import { getTestBed } from '@angular/core/testing';
-// @ts-ignore
 import {
-    BrowserDynamicTestingModule,
-    platformBrowserDynamicTesting,
-} from '@angular/platform-browser-dynamic/testing';
+    BrowserTestingModule,
+    platformBrowserTesting,
+} from '@angular/platform-browser/testing';
 
-// @ts-ignore
 getTestBed().initTestEnvironment(
-    BrowserDynamicTestingModule,
-    platformBrowserDynamicTesting(),
+    BrowserTestingModule,
+    platformBrowserTesting(),
     {
         teardown: { destroyAfterEach: true }
     }

@@ -47,16 +47,22 @@ export class NodeMeshBgComponent implements AfterViewInit, OnDestroy {
         canvas.height = rect.height;
     }
 
+    private getRandom(): number {
+        const array = new Uint32Array(1);
+        window.crypto.getRandomValues(array);
+        return array[0] / (0xFFFFFFFF + 1);
+    }
+
     private initNodes(): void {
         const { width, height } = this.canvasRef.nativeElement;
         this.nodes = [];
         for (let i = 0; i < this.NODE_COUNT; i++) {
             this.nodes.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                vx: (Math.random() - 0.5) * 0.4,
-                vy: (Math.random() - 0.5) * 0.4,
-                r: Math.random() * 2 + 1.5,
+                x: this.getRandom() * width,
+                y: this.getRandom() * height,
+                vx: (this.getRandom() - 0.5) * 0.4,
+                vy: (this.getRandom() - 0.5) * 0.4,
+                r: this.getRandom() * 2 + 1.5,
             });
         }
     }

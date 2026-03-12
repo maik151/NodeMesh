@@ -7,6 +7,15 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!-- Content Security Policy (Compensating control for SRI on dynamic Google services) -->
+  <meta http-equiv="Content-Security-Policy" 
+        content="default-src 'self'; 
+                 script-src 'self' https://accounts.google.com/gsi/client; 
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+                 font-src 'self' https://fonts.gstatic.com; 
+                 frame-src https://accounts.google.com/; 
+                 connect-src 'self' https://accounts.google.com https://generativelanguage.googleapis.com; 
+                 img-src 'self' data: https://*.googleusercontent.com;">
   <!-- Google Identity Services Requirements (SRI not recommended for dynamic gsi/client) -->
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <script src="https://accounts.google.com/gsi/client" async defer crossorigin="anonymous"></script>

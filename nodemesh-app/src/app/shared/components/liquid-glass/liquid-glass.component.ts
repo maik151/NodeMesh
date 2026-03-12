@@ -102,7 +102,7 @@ export class LiquidGlassComponent implements AfterViewInit, OnDestroy, OnChanges
             const filterUrl = this.getDisplacementFilter(actualHeight, actualWidth);
             const bgFilter = `blur(${this.blur / 2}px) url('${filterUrl}') blur(${this.blur}px) brightness(1.1) saturate(1.5)`;
 
-            element.style.backdropFilter = bgFilter;
+            element.style.setProperty('backdrop-filter', bgFilter);
             element.style.setProperty('-webkit-backdrop-filter', bgFilter);
         });
     }

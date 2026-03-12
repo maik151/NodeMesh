@@ -2,5 +2,5 @@ projectKey=nodemeshhh
 serverUrl=http://localhost:9000
 serverVersion=26.3.0.120487
 dashboardUrl=http://localhost:9000/dashboard?id=nodemeshhh
-ceTaskId=b98e40ce-b656-4809-8b96-889e6fa0e3cc
-ceTaskUrl=http://localhost:9000/api/ce/task?id=b98e40ce-b656-4809-8b96-889e6fa0e3cc
+ceTaskId=c3006df5-0121-46bf-8048-274c5e68ec48
+ceTaskUrl=http://localhost:9000/api/ce/task?id=c3006df5-0121-46bf-8048-274c5e68ec48

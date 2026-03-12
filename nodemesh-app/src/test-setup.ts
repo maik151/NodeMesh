@@ -6,7 +6,12 @@ import { webcrypto } from 'node:crypto';
 const polyfills = {
     indexedDB: fIDB,
     IDBKeyRange: fIDBKR,
-    crypto: webcrypto
+    crypto: webcrypto,
+    ResizeObserver: class {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+    }
 };
 
 Object.entries(polyfills).forEach(([key, value]) => {

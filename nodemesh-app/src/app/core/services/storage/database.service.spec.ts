@@ -121,4 +121,76 @@ describe('DatabaseService (TDD - AUT-01) - RED phase', () => {
         expect(filtered.length).toBe(1);
         expect(filtered[0].question).toBe('Q from source A');
     });
+
+    // --- NUEVAS PRUEBAS PARA COBERTURA (Round 1) ---
+
+    describe('Getters y Estados Iniciales', () => {
+        it('debe devolver nombre vacío y tablas vacías si no está inicializado', () => {
+            const freshService = new DatabaseService();
+            expect(freshService.name).toBe('');
+            expect(freshService.tables).toEqual([]);
+        });
+
+        it('debe devolver el nombre y las tablas después de inicializar', async () => {
+            await service.initializeVault('test_getters');
+            expect(service.name).toBe('test_getters');
+            expect(service.tables.length).toBe(4); // nodes, api_keys, history, statistics
+        });
+    });
+
+    describe('Manejo de Errores de Inicialización', () => {
+        it('debe cerrar la base de datos anterior si se inicializa de nuevo', async () => {
+            await service.initializeVault('vault_1');
+            const closeSpy = vi.spyOn(service.db, 'close');
+            await service.initializeVault('vault_2');
+            expect(closeSpy).toHaveBeenCalled();
+            expect(service.name).toBe('vault_2');
+        });
+
+        it('debe capturar y relanzar QuotaExceededError con mensaje específico', async () => {
+            // Simulamos que db.open lanza QuotaExceededError
+            const mockDb = new Dexie('test_quota');
+            vi.spyOn(Dexie.prototype, 'open').mockRejectedValue({ name: 'QuotaExceededError' });
+            const consoleSpy = vi.spyOn(console, 'error');
+
+            await expect(service.initializeVault('test_quota')).rejects.toThrow();
+            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('CRITICAL: QuotaExceededError'));
+            
+            vi.restoreAllMocks();
+        });
+
+        it('debe capturar y relanzar errores genéricos de apertura', async () => {
+            vi.spyOn(Dexie.prototype, 'open').mockRejectedValue(new Error('Generic IDB Error'));
+            const consoleSpy = vi.spyOn(console, 'error');
+
+            await expect(service.initializeVault('test_generic')).rejects.toThrow('Generic IDB Error');
+            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error opening IndexedDB'), expect.anything());
+
+            vi.restoreAllMocks();
+        });
+    });
+
+    describe('Validaciones de Estado (Uninitialized)', () => {
+        const errorMsg = 'Database not initialized';
+
+        it('saveApiKey debe fallar si no hay DB', async () => {
+            await expect(service.saveApiKey('p', 'k')).rejects.toThrow(errorMsg);
+        });
+
+        it('getApiKey debe fallar si no hay DB', async () => {
+            await expect(service.getApiKey('p')).rejects.toThrow(errorMsg);
+        });
+
+        it('saveNodes debe fallar si no hay DB', async () => {
+            await expect(service.saveNodes([])).rejects.toThrow(errorMsg);
+        });
+
+        it('getNodes debe fallar si no hay DB', async () => {
+            await expect(service.getNodes()).rejects.toThrow(errorMsg);
+        });
+
+        it('getNodesBySource debe fallar si no hay DB', async () => {
+            await expect(service.getNodesBySource('s')).rejects.toThrow(errorMsg);
+        });
+    });
 });

@@ -98,8 +98,8 @@
 }
 
 .btn-logout:hover {
-    color: #ff3333;
-    background: rgba(255, 51, 51, 0.15); /* Increased opacity for contrast */
+    color: #ffffff;
+    background: #cc0000; /* High contrast red background on hover */
 }
 
 /* ============ MAIN CONTENT ============ */
@@ -378,8 +378,8 @@
 }
 
 .btn-close-modal:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.15); /* Increased for contrast */
+    color: #000000;
+    background: var(--color-brand-neon); /* High contrast neon indicator */
 }
 
 @keyframes fadeIn {

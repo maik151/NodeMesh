@@ -26,8 +26,12 @@ import {
     BrowserDynamicTestingModule,
     platformBrowserDynamicTesting,
 } from '@angular/platform-browser-dynamic/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 getTestBed().initTestEnvironment(
     BrowserDynamicTestingModule,
-    platformBrowserDynamicTesting()
+    platformBrowserDynamicTesting(),
+    {
+        teardown: { destroyAfterEach: true }
+    }
 );

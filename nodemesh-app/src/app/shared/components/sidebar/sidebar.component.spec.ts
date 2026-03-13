@@ -3,13 +3,19 @@ import { SidebarComponent } from './sidebar.component';
 import { provideRouter } from '@angular/router';
 import { By } from '@angular/platform-browser';
 import { ThemeService } from '../../../core/services/ui/theme.service';
+import { BehaviorSubject } from 'rxjs';
 
 describe('SidebarComponent (TDD)', () => {
   let component: SidebarComponent;
   let fixture: ComponentFixture<SidebarComponent>;
 
   class MockThemeService {
-    isDark = true;
+    private isDarkSubject = new BehaviorSubject<boolean>(true);
+    isDark$ = this.isDarkSubject.asObservable();
+    
+    set isDark(value: boolean) {
+      this.isDarkSubject.next(value);
+    }
   }
 
   let mockThemeService: MockThemeService;
@@ -69,13 +75,17 @@ describe('SidebarComponent (TDD)', () => {
     expect(vaultIcon.nativeElement.textContent.trim()).toBe('database');
   });
 
-  it('debe devolver el logotipo blanco en modo oscuro', () => {
+  it('debe vincular el logotipo blanco en modo oscuro', () => {
     mockThemeService.isDark = true;
-    expect(component.logoSrc).toContain('nodeMesh_white.png');
+    fixture.detectChanges();
+    const logoImg = fixture.debugElement.query(By.css('.logo-img'));
+    expect(logoImg.nativeElement.src).toContain('nodeMesh_white.png');
   });
 
-  it('debe devolver el logotipo oscuro en modo claro', () => {
+  it('debe vincular el logotipo oscuro en modo claro', () => {
     mockThemeService.isDark = false;
-    expect(component.logoSrc).toContain('nodemesh_dark.png');
+    fixture.detectChanges();
+    const logoImg = fixture.debugElement.query(By.css('.logo-img'));
+    expect(logoImg.nativeElement.src).toContain('nodemesh_dark.png');
   });
 });

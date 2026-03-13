@@ -11,7 +11,8 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
     <div class="sidebar-wrapper">
       <div class="sidebar-header">
         <div class="logo-container" [hidden]="!isExpanded">
-          <img [src]="logoSrc" alt="NodeMesh Logo" class="logo-img">
+          <img [src]="(isDark$ | async) ? '/Images/nodeMesh_white.png' : '/Images/nodemesh_dark.png'" 
+               alt="NodeMesh Logo" class="logo-img">
         </div>
         <button class="toggle-btn" (click)="toggle()" [title]="isExpanded ? 'Contraer' : 'Expandir'">
           <span class="material-symbols-rounded">
@@ -25,10 +26,12 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
         <div class="nav-group">
           <small *ngIf="isExpanded" class="group-label">FLUJO</small>
           <a routerLink="/center" routerLinkActive="active" class="nav-item">
+            <div class="item-highlight"></div>
             <span class="material-symbols-rounded">terminal</span>
             <span class="item-text" *ngIf="isExpanded">Command Center</span>
           </a>
           <a routerLink="/vault" routerLinkActive="active" class="nav-item">
+            <div class="item-highlight"></div>
             <span class="material-symbols-rounded">database</span>
             <span class="item-text" *ngIf="isExpanded">Bóveda</span>
           </a>
@@ -38,6 +41,7 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
         <div class="nav-group">
           <small *ngIf="isExpanded" class="group-label">ANÁLISIS</small>
           <a routerLink="/stats" routerLinkActive="active" class="nav-item">
+            <div class="item-highlight"></div>
             <span class="material-symbols-rounded">analytics</span>
             <span class="item-text" *ngIf="isExpanded">Estadísticas</span>
           </a>
@@ -46,10 +50,12 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
         <!-- Bloque 3: Infraestructura (Push down) -->
         <div class="nav-group bottom">
           <a routerLink="/docs" routerLinkActive="active" class="nav-item">
+            <div class="item-highlight"></div>
             <span class="material-symbols-rounded">book</span>
             <span class="item-text" *ngIf="isExpanded">Documentos</span>
           </a>
           <a routerLink="/settings" routerLinkActive="active" class="nav-item">
+            <div class="item-highlight"></div>
             <span class="material-symbols-rounded">settings</span>
             <span class="item-text" *ngIf="isExpanded">Configuración</span>
           </a>
@@ -59,22 +65,30 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
   `,
   styles: [`
     :host {
-      --sidebar-bg: var(--bg-surface, #121212);
-      --active-glow: var(--primary-node, #9ACD32);
-      --text-main: var(--text-base, #ffffff);
-      --text-dim: var(--text-muted, rgba(255, 255, 255, 0.6));
-      --border-color: var(--glass-border, rgba(255, 255, 255, 0.1));
+      --sidebar-bg: var(--bg-surface);
+      --active-glow: var(--primary-node);
+      --text-main: var(--text-base);
+      --text-dim: var(--text-muted);
+      --border-color: var(--glass-border);
+      --glass-fill: rgba(255, 255, 255, 0.03);
       
       display: block;
       height: 100vh;
       background: var(--sidebar-bg);
       border-right: 1px solid var(--border-color);
-      transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: 
+        width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        background-color 0.3s ease,
+        border-color 0.3s ease;
       width: 260px;
       overflow: hidden;
       flex-shrink: 0;
       position: relative;
       z-index: 100;
+    }
+
+    :host-context([data-theme="light"]) {
+      --glass-fill: rgba(0, 0, 0, 0.03);
     }
 
     :host.collapsed {
@@ -114,7 +128,7 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
     }
 
     .toggle-btn {
-      background: rgba(255, 255, 255, 0.03);
+      background: var(--glass-fill);
       backdrop-filter: blur(8px);
       border: 1px solid var(--border-color);
       color: var(--text-main);
@@ -189,11 +203,25 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
       padding-left: 1.25rem;
     }
 
+    .item-highlight {
+      position: absolute;
+      left: 0;
+      width: 3px;
+      height: 60%;
+      background: var(--active-glow);
+      border-radius: 0 4px 4px 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
     .nav-item.active {
-      background: linear-gradient(90deg, rgba(154, 205, 50, 0.15) 0%, rgba(154, 205, 50, 0.05) 100%);
+      background: linear-gradient(90deg, rgba(154, 205, 50, 0.1) 0%, transparent 100%);
       color: var(--active-glow);
       font-weight: 600;
-      box-shadow: inset 2px 0 0 var(--active-glow);
+    }
+
+    .nav-item.active .item-highlight {
+      opacity: 1;
     }
 
     .item-text {
@@ -234,10 +262,7 @@ export class SidebarComponent {
   @HostBinding('class.expanded') get isExpandedInternal() { return this.isExpanded; }
 
   isExpanded = true;
-
-  get logoSrc(): string {
-    return this.themeService.isDark ? '/Images/nodeMesh_white.png' : '/Images/nodemesh_dark.png';
-  }
+  isDark$ = this.themeService.isDark$;
 
   toggle() {
     this.isExpanded = !this.isExpanded;

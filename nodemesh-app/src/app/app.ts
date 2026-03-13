@@ -3,17 +3,19 @@ import { RouterOutlet, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ThemeToggleComponent } from './shared/components/theme-toggle/theme-toggle.component';
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
+import { UserMenuComponent } from './shared/components/user-menu/user-menu.component';
 import { AuthService } from './core/services/auth/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, ThemeToggleComponent, SidebarComponent],
+  imports: [CommonModule, RouterOutlet, ThemeToggleComponent, SidebarComponent, UserMenuComponent],
   template: `
     <div class="app-container" [class.authenticated]="auth.isAuthenticated()">
       <app-sidebar *ngIf="showSidebar()"></app-sidebar>
       
       <main class="content-area">
+        <app-user-menu *ngIf="auth.isAuthenticated()"></app-user-menu>
         <router-outlet />
         <app-theme-toggle />
       </main>

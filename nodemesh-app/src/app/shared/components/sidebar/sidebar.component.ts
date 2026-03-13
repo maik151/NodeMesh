@@ -52,7 +52,7 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
           <a routerLink="/docs" routerLinkActive="active" class="nav-item">
             <div class="item-highlight"></div>
             <span class="material-symbols-rounded">book</span>
-            <span class="item-text" *ngIf="isExpanded">Documentos</span>
+            <span class="item-text" *ngIf="isExpanded">Docs</span>
           </a>
           <a routerLink="/settings" routerLinkActive="active" class="nav-item">
             <div class="item-highlight"></div>
@@ -194,12 +194,13 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
 
     .group-label {
       color: var(--text-dim);
-      font-size: 0.6rem;
+      font-size: 10px;
       font-weight: 700;
       margin-bottom: 0.25rem;
       margin-left: 0.75rem;
-      letter-spacing: 1.2px;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
+      opacity: 0.4;
       animation: slideIn 0.4s ease forwards;
     }
 
@@ -244,9 +245,15 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
     }
 
     .nav-item.active {
-      background: linear-gradient(90deg, rgba(154, 205, 50, 0.1) 0%, transparent 100%);
+      background: rgba(255, 255, 255, 0.05);
+      border-left: 2px solid var(--active-glow);
       color: var(--active-glow);
       font-weight: 600;
+      border-radius: 0 12px 12px 0;
+    }
+
+    :host-context([data-theme="light"]) .nav-item.active {
+      background: rgba(0, 0, 0, 0.05);
     }
 
     .nav-item.active .item-highlight {
@@ -261,7 +268,7 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
     .material-symbols-rounded {
       font-size: 20px;
       min-width: 20px;
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 200, 'opsz' 24;
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
       transition: transform 0.3s ease;
     }
 
@@ -275,7 +282,7 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
     }
 
     .nav-item.active .material-symbols-rounded {
-      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 200, 'opsz' 24;
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
       animation: pulseGlow 2s infinite ease-in-out;
     }
 

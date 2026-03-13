@@ -88,4 +88,21 @@ describe('SidebarComponent (TDD)', () => {
     const logoImg = fixture.debugElement.query(By.css('.logo-img'));
     expect(logoImg.nativeElement.src).toContain('nodemesh_dark.png');
   });
+
+  it('debe mostrar "Docs" en lugar de "Documentos"', () => {
+    fixture.detectChanges();
+    const docsItem = fixture.debugElement.queryAll(By.css('.item-text'))
+      .find(el => el.nativeElement.textContent.trim() === 'Docs');
+    expect(docsItem).toBeTruthy();
+    
+    const documentosItem = fixture.debugElement.queryAll(By.css('.item-text'))
+      .find(el => el.nativeElement.textContent.trim() === 'Documentos');
+    expect(documentosItem).toBeFalsy();
+  });
+
+  it('debe tener la estructura de navegación correcta', () => {
+    fixture.detectChanges();
+    const navItems = fixture.debugElement.queryAll(By.css('.nav-item'));
+    expect(navItems.length).toBe(5);
+  });
 });

@@ -1,19 +1,26 @@
 /* Global application-level styles */
 
 :root {
-  --bg-surface: #050505;
+  --bg-surface: #0a0a0c; /* Softened Obsidian */
   --primary-node: #9ACD32;
-  --text-base: #ffffff;
-  --text-muted: rgba(255, 255, 255, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --text-base: #e9ecef; /* Better for dark readability */
+  --text-muted: rgba(233, 236, 239, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
 }
 
 [data-theme="light"] {
-  --bg-surface: #ffffff;
-  --primary-node: #6b8e23; /* Darker Olive for readability */
-  --text-base: #050505;
-  --text-muted: rgba(0, 0, 0, 0.6);
-  --glass-border: rgba(0, 0, 0, 0.1);
+  --bg-surface: #fcfcfc; /* Neutral White */
+  --primary-node: #6b8e23;
+  --text-base: #1a1a1c; /* Softened Charcoal */
+  --text-muted: rgba(26, 26, 28, 0.6);
+  --glass-border: rgba(0, 0, 0, 0.08);
+}
+
+html, body {
+  background-color: var(--bg-surface);
+  color: var(--text-base);
+  margin: 0;
+  padding: 0;
 }
 
 .app-container {
@@ -21,11 +28,10 @@
   height: 100vh;
   width: 100%;
   overflow: hidden;
-  background: var(--bg-surface, #050505);
 }
 
 .auth-container.authenticated {
-  background: radial-gradient(circle at center, #121212 0%, #050505 100%);
+  position: relative;
 }
 
 .content-area {

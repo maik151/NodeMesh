@@ -65,11 +65,11 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
   `,
   styles: [`
     :host {
-      --sidebar-bg: var(--bg-surface);
+      --sidebar-bg: #141417; /* Elevated Obsidian for Dark Mode */
       --active-glow: var(--primary-node);
       --text-main: var(--text-base);
       --text-dim: var(--text-muted);
-      --border-color: var(--glass-border);
+      --border-color: #202025; /* Subtle Dark Divider */
       --glass-fill: rgba(255, 255, 255, 0.03);
       
       display: block;
@@ -78,8 +78,8 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
       border-right: 1px solid var(--border-color);
       transition: 
         width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-        background-color 0.3s ease,
-        border-color 0.3s ease;
+        background-color 0.4s ease,
+        border-color 0.4s ease;
       width: 260px;
       overflow: hidden;
       flex-shrink: 0;
@@ -88,7 +88,9 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
     }
 
     :host-context([data-theme="light"]) {
+      --sidebar-bg: #f8f9fa; /* Elegant off-white for Light Mode */
       --glass-fill: rgba(0, 0, 0, 0.03);
+      --border-color: #e9ecef; /* Subtle Light Divider */
     }
 
     :host.collapsed {

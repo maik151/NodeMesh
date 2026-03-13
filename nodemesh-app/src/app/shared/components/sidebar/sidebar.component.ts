@@ -103,6 +103,11 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
       height: 100%;
       padding: 1.5rem 1rem;
       box-sizing: border-box;
+      transition: padding 0.4s ease;
+    }
+
+    :host.collapsed .sidebar-wrapper {
+      padding: 1.5rem 0.5rem; /* More breathing room for icons when collapsed */
     }
 
     .sidebar-header {
@@ -215,6 +220,16 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
       background: rgba(154, 205, 50, 0.05);
       color: var(--text-main);
       padding-left: 1.15rem;
+    }
+
+    :host.collapsed .nav-item {
+      justify-content: center;
+      padding: 0.75rem 0;
+      gap: 0;
+    }
+
+    :host.collapsed .nav-item:hover {
+      padding-left: 0;
     }
 
     .item-highlight {

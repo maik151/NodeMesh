@@ -1,13 +1,14 @@
-ID	Categoría	Requerimiento No Funcional	Métrica / Criterio de Aceptación	Estándar / Práctica Asociada
-RNF-SEG-01	Seguridad (Auth)	OAuth 2.0 (Google Login)	El acceso al dashboard debe requerir autenticación exclusiva vía Google OAuth 2.0. El token JWT devuelto debe validarse en el cliente y guardarse de forma segura.	RFC 6749 (OAuth 2.0)
-RNF-SEG-02	Seguridad (BYOK)	Cifrado Local de API Keys	Las API Keys del usuario (Gemini, Claude) NUNCA deben viajar a nuestros servidores. Deben almacenarse en IndexedDB cifradas utilizando la Web Crypto API nativa del navegador.	OWASP HTML5 Security Cheat Sheet
-RNF-SEG-03	Seguridad (Anti-XSS)	Sanitización de Outputs de IA	Todo JSON o Markdown devuelto por el LLM debe pasar por una librería de sanitización (ej. DOMPurify) antes de renderizarse en Angular para evitar ataques de Prompt Injection que ejecuten scripts maliciosos.	OWASP XSS Prevention
-RNF-ALF-01	Local-First (Datos)	Persistencia Indexada	Toda interacción (nodos, historial, estadísticas) debe guardarse en menos de 100ms en IndexedDB usando Dexie.js. El sistema debe manejar cuotas de almacenamiento excedidas con un error amigable.	W3C IndexedDB API
-RNF-IA-01	IA (Resiliencia)	Manejo de Timeouts y Fallbacks	Las peticiones al LLM deben tener un timeout máximo de 20 segundos. Si el LLM devuelve un error (ej. 429 Too Many Requests), el sistema debe reintentar con Exponential Backoff.	Resilience4j / Retry Pattern
-RNF-TDD-01	Calidad (TDD)	Cobertura de Algoritmos Core	El desarrollo debe seguir el ciclo Red-Green-Refactor. Los servicios de Spaced Repetition y Prompt Generation deben tener >85% de cobertura de pruebas unitarias (usando Jest/Jasmine).	Test-Driven Development (TDD)
-RNF-TDD-02	Calidad (E2E)	Pruebas de Flujo Crítico	El simulador de los 9 tipos de preguntas debe estar cubierto por pruebas End-to-End (E2E) automatizadas con Cypress o Playwright, validando que la UI responda correctamente a JSONs simulados.	Shift-Left Testing
-RNF-INF-01	Infraestructura	Multi-Stage Docker Build	El contenedor final a desplegar en Render debe ser un servidor Nginx (Alpine) que sirva los estáticos de Angular. El peso de la imagen final debe ser menor a 50MB.	DevOps / Docker Best Practices
-RNF-INF-02	Infraestructura	CI/CD Automatizado	Cualquier Push o Pull Request hacia la rama main en GitHub debe disparar los tests unitarios. Solo si pasan, Render debe desplegar la nueva imagen de Docker sin downtime.	Continuous Deployment
-RNF-UI-01	UI (Diseño)	Dark Mode Nativo & Dev-Tool Vibe	La aplicación debe renderizarse por defecto en Dark Mode. Debe usar una paleta estricta de grises profundos (Void) y verde neón (Terminal Green). La tipografía del código/prompts debe ser monoespaciada (Fira Code/JetBrains Mono).	Design Systems / WCAG 2.1
-RNF-UX-01	UX (Performance)	Carga Inicial Ultrarrápida	Al ser una Single Page Application Local-First, el Largest Contentful Paint (LCP) debe ocurrir en menos de 1.5 segundos en conexiones 4G estándar.	Core Web Vitals
-RNF-UX-02	UX (Simulador)	Feedback de Fricción Cognitiva	Durante el simulador, las transiciones entre preguntas y justificaciones deben ser instantáneas (<50ms). Si se espera la IA, debe mostrarse un Skeleton Loader con estética de consola/terminal.	Nielsen Heuristics (#1)
+ID | Categoría | Requerimiento No Funcional | Métrica / Criterio de Aceptación | Estándar / Práctica Asociada | Estado
+---|---|---|---|---|---
+RNF-SEG-01 | Seguridad (Auth) | OAuth 2.0 (Google Login) | Acceso al Command Center vía Google OAuth 2.0. Token validado localmente. | RFC 6749 (OAuth 2.0) | **[HECHO]**
+RNF-SEG-02 | Seguridad (BYOK) | Cifrado Local de API Keys | API Key cifrada con AES-GCM 256 (Web Crypto API) en IndexedDB. Nunca toca el servidor. | OWASP HTML5 / Web Crypto | **[HECHO]**
+RNF-SEG-03 | Seguridad (Payload) | Validación Estricta de Esquemas | Todo JSON pegado debe pasar por validador estricto. Rechazo en <50ms si el LLM alucina. | Fail-Fast Principle | **[HECHO]**
+RNF-SEG-04 | Seguridad (Anti-XSS) | Sanitización de Nodos | El contenido de la IA (justificantes) se purga con DOMPurify antes de inyectarse. | OWASP XSS Prevention | **[HECHO]**
+RNF-ALF-01 | Local-First | Persistencia Indexada | Lectura/Escritura en IndexedDB (Dexie.js) en <100ms. Manejo de QuotaExceededError. | W3C IndexedDB API | **[HECHO]**
+RNF-IA-01 | IA (Resiliencia) | Timeouts y Retry Pattern | Timeout de 15s al LLM. Exponential Backoff con máx 3 reintentos en errores 429/500. | Resilience4j | **[HECHO]**
+RNF-TDD-01 | Calidad (Core) | Cobertura de Lógica Crítica | Algoritmo SM-2 y Validador con >90% de cobertura en pruebas unitarias. | TDD Best Practices | **[HECHO]**
+RNF-TDD-02 | Calidad (E2E) | Pruebas de Evaluación | Modo Zen con pruebas E2E asegurando cambio de estado y recepción de auditoría LLM. | Shift-Left Testing | [PENDIENTE]
+RNF-INF-01 | Infraestructura | Multi-Stage Docker Build | Angular + Nginx (Alpine). Imagen optimizada a <50MB. | Docker Best Practices | [PENDIENTE]
+RNF-UX-01 | UX (Performance) | Carga del Command Center | LCP del Bento Grid inicial en <1.2 segundos en 4G. | Core Web Vitals | **[HECHO]**
+RNF-UX-02 | UX (Feedback) | Fricción Cognitiva de UI | Transiciones entre nodos <50ms. Skeleton Loader técnico durante auditoría. | Nielsen Heuristic #1 | **[HECHO]**
+RNF-UX-03 | UX (Error Recovery) | Mitigación del Portapapeles | Si el parseo falla, renderizar bloque técnico con corrección exacta para el prompt. | Nielsen Heuristic #9 | **[HECHO]**

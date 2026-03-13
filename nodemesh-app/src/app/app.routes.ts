@@ -38,11 +38,6 @@ export const routes: Routes = [
         canActivate: [authGuard],
         loadComponent: () => import('./features/settings/pages/settings/settings.component').then(m => m.SettingsComponent)
     },
-    {
-        path: 'simulador',
-        canActivate: [authGuard],
-        loadComponent: () => import('./features/pipeline/pages/dashboard/dashboard.component').then(m => m.DashboardComponent)
-    },
     { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: '**', redirectTo: 'center' }
 ];

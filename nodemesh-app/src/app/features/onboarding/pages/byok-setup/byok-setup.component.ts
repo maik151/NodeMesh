@@ -101,9 +101,9 @@ export class ByokSetupComponent {
             this.isSaveLoading = false;
             this.cdr.detectChanges();
 
-            // Redirigir al dashboard/simulador después de un pequeño delay visual
+            // Redirigir al Command Center después de un pequeño delay visual
             setTimeout(() => {
-                this.router.navigate(['/simulador']);
+                this.router.navigate(['/center']);
             }, 1500);
 
         } catch (error: any) {
@@ -115,7 +115,7 @@ export class ByokSetupComponent {
     }
 
     onSkipSetup() {
-        this.router.navigate(['/simulador']);
+        this.router.navigate(['/center']);
     }
 
     goBack() {

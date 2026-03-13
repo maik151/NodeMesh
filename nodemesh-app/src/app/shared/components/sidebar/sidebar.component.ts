@@ -155,14 +155,12 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
 
     :host.collapsed .toggle-btn {
       background: rgba(154, 205, 50, 0.05); /* Greenish tint for collapsed state */
-      border: 1px solid rgba(154, 205, 50, 0.2);
       backdrop-filter: blur(8px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     .toggle-btn:hover {
-      background: rgba(154, 205, 50, 0.05);
-      border: 1px solid rgba(154, 205, 50, 0.2);
+      background: rgba(154, 205, 50, 0.1);
     }
 
     .toggle-btn:hover .material-symbols-rounded {

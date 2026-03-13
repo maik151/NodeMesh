@@ -53,10 +53,10 @@ export class LoginComponent implements OnInit {
             this.loginSuccess = true;
             this.cdr.detectChanges();
 
-            // Smart redirect: si ya tiene API Key configurada, directo al dashboard
+            // Smart redirect: si ya tiene API Key configurada, directo al Command Center
             const existingKey = await this.dbService.getApiKey('gemini');
             if (existingKey) {
-                this.router.navigate(['/simulador']);
+                this.router.navigate(['/center']);
             } else {
                 this.router.navigate(['/setup']);
             }

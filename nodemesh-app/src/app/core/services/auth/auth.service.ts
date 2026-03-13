@@ -140,7 +140,8 @@ export class AuthService {
             const user: UserProfile = {
                 uid: data.sub,
                 email: data.email,
-                displayName: data.name
+                displayName: data.name,
+                photoURL: data.picture
             };
 
             const vaultKey = await this.deriveStorageKey(user.uid);

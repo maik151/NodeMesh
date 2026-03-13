@@ -1,12 +1,14 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { ThemeService } from '../../../core/services/ui/theme.service';
+import { LiquidGlassComponent } from '../liquid-glass/liquid-glass.component';
 
 @Component({
   selector: 'app-user-menu',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LiquidGlassComponent],
   template: `
     <div class="user-identity-shell" *ngIf="user">
       <div class="avatar-trigger" (click)="toggleMenu()" [class.active]="isOpen">
@@ -15,17 +17,21 @@ import { AuthService } from '../../../core/services/auth/auth.service';
       </div>
 
       <div class="identity-popover" *ngIf="isOpen">
-        <div class="popover-header">
-          <span class="user-display-name">{{ user.displayName }}</span>
-          <span class="user-email">{{ user.email }}</span>
-        </div>
-        
-        <div class="popover-actions">
-          <button class="action-btn logout-btn" (click)="handleLogout()">
-            <span class="material-symbols-rounded">logout</span>
-            <span>Cerrar Sesión</span>
-          </button>
-        </div>
+        <app-liquid-glass [radius]="16" [blur]="8" [strength]="2" [backgroundColor]="(isDark$ | async) ? 'rgba(20, 20, 23, 0.7)' : 'rgba(255, 255, 255, 0.7)'">
+          <div class="popover-content">
+            <div class="popover-header">
+              <span class="user-display-name">{{ user.displayName }}</span>
+              <span class="user-email">{{ user.email }}</span>
+            </div>
+            
+            <div class="popover-actions">
+              <button class="action-btn logout-btn" (click)="handleLogout()">
+                <span class="material-symbols-rounded">logout</span>
+                <span>Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+        </app-liquid-glass>
       </div>
     </div>
   `,
@@ -80,20 +86,18 @@ import { AuthService } from '../../../core/services/auth/auth.service';
       position: absolute;
       top: calc(100% + 1rem);
       right: 0;
-      width: 240px;
-      background: rgba(20, 20, 23, 0.85);
-      backdrop-filter: blur(16px) saturate(180%);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      padding: 1.25rem;
+      width: 280px;
       animation: bloomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       transform-origin: top right;
+      z-index: 1001;
+    }
+
+    .popover-content {
+      padding: 1.25rem;
     }
 
     :host-context([data-theme="light"]) .identity-popover {
-      background: rgba(255, 255, 255, 0.85);
-      border-color: rgba(0, 0, 0, 0.05);
+      /* Theme colors handled via input binding to app-liquid-glass */
     }
 
     .popover-header {
@@ -160,8 +164,18 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 export class UserMenuComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly el = inject(ElementRef);
+  private readonly themeService = inject(ThemeService);
 
   isOpen = false;
+  isDark$ = this.themeService.isDark$;
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (this.isOpen && !this.el.nativeElement.contains(event.target as Node)) {
+      this.isOpen = false;
+    }
+  }
 
   get user() {
     return this.auth.getCurrentUser();

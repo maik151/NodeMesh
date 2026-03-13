@@ -110,12 +110,16 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
       align-items: center;
       justify-content: space-between;
       margin-bottom: 2.5rem;
-      height: 48px;
+      height: 52px; /* Increased header height for larger logo */
       position: relative;
+      gap: 1.25rem; /* Balanced gap */
+      padding-right: 0.5rem;
     }
 
     :host.collapsed .sidebar-header {
       justify-content: center;
+      padding-right: 0;
+      gap: 0;
     }
 
     .logo-container {
@@ -125,7 +129,7 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
     }
 
     .logo-img {
-      height: 44px;
+      height: 52px; /* Restored larger size */
       object-fit: contain;
     }
 
@@ -134,8 +138,8 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
       backdrop-filter: blur(8px);
       border: 1px solid var(--border-color);
       color: var(--text-main);
-      border-radius: 12px;
-      padding: 8px;
+      border-radius: 10px; /* Slightly tighter radius */
+      padding: 6px; /* Reduced button footprint */
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -232,9 +236,14 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
     }
 
     .material-symbols-rounded {
-      font-size: 24px;
-      min-width: 24px;
+      font-size: 20px; /* Smaller icon for the toggle button */
+      min-width: 20px;
       transition: transform 0.3s ease;
+    }
+
+    .nav-item .material-symbols-rounded {
+      font-size: 24px; /* Keep nav icons at standard size */
+      min-width: 24px;
     }
 
     .nav-item:hover .material-symbols-rounded {

@@ -134,9 +134,9 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
     }
 
     .toggle-btn {
-      background: var(--glass-fill);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border-color);
+      background: transparent;
+      backdrop-filter: none;
+      border: none;
       color: var(--text-main);
       border-radius: 10px; /* Slightly tighter radius */
       padding: 6px; /* Reduced button footprint */
@@ -145,47 +145,55 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
       align-items: center;
       justify-content: center;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: none;
     }
 
     :host.collapsed .toggle-btn {
-      background: rgba(154, 205, 50, 0.05);
-      border-color: rgba(154, 205, 50, 0.2);
+      background: rgba(154, 205, 50, 0.05); /* Greenish tint for collapsed state */
+      border: 1px solid rgba(154, 205, 50, 0.2);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     .toggle-btn:hover {
-      background: rgba(154, 205, 50, 0.1);
-      border-color: var(--active-glow);
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(154, 205, 50, 0.2);
+      background: rgba(154, 205, 50, 0.05);
+      border: 1px solid rgba(154, 205, 50, 0.2);
+    }
+
+    .toggle-btn:hover .material-symbols-rounded {
+      animation: nudgeLeft 0.6s infinite ease-in-out;
+    }
+
+    :host.collapsed .toggle-btn:hover .material-symbols-rounded {
+      animation: nudgeRight 0.6s infinite ease-in-out;
     }
 
     .sidebar-nav {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 1.25rem; /* Tighter navigation grouping */
     }
 
     .nav-group {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.25rem;
     }
 
     .nav-group.bottom {
       margin-top: auto;
       border-top: 1px solid var(--border-color);
-      padding-top: 1.5rem;
+      padding-top: 1.25rem;
     }
 
     .group-label {
       color: var(--text-dim);
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       font-weight: 700;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
       margin-left: 0.75rem;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
       animation: slideIn 0.4s ease forwards;
     }
@@ -193,8 +201,8 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
     .nav-item {
       display: flex;
       align-items: center;
-      gap: 1.25rem;
-      padding: 0.85rem 1rem;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
       color: var(--text-dim);
       text-decoration: none;
       border-radius: 12px;
@@ -206,7 +214,7 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
     .nav-item:hover {
       background: rgba(154, 205, 50, 0.05);
       color: var(--text-main);
-      padding-left: 1.25rem;
+      padding-left: 1.15rem;
     }
 
     .item-highlight {
@@ -231,23 +239,52 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
     }
 
     .item-text {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       animation: slideFade 0.3s ease forwards;
     }
 
     .material-symbols-rounded {
-      font-size: 20px; /* Smaller icon for the toggle button */
+      font-size: 20px;
       min-width: 20px;
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 200, 'opsz' 24;
       transition: transform 0.3s ease;
     }
 
     .nav-item .material-symbols-rounded {
-      font-size: 24px; /* Keep nav icons at standard size */
+      font-size: 24px;
       min-width: 24px;
     }
 
     .nav-item:hover .material-symbols-rounded {
-      transform: scale(1.15);
+      animation: tiltShake 0.4s ease-in-out;
+    }
+
+    .nav-item.active .material-symbols-rounded {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 200, 'opsz' 24;
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+
+    @keyframes tiltShake {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-8deg) scale(1.1); }
+      50% { transform: rotate(8deg) scale(1.1); }
+      75% { transform: rotate(-4deg) scale(1.1); }
+      100% { transform: rotate(0deg) scale(1.1); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 2px var(--active-glow)); transform: scale(1); }
+      50% { filter: drop-shadow(0 0 8px var(--active-glow)); transform: scale(1.05); }
+    }
+
+    @keyframes nudgeLeft {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(-4px); }
+    }
+
+    @keyframes nudgeRight {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(4px); }
     }
 
     @keyframes popIn {

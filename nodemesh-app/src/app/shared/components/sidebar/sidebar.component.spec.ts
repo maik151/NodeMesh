@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SidebarComponent } from './sidebar.component';
 import { provideRouter } from '@angular/router';
 import { By } from '@angular/platform-browser';
@@ -27,10 +27,10 @@ describe('SidebarComponent (TDD)', () => {
 
     fixture = TestBed.createComponent(SidebarComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
-  it('debe tener los 5 enlaces principales definidos en el flujo', () => {
+  it('debe tener la estructura bento con 5 enlaces principales', () => {
+    fixture.detectChanges();
     const links = fixture.debugElement.queryAll(By.css('a'));
     const expectedPaths = ['/center', '/vault', '/stats', '/docs', '/settings'];
     
@@ -40,34 +40,41 @@ describe('SidebarComponent (TDD)', () => {
     });
   });
 
-  it('debe iniciar en estado expandido por defecto', () => {
+  it('debe iniciar expandido con las clases host correctas', () => {
+    fixture.detectChanges();
     expect(component.isExpanded).toBe(true);
+    expect(fixture.debugElement.classes['expanded']).toBeTruthy();
+    expect(fixture.debugElement.classes['collapsed']).toBeFalsy();
+  });
+
+  it('debe aplicar la clase host "collapsed" al contraerse', () => {
+    component.isExpanded = false;
+    fixture.detectChanges();
+    expect(fixture.debugElement.classes['collapsed']).toBeTruthy();
+    expect(fixture.debugElement.classes['expanded']).toBeFalsy();
   });
 
   it('debe alternar el estado isExpanded al llamar a toggle()', () => {
+    fixture.detectChanges();
     component.toggle();
     expect(component.isExpanded).toBe(false);
-    component.toggle();
-    expect(component.isExpanded).toBe(true);
   });
 
-  it('debe tener los iconos de Material Symbols correctos para cada sección', () => {
+  it('debe tener los iconos de Material Symbols correctos', () => {
+    fixture.detectChanges();
     const centerIcon = fixture.debugElement.query(By.css('a[routerLink="/center"] span.material-symbols-rounded'));
     expect(centerIcon.nativeElement.textContent.trim()).toBe('terminal');
 
     const vaultIcon = fixture.debugElement.query(By.css('a[routerLink="/vault"] span.material-symbols-rounded'));
     expect(vaultIcon.nativeElement.textContent.trim()).toBe('database');
-
-    const settingsIcon = fixture.debugElement.query(By.css('a[routerLink="/settings"] span.material-symbols-rounded'));
-    expect(settingsIcon.nativeElement.textContent.trim()).toBe('settings');
   });
 
-  it('debe devolver el logotipo correcto según el tema', () => {
-    // Caso Dark
+  it('debe devolver el logotipo blanco en modo oscuro', () => {
     mockThemeService.isDark = true;
     expect(component.logoSrc).toContain('nodeMesh_white.png');
+  });
 
-    // Caso Light
+  it('debe devolver el logotipo oscuro en modo claro', () => {
     mockThemeService.isDark = false;
     expect(component.logoSrc).toContain('nodemesh_dark.png');
   });

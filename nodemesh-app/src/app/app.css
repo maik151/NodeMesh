@@ -1,5 +1,21 @@
 /* Global application-level styles */
 
+:root {
+  --bg-surface: #050505;
+  --primary-node: #9ACD32;
+  --text-base: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] {
+  --bg-surface: #ffffff;
+  --primary-node: #6b8e23; /* Darker Olive for readability */
+  --text-base: #050505;
+  --text-muted: rgba(0, 0, 0, 0.6);
+  --glass-border: rgba(0, 0, 0, 0.1);
+}
+
 .app-container {
   display: flex;
   height: 100vh;

@@ -24,7 +24,7 @@ describe('SidebarComponent (TDD)', () => {
     
     expectedPaths.forEach(path => {
       const link = links.find(l => l.attributes['routerLink'] === path);
-      expect(link).toBeTruthy(`Falta el enlace hacia ${path}`);
+      expect(link).toBeTruthy();
     });
   });
 

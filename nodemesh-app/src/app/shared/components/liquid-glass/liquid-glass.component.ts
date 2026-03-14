@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
     standalone: true,
     imports: [CommonModule],
     template: `
-        <div #glassContainer class="glass-box">
+        <div #glassContainer class="glass-box" [class.is-animating]="isAnimating">
             <div class="content">
                 <ng-content></ng-content>
             </div>
@@ -20,9 +20,19 @@ import { CommonModule } from '@angular/common';
         }
         .glass-box {
             position: relative;
+            width: 100%;
+            height: 100%;
             background: rgba(255, 255, 255, 0.4);
-            box-shadow: 1px 1px 1px 0px rgba(255,255,255, 0.60) inset, -1px -1px 1px 0px rgba(255,255,255, 0.60) inset, 0px 0px 16px 0px rgba(0,0,0, 0.04);
+            box-shadow: 
+              inset 0 0 0 1px rgba(255,255,255, 0.08), 
+              0 8px 32px 0 rgba(0, 0, 0, 0.3);
             transition: transform 0.1s ease;
+            will-change: backdrop-filter;
+        }
+        .glass-box.is-animating {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            transition: none !important;
         }
         .content {
             width: 100%;
@@ -39,9 +49,13 @@ export class LiquidGlassComponent implements AfterViewInit, OnDestroy, OnChanges
     @Input() strength: number = 100;
     @Input() chromaticAberration: number = 2;
     @Input() backgroundColor: string = 'rgba(255, 255, 255, 0.15)';
+    @Input() isAnimating: boolean = false;
+    @Input() simple: boolean = false;
 
     private resizeObserver!: ResizeObserver;
     private hasSVGFilterSupport = true;
+    private lastWidth = 0;
+    private lastHeight = 0;
 
     constructor(
         private readonly zone: NgZone,
@@ -84,23 +98,34 @@ export class LiquidGlassComponent implements AfterViewInit, OnDestroy, OnChanges
     private updateGlassEffect(): void {
         const element = this.glassContainer.nativeElement;
 
-        let actualWidth = Math.ceil(element.offsetWidth);
-        let actualHeight = Math.ceil(element.offsetHeight);
+        const actualWidth = Math.ceil(element.offsetWidth);
+        const actualHeight = Math.ceil(element.offsetHeight);
 
         if (actualWidth === 0 || actualHeight === 0) return;
+        
+        // Skip if dimensions haven't changed to avoid expensive paint/reflow
+        if (actualWidth === this.lastWidth && actualHeight === this.lastHeight) return;
+        
+        this.lastWidth = actualWidth;
+        this.lastHeight = actualHeight;
 
         this.zone.runOutsideAngular(() => {
             element.style.borderRadius = `${this.radius}px`;
             element.style.background = this.backgroundColor;
 
-            if (!this.hasSVGFilterSupport || actualWidth < 30 || actualHeight < 30) {
-                element.style.backdropFilter = `blur(${this.blur * 2}px)`;
-                element.style.setProperty('-webkit-backdrop-filter', `blur(${this.blur * 2}px)`);
+            // PERFORMANCE: Skip SVG filters if simple mode is ON or if element is in transition
+            // or if it's too large/small. Standard CSS blur is Hardware Accelerated.
+            if (this.simple || !this.hasSVGFilterSupport || actualWidth < 30 || actualHeight < 30 || actualHeight > 500 || this.depth < 2) {
+                const blurVal = `blur(${this.blur}px)`;
+                if (element.style.backdropFilter !== blurVal) {
+                    element.style.setProperty('backdrop-filter', blurVal);
+                    element.style.setProperty('-webkit-backdrop-filter', blurVal);
+                }
                 return;
             }
 
             const filterUrl = this.getDisplacementFilter(actualHeight, actualWidth);
-            const bgFilter = `blur(${this.blur / 2}px) url('${filterUrl}') blur(${this.blur}px) brightness(1.1) saturate(1.5)`;
+            const bgFilter = `blur(${this.blur / 3}px) url('${filterUrl}') blur(${this.blur / 1.5}px)`;
 
             element.style.setProperty('backdrop-filter', bgFilter);
             element.style.setProperty('-webkit-backdrop-filter', bgFilter);

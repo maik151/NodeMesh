@@ -70,16 +70,12 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
       --text-main: var(--text-base);
       --text-dim: var(--text-muted);
       --border-color: #202025; /* Subtle Dark Divider */
-      --glass-fill: rgba(255, 255, 255, 0.03);
       
       display: block;
       height: 100vh;
       background: var(--sidebar-bg);
       border-right: 1px solid var(--border-color);
-      transition: 
-        width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-        background-color 0.4s ease,
-        border-color 0.4s ease;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       width: 260px;
       overflow: hidden;
       flex-shrink: 0;
@@ -89,7 +85,6 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
 
     :host-context([data-theme="light"]) {
       --sidebar-bg: #f8f9fa; /* Elegant off-white for Light Mode */
-      --glass-fill: rgba(0, 0, 0, 0.03);
       --border-color: #e9ecef; /* Subtle Light Divider */
     }
 
@@ -103,11 +98,10 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
       height: 100%;
       padding: 1.5rem 1rem;
       box-sizing: border-box;
-      transition: padding 0.4s ease;
     }
 
     :host.collapsed .sidebar-wrapper {
-      padding: 1.5rem 0.5rem; /* More breathing room for icons when collapsed */
+      padding: 1.5rem 0.5rem;
     }
 
     .sidebar-header {
@@ -115,9 +109,9 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
       align-items: center;
       justify-content: space-between;
       margin-bottom: 2.5rem;
-      height: 52px; /* Increased header height for larger logo */
+      height: 52px;
       position: relative;
-      gap: 1.25rem; /* Balanced gap */
+      gap: 1.25rem;
       padding-right: 0.5rem;
     }
 
@@ -130,52 +124,35 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
     .logo-container {
       display: flex;
       align-items: center;
-      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .logo-img {
-      height: 52px; /* Restored larger size */
+      height: 52px;
       object-fit: contain;
     }
 
     .toggle-btn {
       background: transparent;
-      backdrop-filter: none;
       border: none;
       color: var(--text-main);
-      border-radius: 10px; /* Slightly tighter radius */
-      padding: 6px; /* Reduced button footprint */
+      border-radius: 10px;
+      padding: 6px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.3s ease;
-      box-shadow: none;
-    }
-
-    :host.collapsed .toggle-btn {
-      background: rgba(154, 205, 50, 0.05); /* Greenish tint for collapsed state */
-      backdrop-filter: blur(8px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     .toggle-btn:hover {
       background: rgba(154, 205, 50, 0.1);
     }
 
-    .toggle-btn:hover .material-symbols-rounded {
-      animation: nudgeLeft 0.6s infinite ease-in-out;
-    }
-
-    :host.collapsed .toggle-btn:hover .material-symbols-rounded {
-      animation: nudgeRight 0.6s infinite ease-in-out;
-    }
-
     .sidebar-nav {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 1.25rem; /* Tighter navigation grouping */
+      gap: 1.25rem;
     }
 
     .nav-group {
@@ -199,7 +176,6 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
       letter-spacing: 0.15em;
       text-transform: uppercase;
       opacity: 0.4;
-      animation: slideIn 0.4s ease forwards;
     }
 
     .nav-item {
@@ -227,10 +203,6 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
       gap: 0;
     }
 
-    :host.collapsed .nav-item:hover {
-      padding-left: 0;
-    }
-
     .item-highlight {
       position: absolute;
       left: 0;
@@ -254,72 +226,13 @@ import { ThemeService } from '../../../core/services/ui/theme.service';
       background: rgba(0, 0, 0, 0.05);
     }
 
-    .nav-item.active .item-highlight {
-      opacity: 1;
-    }
-
     .item-text {
       font-size: 0.9rem;
-      animation: slideFade 0.3s ease forwards;
     }
 
     .material-symbols-rounded {
-      font-size: 20px;
-      min-width: 20px;
-      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-      transition: transform 0.3s ease;
-    }
-
-    .nav-item .material-symbols-rounded {
       font-size: 24px;
       min-width: 24px;
-    }
-
-    .nav-item:hover .material-symbols-rounded {
-      animation: tiltShake 0.4s ease-in-out;
-    }
-
-    .nav-item.active .material-symbols-rounded {
-      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-      animation: pulseGlow 2s infinite ease-in-out;
-    }
-
-    @keyframes tiltShake {
-      0% { transform: rotate(0deg); }
-      25% { transform: rotate(-8deg) scale(1.1); }
-      50% { transform: rotate(8deg) scale(1.1); }
-      75% { transform: rotate(-4deg) scale(1.1); }
-      100% { transform: rotate(0deg) scale(1.1); }
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { filter: drop-shadow(0 0 2px var(--active-glow)); transform: scale(1); }
-      50% { filter: drop-shadow(0 0 8px var(--active-glow)); transform: scale(1.05); }
-    }
-
-    @keyframes nudgeLeft {
-      0%, 100% { transform: translateX(0); }
-      50% { transform: translateX(-4px); }
-    }
-
-    @keyframes nudgeRight {
-      0%, 100% { transform: translateX(0); }
-      50% { transform: translateX(4px); }
-    }
-
-    @keyframes popIn {
-      from { opacity: 0; transform: scale(0.9) translateX(-10px); }
-      to { opacity: 1; transform: scale(1) translateX(0); }
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-10px); }
-      to { opacity: 0.6; transform: translateX(0); }
-    }
-
-    @keyframes slideFade {
-      from { opacity: 0; transform: translateX(-5px); }
-      to { opacity: 1; transform: translateX(0); }
     }
   `]
 })

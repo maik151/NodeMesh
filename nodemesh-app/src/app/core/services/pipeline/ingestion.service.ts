@@ -11,24 +11,36 @@ import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 })
 export class IngestionService {
 
-    private readonly SYSTEM_PROMPT = `Eres un generador de retos cognitivos para estudio de alto rendimiento.
-A partir del texto proporcionado, genera EXACTAMENTE 9 objetos JSON, uno por cada tipo de reto:
+    private readonly SYSTEM_PROMPT = `Eres la Matriz Maestra de NodeMesh. Tu propósito es transformar texto técnico en una taxonomía de 9 retos cognitivos.
+Genera EXACTAMENTE 9 objetos JSON en un array, uno por cada tipo de reto:
 
-1. "definicion_inversa" — Se da la definición, el estudiante debe identificar el concepto.
-2. "caso_de_estudio" — Escenario práctico donde se aplica el concepto.
-3. "deteccion_de_error" — Fragmento con un error conceptual que el estudiante debe encontrar.
-4. "completar_concepto" — Frase incompleta que el estudiante debe completar.
-5. "verdadero_falso_justificado" — Afirmación que puede ser V o F, requiere justificación.
-6. "conexion_transversal" — Relacionar el concepto con otra disciplina o tema.
-7. "pregunta_socratica" — Pregunta abierta que obliga a pensar críticamente.
-8. "ordenamiento_logico" — Pasos o conceptos que el estudiante debe ordenar.
-9. "analogia_forzada" — El estudiante debe crear o evaluar una analogía del concepto.
+1. "single_choice" - Una verdad absoluta entre distractores.
+2. "multi_choice" - Selección múltiple de múltiples respuestas correctas.
+3. "cloze_deletion" - Completar espacios en blanco (cloze).
+4. "output_prediction" - Predecir el resultado exacto de un código.
+5. "ordering" - Ordenar pasos lógicos o secuencias.
+6. "anomaly_detection" - Identificar fallos lógicos o vulnerabilidades.
+7. "optimization" - Refactorizar hacia la eficiencia.
+8. "case_analysis" - Evaluación de trade-offs en arquitectura.
+9. "feynman_synthesis" - Explicar conceptos complejos sin jerga.
 
-REGLAS:
-- Responde SOLO con un array JSON válido.
-- Cada objeto debe tener: "type", "question", "expectedAnswer", "difficulty" (aprendiz|intermedio|avanzado|senior).
-- Las preguntas deben ser desafiantes y específicas al contenido proporcionado.
-- NO incluyas explicaciones fuera del JSON.`;
+REGLAS ESTRUCTURALES:
+Reresponde SOLO con un array JSON válido. Cada objeto DEBE seguir este esquema:
+{
+  "id_temp": "string_unico",
+  "tipo_reto": "tipo_del_1_al_9",
+  "requiere_ia": boolean,
+  "contexto": "Contexto técnico breve",
+  "pregunta": "¿Qué...?",
+  "opciones": ["A", "B", "C", "D"] o null si no aplica,
+  "respuesta_esperada": "string" o ["array", "de", "strings"],
+  "justificacion_correcta": "Retroalimentación positiva detallada",
+  "justificacion_incorrecta": "Análisis del error y por qué falló"
+}
+
+- "requiere_ia" es true solo para los tipos 6, 7, 8 y 9.
+- "opciones" es null para tipos que no sean choice o ordering.
+- Mantén un tono técnico, preciso y desafiante (Nivel Senior).`;
 
     constructor(
         private readonly cryptoService: CryptoService,
@@ -131,16 +143,18 @@ REGLAS:
             throw new Error('La IA retornó un array vacío o un formato inesperado.');
         }
 
-        const sourceId = `src_${Date.now()}`;
         const now = new Date();
 
         return parsed.map((item: any) => ({
-            type: item.type as ChallengeType,
-            question: String(item.question || ''),
-            expectedAnswer: String(item.expectedAnswer || ''),
-            difficulty: item.difficulty || 'intermedio',
-            sourceId,
-            sourceName,
+            id_temp: item.id_temp || `node_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+            tipo_reto: (item.tipo_reto || item.type) as ChallengeType,
+            requiere_ia: !!item.requiere_ia,
+            contexto: item.contexto || '',
+            pregunta: item.pregunta || item.question || '',
+            opciones: Array.isArray(item.opciones) ? item.opciones : (Array.isArray(item.options) ? item.options : null),
+            respuesta_esperada: item.respuesta_esperada || item.expectedAnswer || '',
+            justificacion_correcta: item.justificacion_correcta || '',
+            justificacion_incorrecta: item.justificacion_incorrecta || '',
             createdAt: now,
             nextReviewDate: now
         }));

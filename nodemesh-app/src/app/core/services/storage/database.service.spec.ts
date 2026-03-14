@@ -61,24 +61,30 @@ describe('DatabaseService (TDD - AUT-01) - RED phase', () => {
     // --- F3: Persistencia de Nodos ---
     it('debe guardar nodos y recuperarlos correctamente', async () => {
         await service.initializeVault('nodemesh_vault_test_nodes');
-        const nodes = [
+        const nodes: any[] = [
             {
-                type: 'definicion_inversa' as const,
-                question: 'Pregunta test 1',
-                expectedAnswer: 'Respuesta test 1',
-                difficulty: 'aprendiz' as const,
-                sourceId: 'src_001',
-                sourceName: 'Tema de Prueba',
+                id_temp: 'nodo_1',
+                tipo_reto: 'single_choice' as const,
+                requiere_ia: false,
+                contexto: 'Test Context 1',
+                pregunta: 'Pregunta test 1',
+                opciones: ['A', 'B'],
+                respuesta_esperada: 'A',
+                justificacion_correcta: 'Bien',
+                justificacion_incorrecta: 'Mal',
                 createdAt: new Date(),
                 nextReviewDate: new Date()
             },
             {
-                type: 'caso_de_estudio' as const,
-                question: 'Pregunta test 2',
-                expectedAnswer: 'Respuesta test 2',
-                difficulty: 'intermedio' as const,
-                sourceId: 'src_001',
-                sourceName: 'Tema de Prueba',
+                id_temp: 'nodo_2',
+                tipo_reto: 'cloze_deletion' as const,
+                requiere_ia: false,
+                contexto: 'Test Context 2',
+                pregunta: 'Pregunta test 2',
+                opciones: null,
+                respuesta_esperada: 'B',
+                justificacion_correcta: 'Bien',
+                justificacion_incorrecta: 'Mal',
                 createdAt: new Date(),
                 nextReviewDate: new Date()
             }
@@ -87,39 +93,47 @@ describe('DatabaseService (TDD - AUT-01) - RED phase', () => {
         await service.saveNodes(nodes);
         const result = await service.getNodes();
         expect(result.length).toBe(2);
-        expect(result[0].question).toBe('Pregunta test 1');
-        expect(result[1].type).toBe('caso_de_estudio');
+        expect(result[0].pregunta).toBe('Pregunta test 1');
+        expect(result[1].tipo_reto).toBe('cloze_deletion');
     });
 
     it('debe filtrar nodos por sourceId', async () => {
         await service.initializeVault('nodemesh_vault_test_filter');
-        const nodes = [
+        const nodes: any[] = [
             {
-                type: 'pregunta_socratica' as const,
-                question: 'Q from source A',
-                expectedAnswer: 'A',
-                difficulty: 'avanzado' as const,
-                sourceId: 'src_A',
-                sourceName: 'Source A',
+                id_temp: 'nodo_A1',
+                tipo_reto: 'single_choice' as const,
+                requiere_ia: false,
+                contexto: 'A',
+                pregunta: 'Q from source A',
+                opciones: null,
+                respuesta_esperada: 'A',
+                justificacion_correcta: 'J',
+                justificacion_incorrecta: 'I',
+                folder_id: 'fld_A',
                 createdAt: new Date(),
                 nextReviewDate: new Date()
             },
             {
-                type: 'analogia_forzada' as const,
-                question: 'Q from source B',
-                expectedAnswer: 'B',
-                difficulty: 'senior' as const,
-                sourceId: 'src_B',
-                sourceName: 'Source B',
+                id_temp: 'nodo_B1',
+                tipo_reto: 'single_choice' as const,
+                requiere_ia: false,
+                contexto: 'B',
+                pregunta: 'Q from source B',
+                opciones: null,
+                respuesta_esperada: 'B',
+                justificacion_correcta: 'J',
+                justificacion_incorrecta: 'I',
+                folder_id: 'fld_B',
                 createdAt: new Date(),
                 nextReviewDate: new Date()
             }
         ];
 
         await service.saveNodes(nodes);
-        const filtered = await service.getNodesBySource('src_A');
+        const filtered = await service.db.table('nodes').where('folder_id').equals('fld_A').toArray();
         expect(filtered.length).toBe(1);
-        expect(filtered[0].question).toBe('Q from source A');
+        expect(filtered[0].pregunta).toBe('Q from source A');
     });
 
     // --- NUEVAS PRUEBAS PARA COBERTURA (Round 1) ---
@@ -134,7 +148,7 @@ describe('DatabaseService (TDD - AUT-01) - RED phase', () => {
         it('debe devolver el nombre y las tablas después de inicializar', async () => {
             await service.initializeVault('test_getters');
             expect(service.name).toBe('test_getters');
-            expect(service.tables.length).toBe(4); // nodes, api_keys, history, statistics
+            expect(service.tables.length).toBe(6); // nodes, api_keys, history, statistics, folders, quizzes
         });
     });
 

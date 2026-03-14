@@ -49,16 +49,26 @@ describe('IngestionService (TDD - F3)', () => {
     it('debe parsear correctamente la respuesta JSON de la IA en NodeChallenges', async () => {
         const mockAiResponse = JSON.stringify([
             {
-                type: 'definicion_inversa',
-                question: 'Es el proceso de convertir datos en formato binario',
-                expectedAnswer: 'Serialización',
-                difficulty: 'intermedio'
+                id_temp: 'nodo_1',
+                tipo_reto: 'single_choice',
+                requiere_ia: false,
+                contexto: 'Seguridad',
+                pregunta: 'Es el proceso de convertir datos en formato binario',
+                opciones: ['A', 'B'],
+                respuesta_esperada: 'Serialización',
+                justificacion_correcta: 'Bien',
+                justificacion_incorrecta: 'Mal'
             },
             {
-                type: 'caso_de_estudio',
-                question: 'Un sistema necesita persistir 1M de registros...',
-                expectedAnswer: 'Usar batch inserts con transacciones',
-                difficulty: 'avanzado'
+                id_temp: 'nodo_2',
+                tipo_reto: 'optimization',
+                requiere_ia: true,
+                contexto: 'Performance',
+                pregunta: 'Un sistema necesita persistir 1M de registros...',
+                opciones: null,
+                respuesta_esperada: 'Usar batch inserts con transacciones',
+                justificacion_correcta: 'Bien',
+                justificacion_incorrecta: 'Mal'
             }
         ]);
 
@@ -78,10 +88,8 @@ describe('IngestionService (TDD - F3)', () => {
         const nodes = await service.generateNodes('Texto de prueba sobre bases de datos', 'fake_key', 'Test Source');
 
         expect(nodes.length).toBe(2);
-        expect(nodes[0].type).toBe('definicion_inversa');
-        expect(nodes[0].question).toContain('binario');
-        expect(nodes[0].sourceName).toBe('Test Source');
-        expect(nodes[1].difficulty).toBe('avanzado');
+        expect(nodes[0].tipo_reto).toBe('single_choice');
+        expect(nodes[0].pregunta).toContain('binario');
         expect(mockCryptoService.sanitizeHtml).toHaveBeenCalled();
     });
 

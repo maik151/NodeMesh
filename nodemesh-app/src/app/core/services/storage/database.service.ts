@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import Dexie, { Table } from 'dexie';
-import { NodeChallenge } from '../../models/node.model';
+import { NodeChallenge, FolderTheme, QuizSession } from '../../models/node.model';
 
 @Injectable({
     providedIn: 'root'
@@ -40,6 +40,12 @@ export class DatabaseService {
             statistics: '++id, metric, value'
         });
 
+        this.db.version(2).stores({
+            nodes: '++id, id_temp, tipo_reto, folder_id, quiz_id, nextReviewDate',
+            folders: 'folder_id, nombre_tema',
+            quizzes: 'quiz_id, folder_id, titulo_quiz'
+        });
+
         try {
             await this.db.open();
         } catch (err: any) {
@@ -76,5 +82,15 @@ export class DatabaseService {
     async getNodesBySource(sourceId: string): Promise<NodeChallenge[]> {
         if (!this.db) throw new Error('Database not initialized');
         return await this.db.table('nodes').where('sourceId').equals(sourceId).toArray();
+    }
+
+    async saveFolder(folder: FolderTheme): Promise<void> {
+        if (!this.db) throw new Error('Database not initialized');
+        await this.db.table('folders').put(folder);
+    }
+
+    async saveQuiz(quiz: QuizSession): Promise<void> {
+        if (!this.db) throw new Error('Database not initialized');
+        await this.db.table('quizzes').put(quiz);
     }
 }

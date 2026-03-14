@@ -1,24 +1,50 @@
 export type ChallengeType =
-    | 'definicion_inversa'
-    | 'caso_de_estudio'
-    | 'deteccion_de_error'
-    | 'completar_concepto'
-    | 'verdadero_falso_justificado'
-    | 'conexion_transversal'
-    | 'pregunta_socratica'
-    | 'ordenamiento_logico'
-    | 'analogia_forzada';
+    | 'single_choice'
+    | 'multi_choice'
+    | 'cloze_deletion'
+    | 'output_prediction'
+    | 'ordering'
+    | 'anomaly_detection'
+    | 'optimization'
+    | 'case_analysis'
+    | 'feynman_synthesis';
 
-export type DifficultyLevel = 'aprendiz' | 'intermedio' | 'avanzado' | 'senior';
+export type DifficultyLevel = 'Aprendiz' | 'Intermedio' | 'Avanzado' | 'Senior';
 
 export interface NodeChallenge {
     id?: number;
-    type: ChallengeType;
-    question: string;
-    expectedAnswer: string;
-    difficulty: DifficultyLevel;
-    sourceId: string;
-    sourceName: string;
-    createdAt: Date;
-    nextReviewDate: Date;
+    id_temp: string;
+    tipo_reto: ChallengeType;
+    requiere_ia: boolean;
+    contexto: string;
+    pregunta: string;
+    opciones: string[] | null;
+    respuesta_esperada: string | string[];
+    justificacion_correcta: string;
+    justificacion_incorrecta: string;
+    folder_id?: string;
+    quiz_id?: string;
+    nextReviewDate?: Date;
+    createdAt?: Date;
+}
+
+export interface FolderTheme {
+    folder_id: string;
+    nombre_tema: string;
+    color_tag: string;
+    creado_en: string;
+    nivel?: string;
+    tiempo?: number;
+    intentos?: number;
+}
+
+export interface QuizSession {
+    quiz_id: string;
+    folder_id: string;
+    titulo_quiz: string;
+    dificultad_global: DifficultyLevel;
+    estadisticas_globales: {
+        intentos: number;
+        ultimo_score_porcentaje: number | null;
+    };
 }

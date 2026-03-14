@@ -15,16 +15,18 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       <header class="cc-header">
         <div class="header-left">
           <h1 class="cc-title">Command Center</h1>
-          <p class="cc-subtitle">ORQUESTA TU FLUJO COGNITIVO</p>
-        </div>
-        <div class="header-right">
-          <div class="status-indicator">
-            <span class="label-tiny">NODE_STATUS</span>
-            <div class="status-pill">
-              <span class="dot pulse"></span>
-              <span class="status-text">SYNC: LOCAL_DB</span>
+          <div class="header-meta">
+            <p class="cc-subtitle">ORQUESTA TU FLUJO COGNITIVO</p>
+            <div class="status-indicator">
+              <div class="status-pill">
+                <span class="dot pulse"></span>
+                <span class="status-text">SYNC: LOCAL_DB</span>
+              </div>
             </div>
           </div>
+        </div>
+        <div class="header-right">
+          <!-- Espacio reservado para el menú de usuario -->
         </div>
       </header>
 
@@ -244,7 +246,7 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
     }
     
     .command-center-container {
-      padding: 1.5rem 2.5rem;
+      padding: 3rem 2.5rem 1.5rem;
       max-width: 1512px;
       margin: 0 auto;
       color: #fff;
@@ -269,19 +271,24 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
     .cc-subtitle {
       font-size: 0.7rem;
       font-weight: 900;
       letter-spacing: 4px;
       opacity: 0.3;
-      margin-top: 0.4rem;
       text-transform: uppercase;
+      margin: 0;
     }
-    .status-indicator { display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem; }
-    .label-tiny { font-size: 0.5rem; font-weight: 950; opacity: 0.25; letter-spacing: 2px; }
+    .status-indicator { display: flex; align-items: center; }
     .status-pill {
-      background: rgba(255,255,255,0.015);
-      padding: 0.4rem 0.8rem;
+      background: rgba(154, 205, 50, 0.05); /* Sutil tinte verde */
+      padding: 0.3rem 0.7rem;
       border-radius: 100px;
       display: flex;
       align-items: center;

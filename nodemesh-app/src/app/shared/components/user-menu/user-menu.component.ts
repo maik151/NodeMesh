@@ -96,10 +96,6 @@ import { LiquidGlassComponent } from '../liquid-glass/liquid-glass.component';
       padding: 1.25rem;
     }
 
-    :host-context([data-theme="light"]) .identity-popover {
-      /* Theme colors handled via input binding to app-liquid-glass */
-    }
-
     .popover-header {
       display: flex;
       flex-direction: column;

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DatabaseService } from '../../../../core/services/storage/database.service';
 import { DifficultyLevel, ChallengeType } from '../../../../core/models/node.model';
+import { ThemeService } from '../../../../core/services/ui/theme.service';
 import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass/liquid-glass.component';
 
 @Component({
@@ -33,7 +34,7 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       <div class="cc-grid">
         <!-- PRIMARY OPS: INJECT PAYLOAD (Wide) -->
         <div class="cc-card span-8 row-2">
-          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="18" [backgroundColor]="'rgba(10, 12, 10, 0.75)'">
+          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="18" [backgroundColor]="'var(--glass-fill)'">
             <div class="card-inner flex-row space-between items-center" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" [class.dragging]="isDragging">
                <div class="inner-glow"></div>
               <div class="payload-visual">
@@ -55,7 +56,7 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
 
         <!-- ACTION: FORZAR SPRINT (Compact & Powerful) -->
         <div class="cc-card span-4 row-2">
-          <app-liquid-glass [simple]="true" [radius]="20" [depth]="4" [blur]="24" [backgroundColor]="'rgba(154, 205, 50, 0.15)'">
+          <app-liquid-glass [simple]="true" [radius]="20" [depth]="4" [blur]="24" [backgroundColor]="'var(--glass-fill-accent)'">
             <div class="card-inner centered gap-1">
               <div class="glow-orb"></div>
               <span class="material-symbols-rounded bolt-icon neon-text">bolt</span>
@@ -70,7 +71,7 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
 
         <!-- TRIAGE: QUEUE (Vertical) -->
         <div class="cc-card span-4 row-4">
-          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="16" [backgroundColor]="'rgba(10, 12, 10, 0.7)'">
+          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="16" [backgroundColor]="'var(--glass-fill)'">
             <div class="card-inner no-padding">
               <div class="inner-glow"></div>
               <div class="header-micro-technical">
@@ -94,7 +95,7 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
 
         <!-- ANALYTICS: CONSISTENCY MAP (Large) -->
         <div class="cc-card span-8 row-4">
-          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="20" [backgroundColor]="'rgba(10, 12, 10, 0.7)'">
+          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="20" [backgroundColor]="'var(--glass-fill)'">
             <div class="card-inner no-padding">
               <div class="inner-glow"></div>
               <div class="header-micro-technical">
@@ -117,7 +118,7 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
 
         <!-- WIDGETS: STREAK & TIMER (Small Square) -->
         <div class="cc-card span-3 row-2">
-          <app-liquid-glass [simple]="true" [radius]="20" [depth]="1" [blur]="20" [backgroundColor]="'rgba(10, 12, 10, 0.7)'">
+          <app-liquid-glass [simple]="true" [radius]="20" [depth]="1" [blur]="20" [backgroundColor]="'var(--glass-fill)'">
             <div class="widget-square">
               <div class="inner-glow"></div>
               <div class="widget-header">
@@ -130,7 +131,7 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
         </div>
 
         <div class="cc-card span-3 row-2">
-          <app-liquid-glass [simple]="true" [radius]="20" [depth]="1" [blur]="20" [backgroundColor]="'rgba(10, 12, 10, 0.7)'">
+          <app-liquid-glass [simple]="true" [radius]="20" [depth]="1" [blur]="20" [backgroundColor]="'var(--glass-fill)'">
             <div class="widget-square clickable" (click)="togglePomo()">
               <div class="inner-glow"></div>
               <div class="widget-header">
@@ -144,7 +145,7 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
 
         <!-- WIDGET: MASTERY (Vertical/Accent) -->
         <div class="cc-card span-2 row-2">
-          <app-liquid-glass [simple]="true" [radius]="20" [depth]="1" [blur]="15" [backgroundColor]="'rgba(10, 12, 10, 0.7)'">
+          <app-liquid-glass [simple]="true" [radius]="20" [depth]="1" [blur]="15" [backgroundColor]="'var(--glass-fill)'">
             <div class="widget-mastery">
               <div class="inner-glow"></div>
               <div class="circular-progress">
@@ -161,7 +162,7 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
 
         <!-- FOOTER: VAULTS (Mid) -->
         <div class="cc-card span-4 row-2">
-          <app-liquid-glass [radius]="20" [depth]="1" [blur]="20" [backgroundColor]="'rgba(10, 12, 10, 0.7)'">
+          <app-liquid-glass [simple]="true" [radius]="20" [depth]="1" [blur]="20" [backgroundColor]="'var(--glass-fill)'">
             <div class="card-inner">
               <div class="inner-glow"></div>
               <div class="label-micro mb-1">VAULTS_CACHE</div>
@@ -177,7 +178,7 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
 
         <!-- FOOTER: FLUX (Wide) -->
         <div class="cc-card span-12 row-2">
-          <app-liquid-glass [radius]="20" [depth]="1" [blur]="20" [backgroundColor]="'rgba(10, 12, 10, 0.6)'">
+          <app-liquid-glass [simple]="true" [radius]="20" [depth]="1" [blur]="20" [backgroundColor]="'var(--glass-fill)'">
             <div class="card-inner flex-row items-center gap-3">
               <div class="inner-glow"></div>
               <div class="label-micro no-wrap">RETENTION_FLUX</div>
@@ -235,21 +236,28 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
   `,
   styles: [`
     :host { 
-      --accent: #9ACD32; 
-      --accent-glow: #C5E100;
-      --bg-void: #050505; 
-      --surface: #0a0c0a;
-      --glass-border: rgba(255, 255, 255, 0.05);
+      --accent: var(--theme-brand-accent); 
+      --accent-glow: var(--theme-brand-neon-alt);
+      --glass-fill: rgba(17, 20, 17, 0.4);
+      --glass-fill-accent: rgba(154, 205, 50, 0.12);
+      --glass-border: var(--theme-border);
       display: block;
       min-height: 100vh;
-      background: radial-gradient(circle at top right, #0d120d, var(--bg-void));
+      background: radial-gradient(circle at top right, var(--theme-surface-solid), var(--theme-bg));
+      color: var(--theme-text);
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+
+    :host-context([data-theme="light"]) {
+      --glass-fill: rgba(255, 255, 255, 0.15);
+      --glass-fill-accent: rgba(154, 205, 50, 0.08);
     }
     
     .command-center-container {
       padding: 3rem 2.5rem 1.5rem;
       max-width: 1512px;
       margin: 0 auto;
-      color: #fff;
+      color: var(--theme-text);
       font-family: 'Inter', sans-serif;
     }
 
@@ -267,9 +275,15 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       letter-spacing: -2.5px;
       margin: 0;
       line-height: 1;
-      background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+      background: linear-gradient(180deg, var(--theme-text) 0%, var(--theme-text-secondary) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+    }
+    :host-context([data-theme="light"]) .cc-title {
+      background: none;
+      -webkit-background-clip: initial;
+      -webkit-text-fill-color: initial;
+      color: var(--theme-text);
     }
     .header-meta {
       display: flex;
@@ -278,16 +292,21 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       margin-top: 0.5rem;
     }
     .cc-subtitle {
-      font-size: 0.7rem;
-      font-weight: 900;
-      letter-spacing: 4px;
-      opacity: 0.3;
+      font-size: 0.8rem;
+      font-weight: 950;
+      letter-spacing: 5px;
+      opacity: 0.7;
       text-transform: uppercase;
       margin: 0;
+      color: var(--theme-text);
+    }
+    :host-context([data-theme="light"]) .cc-subtitle {
+      opacity: 0.8;
+      font-weight: 800;
     }
     .status-indicator { display: flex; align-items: center; }
     .status-pill {
-      background: rgba(154, 205, 50, 0.05); /* Sutil tinte verde */
+      background: var(--theme-border);
       padding: 0.3rem 0.7rem;
       border-radius: 100px;
       display: flex;
@@ -296,7 +315,8 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       font-family: 'Fira Code', monospace;
       font-size: 0.65rem;
       font-weight: 600;
-      box-shadow: inset 0 0 10px rgba(255,255,255,0.02);
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+      color: var(--theme-text);
     }
     .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
 
@@ -321,12 +341,20 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       overflow: hidden; 
       display: flex;
       flex-direction: column;
-      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;
+      box-shadow: 0 4px 20px -10px var(--theme-shadow-soft);
+      border: 1px solid var(--theme-border);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s, border-color 0.3s;
+      background: var(--theme-surface-solid);
     }
+    :host-context([data-theme="light"]) .cc-card {
+      border: 1px solid rgba(0, 0, 0, 0.18); /* Solidified for maximum clarity */
+      box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.05);
+    }
+
     .cc-card:hover { 
       transform: translateY(-4px); 
-      box-shadow: 0 20px 40px -15px rgba(0,0,0,0.6);
+      box-shadow: 0 20px 40px -15px var(--theme-shadow-soft);
+      border-color: var(--theme-brand-neon);
     }
     app-liquid-glass { width: 100%; height: 100%; display: block; }
 
@@ -335,8 +363,11 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
     .card-inner.no-padding { padding: 0; }
     .inner-glow {
       position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 40%);
+      background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 40%);
       pointer-events: none; z-index: 1;
+    }
+    :host-context([data-theme="light"]) .inner-glow {
+      display: none;
     }
 
     .flex-row { display: flex; }
@@ -356,9 +387,9 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       display: flex; align-items: center; justify-content: center;
       box-shadow: inset 0 0 15px rgba(154, 205, 50, 0.1);
     }
-    .icon-orb span { font-size: 1.75rem; }
-    .payload-info h3 { font-size: 1rem; font-weight: 950; margin: 0; letter-spacing: -0.5px; color: #eee; }
-    .payload-info p { font-size: 0.7rem; opacity: 0.3; margin: 0.15rem 0 0; }
+    .icon-orb span { font-size: 1.75rem; color: var(--theme-brand-neon); }
+    .payload-info h3 { font-size: 1.15rem; font-weight: 950; margin: 0; letter-spacing: -0.5px; color: var(--theme-text); }
+    .payload-info p { font-size: 0.75rem; opacity: 0.6; margin: 0.15rem 0 0; color: var(--theme-text-secondary); }
     .btn-terminal-action {
       background: rgba(255,255,255,0.015);
       border: 1px solid rgba(255,255,255,0.05);
@@ -369,7 +400,7 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       font-size: 0.65rem; font-weight: 900; cursor: pointer;
       transition: all 0.2s; z-index: 2;
     }
-    .btn-terminal-action:hover { background: rgba(255,255,255,0.04); color: #fff; border-color: rgba(255,255,255,0.1); }
+    .btn-terminal-action:hover { background: var(--theme-brand-neon); color: #000; border-color: var(--theme-brand-neon); }
 
     /* SPRINT SECTION */
     .glow-orb {
@@ -393,11 +424,12 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
 
     /* TRIAGE QUEUE */
     .header-micro-technical {
-      padding: 1rem 1.25rem;
+      padding: 1.15rem 1.25rem;
       display: flex; align-items: center; gap: 0.6rem;
-      background: rgba(255,255,255,0.01);
-      box-shadow: inset 0 -1px 0 rgba(255,255,255,0.03);
+      background: var(--theme-surface);
+      border-bottom: 2px solid var(--theme-border);
     }
+    .header-micro-technical .label-micro, .header-micro-technical .material-symbols-rounded { opacity: 0.6; }
     .body-list { padding: 0.4rem 0; height: 100%; position: relative; z-index: 2; }
     .triage-item {
       padding: 0.65rem 1.25rem;
@@ -407,9 +439,16 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
     .triage-item:hover { background: rgba(255,255,255,0.02); }
     .triage-status { width: 6px; height: 6px; border-radius: 50%; background: #2a2a2a; }
     .triage-status.overdue { background: #ff4444; box-shadow: 0 0 6px #ff4444; }
-    .triage-name { font-size: 0.7rem; font-weight: 600; flex: 1; opacity: 0.6; }
-    .triage-count { font-family: 'Fira Code', monospace; font-size: 0.65rem; font-weight: 900; opacity: 0.15; }
-    .empty-state { height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.1; }
+    .triage-name { font-size: 0.7rem; font-weight: 600; flex: 1; color: var(--theme-text); opacity: 0.9; }
+    .triage-count { font-family: 'Fira Code', monospace; font-size: 0.65rem; font-weight: 900; color: var(--theme-brand-neon); opacity: 0.6; }
+    .empty-state { 
+      height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+      opacity: 0.6; color: var(--theme-text); 
+    }
+    :host-context([data-theme="light"]) .empty-state {
+      opacity: 0.8;
+      font-weight: 600;
+    }
     .empty-state span { font-size: 2rem; margin-bottom: 0.4rem; }
     .empty-state p { font-size: 0.6rem; font-weight: 950; letter-spacing: 2px; }
 
@@ -422,43 +461,51 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
     /* WIDGETS */
     .widget-square { height: 100%; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; position: relative; z-index: 2; }
     .widget-header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .widget-value { font-size: 2rem; font-weight: 950; letter-spacing: -1px; color: #fff; }
+    .widget-value { font-size: 2rem; font-weight: 950; letter-spacing: -1px; color: var(--theme-text); }
     .widget-value.mono { font-family: 'Fira Code', monospace; font-size: 1.6rem; }
     .widget-mastery { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 2; }
     .circular-progress { position: relative; width: 70px; height: 70px; }
     .chart-svg { transform: rotate(-90deg); }
-    .circle-bg { fill: none; stroke: rgba(255,255,255,0.02); stroke-width: 2.5; }
-    .circle-fg { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dasharray 1s ease-out; }
-    .perc-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 950; font-family: 'Fira Code', monospace; }
+    .circle-bg { fill: none; stroke: var(--theme-border); stroke-width: 2.5; }
+    .circle-fg { fill: none; stroke: var(--theme-brand-neon); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dasharray 1s ease-out; }
+    .perc-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 950; font-family: 'Fira Code', monospace; color: var(--theme-text); }
 
     /* VAULTS & FLUX */
     .vault-tokens { display: flex; flex-wrap: wrap; gap: 0.4rem; position: relative; z-index: 2; }
     .vault-token {
-      background: rgba(255,255,255,0.015);
-      border: 1px solid rgba(255,255,255,0.03);
+      background: var(--theme-border);
+      border: 1px solid var(--theme-border);
       padding: 0.35rem 0.6rem; border-radius: 8px;
       display: flex; align-items: center; gap: 0.4rem;
-      font-size: 0.65rem; font-weight: 700; color: #888;
+      font-size: 0.65rem; font-weight: 700; color: var(--theme-text-secondary);
     }
-    .vault-token span:first-child { font-size: 0.8rem; opacity: 0.2; }
+    .vault-token span:first-child { font-size: 0.8rem; opacity: 0.4; }
     .flux-viz { flex: 1; height: 35px; padding-top: 4px; position: relative; z-index: 2; }
     .flux-svg { width: 100%; height: 100%; }
 
-    /* MISC */
-    kbd { background: #1a1a1a; border-radius: 4px; padding: 0.1rem 0.25rem; border: 1px solid #2a2a2a; font-family: inherit; font-size: 0.6rem; color: #666; }
+    /* MISC & UTILS */
+    .label-micro { font-size: 0.75rem; font-weight: 950; letter-spacing: 2px; opacity: 0.8; color: var(--theme-text); text-transform: uppercase; font-family: 'Fira Code', monospace; transition: opacity 0.3s; }
+    .ico-mini { font-size: 1.25rem; opacity: 0.8; color: var(--theme-text); transition: opacity 0.3s; }
+    .size-mini { font-size: 0.85rem; }
+    kbd { background: var(--theme-surface-solid); border-radius: 4px; padding: 0.1rem 0.25rem; border: 1px solid var(--theme-border); font-family: inherit; font-size: 0.6rem; color: var(--theme-text-secondary); }
     .neon-text { color: var(--accent); text-shadow: 0 0 10px rgba(154, 205, 50, 0.2); }
     .clickable { cursor: pointer; }
     .mb-1 { margin-bottom: 0.5rem; }
     .mt-1 { margin-top: 0.4rem; }
 
+    :host-context([data-theme="light"]) .label-micro,
+    :host-context([data-theme="light"]) .ico-mini {
+      opacity: 0.9;
+      font-weight: 800;
+    }
+
     /* MODAL UI */
     .cc-input, .cc-select {
-      width: 100%; padding: 0.75rem 1rem; background: #070907; border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 10px; color: #fff; font-family: 'Inter', sans-serif; font-size: 0.85rem;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+      width: 100%; padding: 0.75rem 1rem; background: var(--theme-input-bg); border: 1px solid var(--theme-border);
+      border-radius: 10px; color: var(--theme-text); font-family: 'Inter', sans-serif; font-size: 0.85rem;
     }
     .cc-input:focus, .cc-select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 15px rgba(154, 205, 50, 0.1); }
-    .modal-body label { font-size: 0.55rem; font-weight: 950; opacity: 0.2; letter-spacing: 1px; margin-bottom: 0.4rem; display: block; }
+    .modal-body label { font-size: 0.55rem; font-weight: 950; opacity: 0.6; letter-spacing: 1px; margin-bottom: 0.4rem; display: block; color: var(--theme-text); }
     .input-group { margin-bottom: 1.25rem; }
 
     @keyframes pulse { 0% { opacity: 0.2; transform: scale(0.95); } 50% { opacity: 0.6; transform: scale(1.05); } 100% { opacity: 0.2; transform: scale(0.95); } }
@@ -468,6 +515,8 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
 export class CommandCenterComponent implements OnInit {
   private readonly db = inject(DatabaseService);
   private readonly router = inject(Router);
+  private readonly themeService = inject(ThemeService);
+  isDark$ = this.themeService.isDark$;
 
   // Dashboard Data
   dueModules: any[] = [];
@@ -532,7 +581,8 @@ export class CommandCenterComponent implements OnInit {
   }
 
   getHeatColor(count: number): string {
-    if (count === 0) return '#111411';
+    const isDark = !document.body.classList.contains('light-theme') && document.body.getAttribute('data-theme') !== 'light';
+    if (count === 0) return isDark ? '#111411' : '#e9ecef';
     if (count < 5) return 'rgba(159, 255, 34, 0.2)';
     if (count < 15) return 'rgba(159, 255, 34, 0.5)';
     return '#9FFF22';

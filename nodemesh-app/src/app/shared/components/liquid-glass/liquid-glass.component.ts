@@ -24,8 +24,8 @@ import { CommonModule } from '@angular/common';
             height: 100%;
             background: rgba(255, 255, 255, 0.4);
             box-shadow: 
-              inset 0 0 0 1px rgba(255,255,255, 0.08), 
-              0 8px 32px 0 rgba(0, 0, 0, 0.3);
+              inset 0 0 0 1px rgba(255,255,255, 0.05), 
+              0 8px 32px 0 var(--theme-shadow-soft);
             transition: transform 0.1s ease;
             will-change: backdrop-filter;
         }

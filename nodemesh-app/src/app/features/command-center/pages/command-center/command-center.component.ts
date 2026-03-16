@@ -307,14 +307,14 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
     .status-indicator { display: flex; align-items: center; }
     .status-pill {
       background: var(--theme-border);
-      padding: 0.3rem 0.7rem;
+      padding: 0.35rem 0.8rem;
       border-radius: 100px;
       display: flex;
       align-items: center;
       gap: 0.6rem;
       font-family: 'Fira Code', monospace;
       font-size: 0.65rem;
-      font-weight: 600;
+      font-weight: 800;
       box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
       color: var(--theme-text);
     }
@@ -439,8 +439,8 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
     .triage-item:hover { background: rgba(255,255,255,0.02); }
     .triage-status { width: 6px; height: 6px; border-radius: 50%; background: #2a2a2a; }
     .triage-status.overdue { background: #ff4444; box-shadow: 0 0 6px #ff4444; }
-    .triage-name { font-size: 0.7rem; font-weight: 600; flex: 1; color: var(--theme-text); opacity: 0.9; }
-    .triage-count { font-family: 'Fira Code', monospace; font-size: 0.65rem; font-weight: 900; color: var(--theme-brand-neon); opacity: 0.6; }
+    .triage-name { font-size: 0.72rem; font-weight: 800; flex: 1; color: var(--theme-text); opacity: 0.95; }
+    .triage-count { font-family: 'Fira Code', monospace; font-size: 0.68rem; font-weight: 950; color: var(--theme-brand-neon); opacity: 0.8; }
     .empty-state { 
       height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
       opacity: 0.6; color: var(--theme-text); 
@@ -475,9 +475,9 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
     .vault-token {
       background: var(--theme-border);
       border: 1px solid var(--theme-border);
-      padding: 0.35rem 0.6rem; border-radius: 8px;
+      padding: 0.38rem 0.7rem; border-radius: 8px;
       display: flex; align-items: center; gap: 0.4rem;
-      font-size: 0.65rem; font-weight: 700; color: var(--theme-text-secondary);
+      font-size: 0.68rem; font-weight: 900; color: var(--theme-text-secondary);
     }
     .vault-token span:first-child { font-size: 0.8rem; opacity: 0.4; }
     .flux-viz { flex: 1; height: 35px; padding-top: 4px; position: relative; z-index: 2; }
@@ -494,9 +494,12 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
     .mt-1 { margin-top: 0.4rem; }
 
     :host-context([data-theme="light"]) .label-micro,
-    :host-context([data-theme="light"]) .ico-mini {
-      opacity: 0.9;
-      font-weight: 800;
+    :host-context([data-theme="light"]) .ico-mini,
+    :host-context([data-theme="light"]) .triage-name,
+    :host-context([data-theme="light"]) .vault-token,
+    :host-context([data-theme="light"]) .status-pill {
+      font-weight: 950;
+      opacity: 1;
     }
 
     /* MODAL UI */

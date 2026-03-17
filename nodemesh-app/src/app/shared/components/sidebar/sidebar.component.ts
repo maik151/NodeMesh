@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ThemeService } from '../../../core/services/ui/theme.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { NAV_ICONS } from '../../constants/icons.constants';
 
 @Component({
   selector: 'app-sidebar',
@@ -61,21 +62,24 @@ import { AuthService } from '../../../core/services/auth/auth.service';
           <small class="group-label" [class.hidden]="!isExpanded">Flujo</small>
           <a routerLink="/center" routerLinkActive="active" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-              <path d="M128,128a8,8,0,0,1-3,6.25l-40,32a8,8,0,1,1-10-12.5L107.19,128,75,102.25a8,8,0,1,1,10-12.5l40,32A8,8,0,0,1,128,128Zm48,24H136a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm56-96V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56ZM216,200V56H40V200H216Z"/>
+              <path [attr.d]="icons.center"/>
             </svg>
             <span class="item-text" [class.hidden]="!isExpanded">Command Center</span>
+            <span class="nav-tooltip" *ngIf="!isExpanded">Command Center</span>
           </a>
           <a routerLink="/vault" routerLinkActive="active" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-              <path d="M216,40H40A16,16,0,0,0,24,56V216a8,8,0,0,0,11.58,7.16L64,208.94l28.42,14.22a8,8,0,0,0,7.16,0L128,208.94l28.42,14.22a8,8,0,0,0,7.16,0L192,208.94l28.42,14.22A8,8,0,0,0,232,216V56A16,16,0,0,0,216,40Zm0,163.06-20.42-10.22a8,8,0,0,0-7.16,0L160,207.06l-28.42-14.22a8,8,0,0,0-7.16,0L96,207.06,67.58,192.84a8,8,0,0,0-7.16,0L40,203.06V56H216ZM60.42,167.16a8,8,0,0,0,10.74-3.58L76.94,152h38.12l5.78,11.58a8,8,0,1,0,14.32-7.16l-32-64a8,8,0,0,0-14.32,0l-32,64A8,8,0,0,0,60.42,167.16ZM96,113.89,107.06,136H84.94ZM136,128a8,8,0,0,1,8-8h16V104a8,8,0,0,1,16,0v16h16a8,8,0,0,1,0,16H176v16a8,8,0,0,1-16,0V136H144A8,8,0,0,1,136,128Z"/>
+              <path [attr.d]="icons.vault"/>
             </svg>
             <span class="item-text" [class.hidden]="!isExpanded">Temas y Tests</span>
+            <span class="nav-tooltip" *ngIf="!isExpanded">Temas y Tests</span>
           </a>
           <a routerLink="/stats" routerLinkActive="active" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-              <path d="M216,40H136V24a8,8,0,0,0-16,0V40H40A16,16,0,0,0,24,56V176a16,16,0,0,0,16,16H79.36L57.75,219a8,8,0,0,0,12.5,10l29.59-37h56.32l29.59,37a8,8,0,1,0,12.5-10l-21.61-27H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,136H40V56H216V176ZM104,120v24a8,8,0,0,1-16,0V120a8,8,0,0,1,16,0Zm32-16v40a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm32-16v56a8,8,0,0,1-16,0V88a8,8,0,0,1,16,0Z"/>
+              <path [attr.d]="icons.stats"/>
             </svg>
             <span class="item-text" [class.hidden]="!isExpanded">Estadísticas</span>
+            <span class="nav-tooltip" *ngIf="!isExpanded">Estadísticas</span>
           </a>
         </div>
 
@@ -84,21 +88,24 @@ import { AuthService } from '../../../core/services/auth/auth.service';
           <small class="group-label" [class.hidden]="!isExpanded">Sistema</small>
           <a routerLink="/settings" routerLinkActive="active" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-              <path d="M144,157.68a68,68,0,1,0-71.9,0c-20.65,6.76-39.23,19.39-54.17,37.17a8,8,0,1,0,12.24,10.3C50.25,181.19,77.91,168,108,168s57.75,13.19,77.87,37.15a8,8,0,0,0,12.26-10.3C183.18,177.07,164.6,164.44,144,157.68ZM56,100a52,52,0,1,1,52,52A52.06,52.06,0,0,1,56,100Zm196.25,43.07-4.66-2.69a23.6,23.6,0,0,0,0-8.76l4.66-2.69a8,8,0,1,0-8-13.86l-4.67,2.7a23.92,23.92,0,0,0-7.58-4.39V108a8,8,0,0,0-16,0v5.38a23.92,23.92,0,0,0-7.58,4.39l-4.67-2.7a8,8,0,1,0-8,13.86l4.66,2.69a23.6,23.6,0,0,0,0,8.76l-4.66,2.69a8,8,0,0,0,8,13.86l4.67-2.7a23.92,23.92,0,0,0,7.58,4.39V164a8,8,0,0,0,16,0v-5.38a23.92,23.92,0,0,0,7.58-4.39l4.67,2.7a7.92,7.92,0,0,0,4,1.07,8,8,0,0,0,4-14.93ZM216,136a8,8,0,1,1,8,8A8,8,0,0,1,216,136Z"/>
+              <path [attr.d]="icons.user"/>
             </svg>
             <span class="item-text" [class.hidden]="!isExpanded">Usuario</span>
+            <span class="nav-tooltip" *ngIf="!isExpanded">Usuario</span>
           </a>
           <a routerLink="/docs" routerLinkActive="active" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-              <path d="M216,56H176V48a24,24,0,0,0-24-24H104A24,24,0,0,0,80,48v8H40A16,16,0,0,0,24,72V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V72A16,16,0,0,0,216,56ZM96,48a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96ZM216,72v41.61A184,184,0,0,1,128,136a184.07,184.07,0,0,1-88-22.38V72Zm0,128H40V131.64A200.19,200.19,0,0,0,128,152a200.25,200.25,0,0,0,88-20.37V200ZM104,112a8,8,0,0,1,8-8h32a8,8,0,0,1,0,16H112A8,8,0,0,1,104,112Z"/>
+              <path [attr.d]="icons.docs"/>
             </svg>
             <span class="item-text" [class.hidden]="!isExpanded">Documentos</span>
+            <span class="nav-tooltip" *ngIf="!isExpanded">Documentos</span>
           </a>
           <a routerLink="/settings" routerLinkActive="active" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-              <path d="M128,80a48,48,0,1,0,48,48A48.06,48.06,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm95.68-93.85L135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17h0a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,224,40,175.82V80.18L128,32l88,48.17v95.64Z"/>
+              <path [attr.d]="icons.settings"/>
             </svg>
             <span class="item-text" [class.hidden]="!isExpanded">Configuración</span>
+            <span class="nav-tooltip" *ngIf="!isExpanded">Configuración</span>
           </a>
         </div>
       </nav>
@@ -109,13 +116,13 @@ import { AuthService } from '../../../core/services/auth/auth.service';
           <div class="theme-slider" [class.dark]="isDark$ | async"></div>
           <button class="theme-btn" [class.active]="!(isDark$ | async)" (click)='setTheme("light")' title="Modo Claro">
             <svg class="theme-icon icon-sun" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-              <path d="M120,40V32a8,8,0,0,1,16,0v8a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-8-8A8,8,0,0,0,50.34,61.66Zm0,116.68-8,8a8,8,0,0,0,11.32,11.32l8-8a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l8-8a8,8,0,0,0-11.32-11.32l-8,8A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l8,8a8,8,0,0,0,11.32-11.32ZM40,120H32a8,8,0,0,0,0,16h8a8,8,0,0,0,0-16Zm88,88a8,8,0,0,0-8,8v8a8,8,0,0,0,16,0v-8A8,8,0,0,0,128,208Zm96-88h-8a8,8,0,0,0,0,16h8a8,8,0,0,0,0-16Z"></path>
+              <path [attr.d]="icons.sun"/>
             </svg>
             <span class="theme-label" [class.hidden]="!isExpanded">Light</span>
           </button>
           <button class="theme-btn" [class.active]="isDark$ | async" (click)='setTheme("dark")' title="Modo Oscuro">
             <svg class="theme-icon" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-              <path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"></path>
+              <path [attr.d]="icons.moon"/>
             </svg>
             <span class="theme-label" [class.hidden]="!isExpanded">Dark</span>
           </button>
@@ -138,7 +145,7 @@ import { AuthService } from '../../../core/services/auth/auth.service';
         
         <button class="logout-btn" [class.hidden]="!isExpanded" (click)="logout()" title="Cerrar sesión">
           <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-            <path d="M120,216a8,8,0,0,1-8,8H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32h64a8,8,0,0,1,0,16H48V208h64A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z"/>
+            <path [attr.d]="icons.logout"/>
           </svg>
         </button>
       </div>
@@ -172,6 +179,7 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 
     :host.collapsed {
       width: 72px;
+      overflow: visible;
     }
 
     .sidebar-wrapper {
@@ -349,8 +357,9 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 
     .nav-group.bottom {
       border-top: 1px solid var(--border-color);
-      padding-top: 0.5rem;
-      margin-top: 0.25rem;
+      padding-top: 0.8rem;
+      margin-top: 0.6rem;
+      width: 100%;
     }
 
     .group-label {
@@ -385,8 +394,32 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 
     :host.collapsed .nav-item {
       justify-content: center;
-      padding: 0.75rem 0;
+      padding: 10px 0;
       gap: 0;
+      position: relative; /* Base for tooltips */
+    }
+
+    :host.collapsed .nav-item:hover {
+      background: transparent; /* No full-width background in collapsed mode */
+    }
+
+    :host.collapsed .nav-icon {
+      padding: 10px;
+      border-radius: 50%;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 42px; /* Fixed size for the circle */
+      height: 42px;
+    }
+
+    :host.collapsed .nav-item:hover .nav-icon {
+      background: rgba(154, 205, 50, 0.12);
+      color: var(--active-glow);
+      box-shadow: 0 0 12px rgba(154, 205, 50, 0.1);
+    }
+
+    :host.collapsed .nav-item.active .nav-icon {
+      background: rgba(154, 205, 50, 0.15);
+      color: var(--active-glow);
     }
 
     /* SVG icon en los nav items */
@@ -399,8 +432,10 @@ import { AuthService } from '../../../core/services/auth/auth.service';
     }
 
     :host.collapsed .nav-icon {
-      width: 24px;
-      height: 24px;
+      width: 42px;
+      height: 42px;
+      padding: 10px;
+      border-radius: 50%;
     }
 
     .nav-item:hover .nav-icon {
@@ -447,6 +482,45 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 
     .nav-item.active .material-symbols-rounded {
       color: var(--active-glow);
+    }
+
+    /* ── TOOLTIPS (Subtle & Small) ───────────────────── */
+    .nav-tooltip {
+      position: absolute;
+      left: calc(100% + 8px);
+      top: 50%;
+      transform: translateY(-50%) translateX(-6px);
+      background: rgba(20, 20, 20, 0.9);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.2s ease-out;
+      z-index: 10000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border: 1px solid var(--border-color);
+      letter-spacing: 0.03em;
+      text-transform: none;
+      visibility: hidden;
+    }
+
+    :host.collapsed .nav-item:hover .nav-tooltip {
+      opacity: 1;
+      transform: translateY(-50%) translateX(6px);
+      visibility: visible;
+    }
+
+    :host-context([data-theme="light"]) .nav-tooltip {
+      background: #f5f5f5; /* Subtle light gray */
+      color: #333;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border: 1px solid rgba(0,0,0,0.06);
     }
 
     /* ── THEME SWITCHER ─────────────────────────────── */
@@ -721,6 +795,7 @@ export class SidebarComponent {
 
   isExpanded = true;
   isDark$ = this.themeService.isDark$;
+  icons = NAV_ICONS;
 
   get currentUser() { return this.authService.getCurrentUser(); }
   get userName()    { return this.currentUser?.displayName ?? 'Admin Profile'; }

@@ -36,6 +36,12 @@ export class ThemeService {
         this.saveTheme();
     }
 
+    setTheme(theme: 'light' | 'dark'): void {
+        this.themeSubject.next(theme);
+        this.applyTheme();
+        this.saveTheme();
+    }
+
     private loadTheme(): void {
         const saved = localStorage.getItem(this.STORAGE_KEY);
         if (saved === 'light' || saved === 'dark') {

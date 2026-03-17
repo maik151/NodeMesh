@@ -123,13 +123,19 @@ import { AuthService } from '../../../core/services/auth/auth.service';
       </div>
 
 
-      <!-- Profile Card -->
+      <!-- Profile Card (Footer) -->
       <div class="profile-card">
-        <div class="avatar">{{ userInitial }}</div>
+        <div class="avatar-wrapper">
+          <img *ngIf="currentUser?.photoURL" [src]="currentUser?.photoURL" alt="Profile" class="avatar-img">
+          <div *ngIf="!currentUser?.photoURL" class="avatar-placeholder">{{ userInitial }}</div>
+          <div class="status-dot"></div>
+        </div>
+        
         <div class="profile-info" [class.hidden]="!isExpanded">
           <span class="profile-name">{{ userName }}</span>
           <span class="profile-email">{{ userEmail }}</span>
         </div>
+        
         <button class="logout-btn" [class.hidden]="!isExpanded" (click)="logout()" title="Cerrar sesión">
           <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
             <path d="M120,216a8,8,0,0,1-8,8H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32h64a8,8,0,0,1,0,16H48V208h64A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z"/>
@@ -590,33 +596,58 @@ import { AuthService } from '../../../core/services/auth/auth.service';
     .profile-card {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.85rem 0;
+      gap: 0.85rem;
+      padding: 1.25rem 1rem;
       margin: 0 -1rem;
-      padding-left: 1rem;
-      padding-right: 0.75rem;
       border-top: 1px solid var(--border-color);
+      transition: all 0.3s ease;
     }
 
     :host.collapsed .profile-card {
       justify-content: center;
-      padding-left: 0;
-      padding-right: 0;
+      padding: 1.25rem 0.5rem;
     }
 
-    .avatar {
-      width: 34px;
-      height: 34px;
+    .avatar-wrapper {
+      position: relative;
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+    }
+
+    .avatar-img {
+      width: 100%;
+      height: 100%;
       border-radius: 50%;
-      background: #8b0000;
+      object-fit: cover;
+      box-shadow: 0 0 0 2px var(--sidebar-bg), 0 0 0 3px var(--border-color);
+    }
+
+    .avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #8b0000; /* Dark red as requested/shown */
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       font-weight: 800;
-      flex-shrink: 0;
+      box-shadow: 0 0 0 2px var(--sidebar-bg), 0 0 0 3px var(--border-color);
+    }
+
+    .status-dot {
+      position: absolute;
+      bottom: 1px;
+      right: 1px;
+      width: 11px;
+      height: 11px;
+      background: #86db00; /* Neon green */
+      border: 2.5px solid var(--sidebar-bg);
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(134, 219, 0, 0.4);
     }
 
     .profile-info {
@@ -624,54 +655,59 @@ import { AuthService } from '../../../core/services/auth/auth.service';
       display: flex;
       flex-direction: column;
       min-width: 0;
+      gap: 1px;
     }
 
     .profile-name {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
+      font-size: 0.82rem;
       font-weight: 700;
       color: var(--text-main);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      letter-spacing: -0.01em;
     }
 
     .profile-email {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      font-weight: 400;
+      font-size: 0.68rem;
+      font-weight: 500;
       color: var(--text-dim);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      opacity: 0.8;
     }
 
     .logout-btn {
       background: transparent;
       border: none;
       cursor: pointer;
-      padding: 6px;
-      border-radius: 8px;
+      padding: 8px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      transition: background 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-right: -4px;
     }
 
     .logout-btn svg {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       fill: var(--text-dim);
-      transition: fill 0.2s ease;
+      transition: fill 0.2s ease, transform 0.2s ease;
     }
 
     .logout-btn:hover {
-      background: rgba(255, 60, 60, 0.12);
+      background: rgba(255, 68, 68, 0.1);
     }
 
     .logout-btn:hover svg {
       fill: #ff4444;
+      transform: translateX(2px);
     }
   `]
 })

@@ -10,7 +10,17 @@ import { NAV_ICONS } from '../../constants/icons.constants';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <div class="sidebar-wrapper">
+    <!-- Mobile Hamburger Toggle -->
+    <button class="mobile-toggle" (click)="toggleMobile()" [class.active]="isMobileOpen">
+      <svg viewBox="0 0 256 256">
+        <path [attr.d]="isMobileOpen ? icons.close : icons.menu"/>
+      </svg>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" [class.show]="isMobileOpen" (click)="toggleMobile()"></div>
+
+    <div class="sidebar-wrapper" [class.mobile-open]="isMobileOpen">
       <div class="sidebar-header">
         <div class="logo-container" [class.hidden]="!isExpanded">
           <!-- Logo completo SVG -->
@@ -163,13 +173,11 @@ import { NAV_ICONS } from '../../constants/icons.constants';
       height: 100vh;
       background: var(--sidebar-bg);
       border-radius: 0 24px 24px 0;
-      box-shadow: inset -1px 0 0 var(--border-color);
-      transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease;
-      width: 260px;
-      overflow: hidden;
-      flex-shrink: 0;
       position: relative;
-      z-index: 100;
+      z-index: 1000;
+      transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                  background-color 0.4s ease,
+                  transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     :host-context([data-theme="light"]) {
@@ -182,6 +190,77 @@ import { NAV_ICONS } from '../../constants/icons.constants';
       overflow: visible;
     }
 
+    /* ── MOBILE RESPONSIVENESS ──────────────────────── */
+    .mobile-toggle {
+      display: none;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1100;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+    }
+
+    .mobile-toggle svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .mobile-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(4px);
+      z-index: 950;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .mobile-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (max-width: 768px) {
+      :host {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 280px !important;
+        transform: translateX(-100%);
+        border-radius: 0;
+      }
+
+      :host.mobile-active {
+        transform: translateX(0);
+      }
+
+      .mobile-toggle {
+        display: flex;
+      }
+
+      .mobile-overlay {
+        display: block;
+      }
+      
+      .sidebar-wrapper {
+        padding-top: 5rem; /* Space for the toggle */
+      }
+    }
+
     .sidebar-wrapper {
       display: flex;
       flex-direction: column;
@@ -190,7 +269,7 @@ import { NAV_ICONS } from '../../constants/icons.constants';
     }
 
     :host.collapsed .sidebar-wrapper {
-      padding: 1.5rem 0.75rem;
+      padding: 1rem 0.6rem;
     }
 
     .sidebar-header {
@@ -209,6 +288,8 @@ import { NAV_ICONS } from '../../constants/icons.constants';
     :host.collapsed .sidebar-header {
       justify-content: center;
       gap: 0;
+      margin: 0 -0.6rem 1.25rem;
+      padding: 0 0.6rem 1.25rem;
     }
 
     .logo-container {
@@ -355,11 +436,31 @@ import { NAV_ICONS } from '../../constants/icons.constants';
       gap: 0.25rem;
     }
 
+    :host.collapsed .sidebar-nav {
+      gap: 0.4rem;
+    }
+
+    :host.collapsed .nav-group {
+      gap: 0.15rem;
+    }
+
     .nav-group.bottom {
       border-top: 1px solid var(--border-color);
       padding-top: 0.8rem;
       margin-top: 0.6rem;
-      width: 100%;
+      margin-left: -1rem;
+      margin-right: -1rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    :host.collapsed .nav-group.bottom {
+      padding-top: 0.5rem;
+      margin-top: 0.4rem;
+      margin-left: -0.6rem;
+      margin-right: -0.6rem;
+      padding-left: 0.6rem;
+      padding-right: 0.6rem;
     }
 
     .group-label {
@@ -394,7 +495,7 @@ import { NAV_ICONS } from '../../constants/icons.constants';
 
     :host.collapsed .nav-item {
       justify-content: center;
-      padding: 10px 0;
+      padding: 6px 0;
       gap: 0;
       position: relative; /* Base for tooltips */
     }
@@ -525,12 +626,17 @@ import { NAV_ICONS } from '../../constants/icons.constants';
 
     /* ── THEME SWITCHER ─────────────────────────────── */
     .theme-switcher {
-      margin: auto 0 0;
+      margin: auto -1rem 0;
       padding: 1.25rem 1rem;
       border-top: 1px solid var(--border-color);
-      transition: padding 0.35s ease;
+      transition: all 0.35s ease;
       display: flex;
       flex-direction: column;
+    }
+
+    :host.collapsed .theme-switcher {
+      margin: auto -0.6rem 0;
+      padding: 0.75rem 0.6rem;
     }
 
     .theme-track {
@@ -674,12 +780,13 @@ import { NAV_ICONS } from '../../constants/icons.constants';
       padding: 1.25rem 1rem;
       margin: 0 -1rem;
       border-top: 1px solid var(--border-color);
-      transition: all 0.3s ease;
+      transition: all 0.35s ease;
     }
 
     :host.collapsed .profile-card {
       justify-content: center;
-      padding: 1.25rem 0.5rem;
+      padding: 0.85rem 0.6rem;
+      margin: 0 -0.6rem;
     }
 
     .avatar-wrapper {
@@ -687,21 +794,23 @@ import { NAV_ICONS } from '../../constants/icons.constants';
       width: 38px;
       height: 38px;
       flex-shrink: 0;
+      border-radius: 50%;
+      overflow: hidden; /* Fix overflow */
+      border: 2px solid var(--border-color);
+      background: var(--sidebar-bg);
     }
 
     .avatar-img {
       width: 100%;
       height: 100%;
-      border-radius: 50%;
       object-fit: cover;
-      box-shadow: 0 0 0 2px var(--sidebar-bg), 0 0 0 3px var(--border-color);
+      display: block;
     }
 
     .avatar-placeholder {
       width: 100%;
       height: 100%;
-      border-radius: 50%;
-      background: #8b0000; /* Dark red as requested/shown */
+      background: #8b0000;
       color: #fff;
       display: flex;
       align-items: center;
@@ -709,7 +818,6 @@ import { NAV_ICONS } from '../../constants/icons.constants';
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.9rem;
       font-weight: 800;
-      box-shadow: 0 0 0 2px var(--sidebar-bg), 0 0 0 3px var(--border-color);
     }
 
     .status-dot {
@@ -794,15 +902,24 @@ export class SidebarComponent {
   @HostBinding('class.expanded') get isExpandedInternal() { return this.isExpanded; }
 
   isExpanded = true;
+  isMobileOpen = false;
   isDark$ = this.themeService.isDark$;
   icons = NAV_ICONS;
+
+  @HostBinding('class.mobile-active') get isMobileActive() { return this.isMobileOpen; }
 
   get currentUser() { return this.authService.getCurrentUser(); }
   get userName()    { return this.currentUser?.displayName ?? 'Admin Profile'; }
   get userEmail()   { return this.currentUser?.email ?? ''; }
   get userInitial() { return (this.currentUser?.displayName ?? 'A')[0].toUpperCase(); }
 
-  toggle() { this.isExpanded = !this.isExpanded; }
+  toggle() { 
+    this.isExpanded = !this.isExpanded; 
+  }
+
+  toggleMobile() {
+    this.isMobileOpen = !this.isMobileOpen;
+  }
 
   setTheme(theme: 'light' | 'dark') {
     this.themeService.setTheme(theme);

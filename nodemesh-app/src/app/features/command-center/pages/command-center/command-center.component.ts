@@ -979,9 +979,9 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     .input-group.half { flex: 1; min-width: 200px; }
 
     /* V2 COMPILER UI & TOGGLES */
-    .cc-label {
-      display: block; font-family: 'JetBrains Mono', monospace; font-size: 1.05rem;
-      font-weight: 800; color: var(--theme-text); margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 1px; opacity: 1;
+    .compiler-modal .cc-label {
+      display: block; font-family: 'JetBrains Mono', monospace; font-size: 1.15rem;
+      font-weight: 800; color: var(--theme-text); margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; opacity: 1;
     }
     
     .compiler-modal { padding: 3rem; box-sizing: border-box; overflow-x: hidden; background: #131313; border-color: rgba(255,255,255,0.05); }

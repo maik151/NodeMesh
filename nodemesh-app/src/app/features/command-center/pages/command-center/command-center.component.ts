@@ -1026,43 +1026,24 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     :host-context([data-theme="light"]) .copier-btn:not(:disabled):hover { color: var(--theme-brand-neon) !important; }
 
     /* ANIMATED TOGGLES */
-    .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 46px;
-      height: 24px;
-      margin: 0;
-    }
+    .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; margin: 0; }
     .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
     .toggle-switch .slider {
       position: absolute; cursor: pointer; inset: 0;
       background-color: rgba(255, 255, 255, 0.1); 
-      transition: .3s cubic-bezier(0.4, 0.0, 0.2, 1);
-      border-radius: 34px;
-      border: 1px solid rgba(255,255,255,0.05);
+      transition: background-color .3s cubic-bezier(0.4, 0.0, 0.2, 1), border-color .3s ease;
+      border-radius: 34px; border: 1px solid rgba(255,255,255,0.05);
     }
     .toggle-switch .slider:before {
-      position: absolute; content: "";
-      height: 16px; width: 16px;
-      left: 3px; bottom: 3px;
-      background-color: #e4e4e7;
-      transition: .3s cubic-bezier(0.4, 0.0, 0.2, 1);
-      border-radius: 50%;
+      position: absolute; content: ""; height: 18px; width: 18px;
+      left: 2px; bottom: 2px; background-color: #f4f4f5;
+      transition: transform .3s cubic-bezier(0.4, 0.0, 0.2, 1), background-color .3s ease;
+      border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
-    .toggle-switch input:checked + .slider {
-      background-color: var(--theme-brand-neon);
-      border-color: var(--theme-brand-neon);
-    }
-    .toggle-switch input:checked + .slider:before {
-      transform: translateX(22px);
-      background-color: #000;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256' fill='%239ACD32'%3E%3Cpath d='M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z'%3E%3C/path%3E%3C/svg%3E");
-      background-size: 10px;
-      background-repeat: no-repeat;
-      background-position: center;
-    }
-    :host-context([data-theme="light"]) .toggle-switch .slider { background-color: rgba(0, 0, 0, 0.1); border-color: rgba(0,0,0,0.1); }
-    :host-context([data-theme="light"]) .toggle-switch .slider:before { background-color: #fff; }
+    .toggle-switch input:checked + .slider { background-color: var(--theme-brand-neon); border-color: var(--theme-brand-neon); box-shadow: 0 0 10px rgba(110, 175, 11, 0.2); }
+    .toggle-switch input:checked + .slider:before { transform: translateX(20px); background-color: #ffffff; }
+    :host-context([data-theme="light"]) .toggle-switch .slider { background-color: rgba(0, 0, 0, 0.15); border-color: rgba(0,0,0,0.05); }
+    :host-context([data-theme="light"]) .toggle-switch .slider:before { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
     @keyframes pulse { 0% { opacity: 0.2; transform: scale(0.95); } 50% { opacity: 0.6; transform: scale(1.05); } 100% { opacity: 0.2; transform: scale(0.95); } }
   `]

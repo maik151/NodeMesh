@@ -854,8 +854,8 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
 
     /* MODAL UI */
     .cc-input, .cc-select {
-      width: 100%; padding: 0.75rem 1rem; background: var(--theme-input-bg); border: 1px solid var(--theme-border);
-      border-radius: 10px; color: var(--theme-text); font-family: 'Inter', sans-serif; font-size: 0.85rem;
+      width: 100%; padding: 0.55rem 0.8rem; background: var(--theme-input-bg); border: 1px solid var(--theme-border);
+      border-radius: 8px; color: var(--theme-text); font-family: 'Inter', sans-serif; font-size: 0.85rem;
     }
     .cc-input:focus, .cc-select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 15px rgba(154, 205, 50, 0.1); }
     .modal-body label { font-size: 0.55rem; font-weight: 950; opacity: 0.6; letter-spacing: 1px; margin-bottom: 0.4rem; display: block; color: var(--theme-text); }
@@ -980,8 +980,8 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
 
     /* V2 COMPILER UI & TOGGLES */
     .compiler-modal .cc-label {
-      display: block; font-family: 'JetBrains Mono', monospace; font-size: 1.15rem;
-      font-weight: 800; color: var(--theme-text); margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; opacity: 1;
+      display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+      font-weight: 800; color: var(--theme-text); margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; opacity: 1;
     }
     
     .compiler-modal { padding: 3rem; box-sizing: border-box; overflow-x: hidden; background: #131313; border-color: rgba(255,255,255,0.05); }
@@ -1005,7 +1005,7 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     }
     
     .custom-select-wrapper { position: relative; width: 100%; user-select: none; z-index: 10; }
-    .select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1rem; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600; }
+    .select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 0.8rem; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600; }
     .select-trigger:hover, .select-trigger.active { border-color: var(--theme-brand-neon); }
     .select-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #1a1a1e; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; z-index: 1000; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
     :host-context([data-theme="light"]) .select-dropdown { background: #fff; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 10px 40px rgba(0,0,0,0.1); }

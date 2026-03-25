@@ -1,12 +1,13 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { DatabaseService } from '../../../../core/services/storage/database.service';
-import { DifficultyLevel, ChallengeType } from '../../../../core/models/node.model';
+import { DifficultyLevel, ChallengeType, FolderTheme } from '../../../../core/models/node.model';
+import { PromptConfigV2, buildPromptV2, AuditorPersona, OutputLanguage } from '../../../../core/services/pipeline/prompt-templates.constants';
 import { ThemeService } from '../../../../core/services/ui/theme.service';
 import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass/liquid-glass.component';
-
+import { NAV_ICONS } from '../../../../shared/constants/icons.constants';
+import { Router } from '@angular/router';
+import { DatabaseService } from '../../../../core/services/storage/database.service';
 @Component({
   selector: 'app-command-center',
   standalone: true,
@@ -17,7 +18,7 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
         <div class="header-left">
           <h1 class="cc-title">Command Center</h1>
           <div class="header-meta">
-            <p class="cc-subtitle">ORQUESTA TU FLUJO COGNITIVO</p>
+            <p class="cc-subtitle">Orquesta tu Flujo Cognitivo</p>
             <div class="status-indicator">
               <div class="status-pill">
                 <span class="dot pulse"></span>
@@ -33,25 +34,32 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
 
       <div class="cc-grid">
         <!-- PRIMARY OPS: INJECT PAYLOAD (Wide) -->
-        <div class="cc-card span-8 row-2">
-          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="18" [backgroundColor]="'var(--glass-fill)'">
-            <div class="card-inner flex-row space-between items-center" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" [class.dragging]="isDragging">
-               <div class="inner-glow"></div>
-              <div class="payload-visual">
-                <div class="icon-orb">
-                  <span class="material-symbols-rounded neon-text">database_upload</span>
-                </div>
-                <div class="payload-info">
-                  <h3>INJECT_PAYLOAD</h3>
-                  <p>Arrastra archivos JSON o usa <kbd>Ctrl+V</kbd></p>
-                </div>
-              </div>
-              <button class="btn-terminal-action" (click)="openCompilerModal()">
-                <span class="material-symbols-rounded">terminal</span>
-                <span>OPEN_COMPILER</span>
-              </button>
+        <div class="cc-card span-8 row-2 card-ingest"
+             (dragenter)="onDragEnter($event)"
+             (dragover)="onDragOver($event)" 
+             (dragleave)="onDragLeave($event)" 
+             (drop)="onDrop($event)"
+             [class.dragging]="isDragging"
+             [class.ctrl-active]="isCtrlPressed">
+          
+          <div class="ingest-header">
+            <div class="ingest-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V64a8,8,0,0,1,8-8H208a8,8,0,0,1,8,8Zm-48,48a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,224ZM157.66,106.34a8,8,0,0,1-11.32,11.32L136,107.31V152a8,8,0,0,1-16,0V107.31l-10.34,10.35a8,8,0,0,1-11.32-11.32l24-24a8,8,0,0,1,11.32,0Z"></path></svg>
+              <span class="label-micro mb-0" style="font-size: 0.8rem; margin: 0;">SUBIR PREGUNTAS</span>
             </div>
-          </app-liquid-glass>
+            <button class="btn-generate-prompt" (click)="openCompilerModal()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,128a8,8,0,0,1-3,6.25l-40,32a8,8,0,1,1-10-12.5L107.19,128,75,102.25a8,8,0,1,1,10-12.5l40,32A8,8,0,0,1,128,128Zm48,24H136a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm56-96V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56ZM216,200V56H40V200H216Z"></path></svg>
+              <span>Generar Prompt</span>
+            </button>
+          </div>
+
+          <div class="ingest-body">
+            <svg class="cloud-icon" xmlns="http://www.w3.org/2000/svg" width="56" height="56" fill="currentColor" viewBox="0 0 256 256"><path d="M178.34,165.66,160,147.31V208a8,8,0,0,1-16,0V147.31l-18.34,18.35a8,8,0,0,1-11.32-11.32l32-32a8,8,0,0,1,11.32,0l32,32a8,8,0,0,1-11.32,11.32ZM160,40A88.08,88.08,0,0,0,81.29,88.68,64,64,0,1,0,72,216h40a8,8,0,0,0,0-16H72a48,48,0,0,1,0-96c1.1,0,2.2,0,3.29.12A88,88,0,0,0,72,128a8,8,0,0,0,16,0,72,72,0,1,1,100.8,66,8,8,0,0,0,3.2,15.34,7.9,7.9,0,0,0,3.2-.68A88,88,0,0,0,160,40Z"></path></svg>
+            <h4 class="ingest-main-text">Usa CTRL+V para subir tus Preguntas</h4>
+            <p class="ingest-sub-text">También puedes subir tu archivo .JSON</p>
+            <button class="btn-explore-files" (click)="fileInput.click()">Explorar Archivos</button>
+            <input type="file" #fileInput (change)="onFileSelected($event)" accept=".json" style="display: none;">
+          </div>
         </div>
 
         <!-- ACTION: FORZAR SPRINT (Compact & Powerful) -->
@@ -193,38 +201,253 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
         </div>
       </div>
 
-      <!-- MODALS & TOASTS -->
-      <div class="cc-modal-backdrop" *ngIf="showCompiler">
-        <div class="cc-modal card-glass shadow-bloom">
+      <!-- TEMPORAL UPLOAD MODAL (TDD) -->
+      <div class="cc-modal-backdrop" *ngIf="showUploadModal">
+        <div class="cc-modal card-glass shadow-bloom" style="width: 650px; max-width: 95vw;">
           <header class="modal-header">
-            <h3>COMPILADOR DE PROMPT MAESTRO</h3>
+            <h3 style="display: flex; align-items: center; gap: 0.6rem; color: rgba(255,255,255,0.85);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M237.66,86.34l-60-60a8,8,0,0,0-11.32,0L37.11,155.57a44.77,44.77,0,0,0,63.32,63.32L212.32,107l22.21-7.4a8,8,0,0,0,3.13-13.25ZM89.11,207.57a28.77,28.77,0,0,1-40.68-40.68l28.8-28.8c8.47-2.9,21.75-4,39.07,5,10.6,5.54,20.18,8,28.56,8.73ZM205.47,92.41a8,8,0,0,0-3.13,1.93l-39.57,39.57c-8.47,2.9-21.75,4-39.07-5-10.6-5.54-20.18-8-28.56-8.73L172,43.31,217.19,88.5Z"></path></svg>
+              TEST UPLOAD MODAL
+            </h3>
+            <button class="btn-close" (click)="showUploadModal = false">×</button>
+          </header>
+          
+          <div class="modal-body">
+            
+            <div class="row">
+              <div class="input-group half relative">
+                <label>TEMA (FOLDER)</label>
+                <input type="text" [(ngModel)]="uploadConfig.themeName" (focus)="showThemeDropdown=true" (blur)="hideThemeDropdownDelay()" (input)="filterThemes()" placeholder="Escribe o selecciona..." class="cc-input" autocomplete="off">
+                <div class="combo-dropdown" *ngIf="showThemeDropdown && filteredThemes.length > 0">
+                  <div class="combo-item" *ngFor="let t of filteredThemes" (click)="selectTheme(t)">
+                     {{ t.nombre_tema }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="input-group half">
+                <label>TÍTULO DEL QUIZ</label>
+                <input type="text" [(ngModel)]="uploadConfig.quizTitle" placeholder="Ej. Bases de microservicios" class="cc-input" autocomplete="off">
+              </div>
+            </div>
+
+            <div class="kpi-banner" [class.error]="!uploadStats.isValid">
+               <div class="kpi-item">
+                 <span class="kpi-label">NODOS DETECTADOS</span>
+                 <span class="kpi-val">{{ uploadStats.nodeCount }}</span>
+               </div>
+               <div class="kpi-item">
+                 <span class="kpi-label">CARACTERES</span>
+                 <span class="kpi-val">{{ uploadStats.charCount }}</span>
+               </div>
+               <div class="kpi-item">
+                 <span class="kpi-label">ESTADO JSON</span>
+                 <span class="kpi-val status-text">{{ uploadStats.isValid ? 'VÁLIDO' : 'INVÁLIDO' }}</span>
+               </div>
+            </div>
+            
+            <div class="error-text" *ngIf="!uploadStats.isValid && uploadStats.errorMessage">
+                {{ uploadStats.errorMessage }}
+            </div>
+
+            <div class="payload-editor-container">
+               <div class="editor-toolbar">
+                  <span class="label-micro" style="margin: 0; padding: 0;">PAYLOAD_RAW</span>
+                  <button class="btn-micro" (click)="normalizeJson()" title="Intentar reparar JSON dañado o limpiar Markdown">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M48,64a8,8,0,0,1,8-8H72V40a8,8,0,0,1,16,0V56h16a8,8,0,0,1,0,16H88V88a8,8,0,0,1-16,0V72H56A8,8,0,0,1,48,64ZM184,192h-8v-8a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0v-8h8a8,8,0,0,0,0-16Zm56-48H224V128a8,8,0,0,0-16,0v16H192a8,8,0,0,0,0,16h16v16a8,8,0,0,0,16,0V160h16a8,8,0,0,0,0-16ZM219.31,80,80,219.31a16,16,0,0,1-22.62,0L36.68,198.63a16,16,0,0,1,0-22.63L176,36.69a16,16,0,0,1,22.63,0l20.68,20.68A16,16,0,0,1,219.31,80Zm-54.63,32L144,91.31l-96,96L68.68,208ZM208,68.69,187.31,48l-32,32L176,100.69Z"></path></svg>
+                     NORMALIZAR
+                  </button>
+               </div>
+               <textarea class="cc-textarea mono scroll-hide" [(ngModel)]="temporaryUploadPayload" (ngModelChange)="onPayloadInput()" placeholder="Pega aquí tu lista JSON de nodos..."></textarea>
+            </div>
+            
+          </div>
+
+          <footer class="modal-footer">
+             <button class="btn-text-upload" [disabled]="!uploadStats.isValid || !uploadConfig.themeName || !uploadConfig.quizTitle" (click)="confirmUpload()">
+               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z"></path></svg>
+               Cargar Quiz
+             </button>
+          </footer>
+        </div>
+      </div>
+
+      <div class="cc-modal-backdrop" *ngIf="showCompiler">
+        <div class="cc-modal compiler-modal card-glass shadow-bloom" style="width: 95vw; max-width: 1400px; background: #131313; border-color: rgba(255,255,255,0.05); overflow: hidden;">
+          
+          <header class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+            <h3 style="color: var(--theme-brand-neon); display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M128,128a8,8,0,0,1-3,6.25l-40,32a8,8,0,1,1-10-12.5L107.19,128,75,102.25a8,8,0,1,1,10-12.5l40,32A8,8,0,0,1,128,128Zm48,24H136a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm56-96V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56ZM216,200V56H40V200H216Z"></path></svg>
+              Compilador de PROMPT
+            </h3>
             <button class="btn-close" (click)="showCompiler = false">×</button>
           </header>
-          <div class="modal-body">
-            <div class="input-group">
-                <label>TEMA CENTRAL</label>
-                <input type="text" [(ngModel)]="compiler.theme" placeholder="Ej. Arquitectura Microservicios" class="cc-input">
-            </div>
-            <div class="row">
-              <div class="input-group half">
-                <label>NIVEL DE FRICCIÓN</label>
-                <select [(ngModel)]="compiler.level" class="cc-select">
-                  <option value="Aprendiz">Baja / Retención</option>
-                  <option value="Intermedio">Media / Aplicación</option>
-                  <option value="Senior">Máxima / Maestría</option>
-                </select>
+          
+          <div class="modal-body compiler-layout">
+            
+            <!-- COLUMNA IZQUIERDA (Controles) -->
+            <div class="compiler-controls" style="display: flex; flex-direction: column; gap: 1.2rem;">
+              
+              <div class="input-group">
+                  <label>Tema Central (Objetivo):</label>
+                  <input type="text" [(ngModel)]="compiler.tema" placeholder="Ej. Arquitectura Frontend React" class="cc-input" style="font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.5); border-radius: 8px;">
               </div>
-              <div class="input-group half">
-                <label>DENSIDAD (NODOS)</label>
-                <input type="number" [(ngModel)]="compiler.count" min="5" max="25" class="cc-input">
+              
+              <div class="row-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="input-group">
+                  <label title="El nivel definirá la complejidad teórica y práctica exigida por la IA a la hora de resolver el Quiz.">Nivel de Complejidad:</label>
+                  <div class="custom-select-wrapper">
+                    <select [(ngModel)]="compiler.nivel" class="cc-select with-icon" style="background: rgba(0,0,0,0.5); border-radius: 8px;">
+                      <option value="Aprendiz" title="Preguntas de retención teórica directa.">Junior</option>
+                      <option value="Intermedio" title="Preguntas de aplicación de conceptos en contextos medianos.">Medium</option>
+                      <option value="Senior" title="Preguntas de diseño de sistemas, arquitectura profunda y análisis de performance.">Senior</option>
+                    </select>
+                    <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm37.66-85.66a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L120,148.69V88a8,8,0,0,1,16,0v60.69l18.34-18.35A8,8,0,0,1,165.66,130.34Z"></path></svg>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label>Número de Preguntas:</label>
+                  <input type="number" [(ngModel)]="compiler.totalPreguntas" min="1" max="100" class="cc-input" style="text-align: center; background: rgba(0,0,0,0.5); border-radius: 8px; font-weight: bold;">
+                </div>
+              </div>
+
+              <div class="row-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="input-group">
+                  <label title="Define cómo va a redactar la IA las explicaciones y las pistas.">Personalidad del Auditor:</label>
+                  <div class="custom-select-wrapper">
+                    <select [(ngModel)]="compiler.auditor" class="cc-select with-icon" style="background: rgba(0,0,0,0.5); border-radius: 8px;">
+                      <option value="Socrático" title="Socrático: Te guía a la respuesta con pistas lógicas deductivas.">Socrático</option>
+                      <option value="Implacable" title="Implacable: Estilo revisión de código en GitHub, directo y al grano.">Implacable</option>
+                      <option value="Académico" title="Académico: Cita documentación, RFCs y principios computacionales rigurosos.">Académico</option>
+                    </select>
+                    <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm37.66-85.66a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L120,148.69V88a8,8,0,0,1,16,0v60.69l18.34-18.35A8,8,0,0,1,165.66,130.34Z"></path></svg>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label>Idioma Salida:</label>
+                  <div class="custom-select-wrapper">
+                    <select [(ngModel)]="compiler.idioma" class="cc-select with-icon" style="background: rgba(0,0,0,0.5); border-radius: 8px;">
+                      <option value="Español">Español</option>
+                      <option value="Inglés">English</option>
+                    </select>
+                    <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm37.66-85.66a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L120,148.69V88a8,8,0,0,1,16,0v60.69l18.34-18.35A8,8,0,0,1,165.66,130.34Z"></path></svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- MATRIZ DE PREGUNTAS -->
+              <div class="matrix-container" style="background: transparent; border-radius: 12px; display: flex; flex-direction: column; gap: 0.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <label style="margin: 0; display: flex; align-items: center; gap: 0.4rem;">Matriz de Preguntas:</label>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="label-micro" style="margin-right: 0.5rem; opacity: 0.8;" [style.color]="matrixSum === compiler.totalPreguntas ? 'var(--theme-brand-neon)' : '#ff4444'">
+                      {{ matrixSum }} / {{ compiler.totalPreguntas }}
+                    </span>
+                    <button class="btn-text-upload magic-btn" (click)="distribuirAzar()" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--theme-text-secondary); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 0.4rem;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M48,64a8,8,0,0,1,8-8H72V40a8,8,0,0,1,16,0V56h16a8,8,0,0,1,0,16H88V88a8,8,0,0,1-16,0V72H56A8,8,0,0,1,48,64ZM184,192h-8v-8a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0v-8h8a8,8,0,0,0,0-16Zm56-48H224V128a8,8,0,0,0-16,0v16H192a8,8,0,0,0,0,16h16v16a8,8,0,0,0,16,0V160h16a8,8,0,0,0,0-16ZM219.31,80,80,219.31a16,16,0,0,1-22.62,0L36.68,198.63a16,16,0,0,1,0-22.63L176,36.69a16,16,0,0,1,22.63,0l20.68,20.68A16,16,0,0,1,219.31,80Zm-54.63,32L144,91.31l-96,96L68.68,208ZM208,68.69,187.31,48l-32,32L176,100.69Z"></path></svg> Distribuir al Azar
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="matrix-grid-v2" style="border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem;">
+                  <!-- COLUMN 1 -->
+                  <div class="matrix-item" title="Aislar una verdad absoluta entre distractores.">
+                    <span>Single Choice</span>
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.single_choice" class="cc-input mini">
+                  </div>
+                  <div class="matrix-item" title="Compretar la palabra saltante para memoria muscular.">
+                    <span>Cloze Deletion</span>
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.cloze_deletion" class="cc-input mini">
+                  </div>
+                  <div class="matrix-item" title="Entender causalidad y ciclos de vida.">
+                    <span>Ordering</span>
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.ordering" class="cc-input mini">
+                  </div>
+                  
+                  <!-- COLUMN 2 -->
+                  <div class="matrix-item" title="Refactorizar hacia eficiencia algorítmica.">
+                    <span>Optimization</span>
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.optimization" class="cc-input mini">
+                  </div>
+                  <div class="matrix-item" title="Transferencia de conocimiento sin jerga.">
+                    <span>Feynman Synth</span>
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.feynman_synthesis" class="cc-input mini">
+                  </div>
+                  <div class="matrix-item" title="Exige panorama completo; selección de un array de resupestas verdaderas.">
+                    <span>Multi Choice</span>
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.multi_choice" class="cc-input mini">
+                  </div>
+                  
+                  <!-- COLUMN 3 -->
+                  <div class="matrix-item" title="Forzar ejecución y predecir lo que imprimiría.">
+                    <span>Output Predict</span>
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.output_prediction" class="cc-input mini">
+                  </div>
+                  <div class="matrix-item" title="Detectar vulnerabilidades o errores ocultos.">
+                    <span>Anomaly Detect</span>
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.anomaly_detection" class="cc-input mini">
+                  </div>
+                  <div class="matrix-item" title="Trade-offs y System Design global.">
+                    <span>Case Analysis</span>
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.case_analysis" class="cc-input mini">
+                  </div>
+                </div>
+              </div>
+              
+              <!-- TAGS EXTRA -->
+              <div class="input-group" style="margin-top: 0.5rem;">
+                <div style="display: flex; flex-direction: column;">
+                  <label>Tags Extra</label>
+                  <label class="label-micro" style="text-transform: none; opacity: 0.5;">(Escribe etiquetas extra para mejorar la calidad del quiz)</label>
+                </div>
+                <textarea [(ngModel)]="compiler.tagsExtra" placeholder="Ej. Específicamente céntrate en temas de Hooks y contextos concurrentes..." class="cc-textarea scroll-hide" style="min-height: 80px; background: rgba(0,0,0,0.5); border-radius: 8px; font-size: 0.8rem; padding: 0.8rem; margin-top: 0.5rem;"></textarea>
+              </div>
+
+              <!-- TOGGLES INFERIORES -->
+              <div class="toggles-container" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem;">
+                <div class="switch-group" style="display: flex; align-items: center; justify-content: space-between;">
+                  <label title="Inyecta un comando en el prompt para obligar a la IA a leer documentación enviada (RAG)." style="margin: 0; font-size: 0.85rem; max-width: 80%;">¿Vas a generar preguntas en base a uno o varios Documentos (PDF, WORD, EXCEL)?</label>
+                  <label class="toggle-switch">
+                    <input type="checkbox" [(ngModel)]="compiler.adjuntarDocs">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="switch-group" style="display: flex; align-items: center; justify-content: space-between;">
+                  <label title="Añade el campo dinámico 'pista_opcional' en cada Nodo para gamificación." style="margin: 0; font-size: 0.85rem; max-width: 80%;">¿Incluir Pistas en las preguntas?</label>
+                  <label class="toggle-switch">
+                    <input type="checkbox" [(ngModel)]="compiler.incluirPistas">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="switch-group" style="display: flex; align-items: center; justify-content: space-between;">
+                  <label title="Previene que la IA use identificadores markdown 'json' alrededor de la respuesta. Útil en flujos automatizados crudos." style="margin: 0; font-size: 0.85rem; max-width: 80%;">¿Forzar JSON RAW (Sin envoltura de llaves de markdown)?</label>
+                  <label class="toggle-switch">
+                    <input type="checkbox" [(ngModel)]="compiler.forzarJsonRaw">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- COLUMNA DERECHA (Preview) -->
+            <div class="compiler-preview" style="display: flex; flex-direction: column; gap: 0.5rem; height: 100%;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <button class="btn-primary-neon" style="background: var(--theme-brand-neon); color: #000; border-radius: 8px; padding: 0.6rem 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;" [disabled]="!isCompilerValid" (click)="generateAndCopyPrompt()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"></path></svg>
+                  Compilar PROMPT
+                </button>
+                <button class="btn-text-upload" (click)="generateAndCopyPrompt()" [disabled]="!isCompilerValid" style="background: transparent; border: none; color: var(--theme-text-secondary); display: flex; align-items: center; gap: 0.3rem;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"></path></svg>
+                  Copiar
+                </button>
+              </div>
+              <div style="flex: 1; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 0.5rem; background: #000; position: relative;">
+                <textarea readonly class="cc-textarea mono scroll-hide" style="width: 100%; height: 100%; min-height: 600px; resize: none; font-size: 0.75rem; background: transparent; border: none; color: #a1a1aa; opacity: {{ isCompilerValid ? '1' : '0.4' }}" [value]="livePromptPreview"></textarea>
               </div>
             </div>
+
           </div>
-          <footer class="modal-footer">
-            <button class="btn-primary-neon full" (click)="copyPrompt()">
-              GENERAR Y COPIAR
-            </button>
-          </footer>
         </div>
       </div>
 
@@ -270,9 +493,10 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       position: relative;
     }
     .cc-title {
-      font-size: 2.8rem;
-      font-weight: 950;
-      letter-spacing: -2.5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: -2px;
       margin: 0;
       line-height: 1;
       background: linear-gradient(180deg, var(--theme-text) 0%, var(--theme-text-secondary) 100%);
@@ -292,11 +516,11 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       margin-top: 0.5rem;
     }
     .cc-subtitle {
-      font-size: 0.8rem;
-      font-weight: 950;
-      letter-spacing: 5px;
-      opacity: 0.7;
-      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      font-weight: 400;
+      letter-spacing: 1px;
+      opacity: 0.5;
       margin: 0;
       color: var(--theme-text);
     }
@@ -350,6 +574,13 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       border: 1px solid rgba(0, 0, 0, 0.18); /* Solidified for maximum clarity */
       box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.05);
     }
+    
+    .matrix-item {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 0.4rem 0.6rem; border-radius: 8px;
+    }
+    .matrix-item span { font-size: 0.7rem; color: var(--theme-text-secondary); font-family: 'JetBrains Mono', monospace; width: 60%; display: block; line-height: 1.1; }
+    .matrix-item .cc-input.mini { width: 35px; height: 26px; padding: 0; text-align: center; font-size: 0.8rem; background: rgba(0,0,0,0.5); border: none; color: #fff; }
 
     .cc-card:hover { 
       transform: translateY(-4px); 
@@ -378,29 +609,125 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
     .gap-3 { gap: 1.5rem; }
     .no-wrap { white-space: nowrap; }
 
-    /* PAYLOAD SECTION */
-    .payload-visual { display: flex; align-items: center; gap: 1.25rem; z-index: 2; }
-    .icon-orb {
-      width: 48px; height: 48px;
+    /* --- INGEST CARD --- */
+    .cc-card.card-ingest {
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.02);
+      padding: 1.25rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: none;
+    }
+    :host-context([data-theme="light"]) .cc-card.card-ingest {
+      border: 2px dashed rgba(0, 0, 0, 0.15);
+      background: rgba(0, 0, 0, 0.02);
+    }
+    
+    .cc-card.card-ingest:hover {
+      border-color: var(--theme-brand-neon);
+    }
+    .cc-card.card-ingest.dragging, .cc-card.card-ingest.ctrl-active {
+      border-color: var(--theme-brand-neon);
       background: rgba(154, 205, 50, 0.05);
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
       box-shadow: inset 0 0 15px rgba(154, 205, 50, 0.1);
     }
-    .icon-orb span { font-size: 1.75rem; color: var(--theme-brand-neon); }
-    .payload-info h3 { font-size: 1.15rem; font-weight: 950; margin: 0; letter-spacing: -0.5px; color: var(--theme-text); }
-    .payload-info p { font-size: 0.75rem; opacity: 0.6; margin: 0.15rem 0 0; color: var(--theme-text-secondary); }
-    .btn-terminal-action {
-      background: rgba(255,255,255,0.015);
-      border: 1px solid rgba(255,255,255,0.05);
-      color: #aaa;
-      padding: 0.6rem 1rem;
-      border-radius: 10px;
-      display: flex; align-items: center; gap: 0.6rem;
-      font-size: 0.65rem; font-weight: 900; cursor: pointer;
-      transition: all 0.2s; z-index: 2;
+
+    .ingest-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
     }
-    .btn-terminal-action:hover { background: var(--theme-brand-neon); color: #000; border-color: var(--theme-brand-neon); }
+    .ingest-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--theme-text-secondary);
+    }
+    .ingest-title svg { opacity: 0.7; }
+    
+    .btn-generate-prompt {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      border: 1px solid var(--theme-border);
+      color: var(--theme-text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-generate-prompt:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--theme-text);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    :host-context([data-theme="light"]) .btn-generate-prompt:hover {
+      background: rgba(0, 0, 0, 0.05);
+      border-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .ingest-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .cloud-icon {
+      color: var(--theme-text-secondary);
+      margin-bottom: 0.5rem;
+      transition: all 0.3s;
+    }
+    .card-ingest.dragging .cloud-icon, .card-ingest.ctrl-active .cloud-icon {
+      color: var(--theme-brand-neon);
+      transform: scale(1.1);
+    }
+    .ingest-main-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--theme-text-secondary);
+      margin: 0;
+    }
+    .ingest-sub-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: var(--theme-text-secondary);
+      margin: 0 0 1rem 0;
+    }
+    .btn-explore-files {
+      background: var(--theme-brand-neon);
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      padding: 0.5rem 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(154, 205, 50, 0.2);
+      transition: all 0.2s;
+    }
+    .btn-explore-files:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(154, 205, 50, 0.4);
+    }
+    :host-context([data-theme="light"]) .btn-explore-files {
+      background: #6eaf0b;
+      color: #fff;
+    }
+    :host-context([data-theme="light"]) .btn-explore-files:hover {
+      background: #5c9309;
+      box-shadow: 0 6px 20px rgba(110, 175, 11, 0.4);
+    }
 
     /* SPRINT SECTION */
     .glow-orb {
@@ -510,6 +837,174 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
     .cc-input:focus, .cc-select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 15px rgba(154, 205, 50, 0.1); }
     .modal-body label { font-size: 0.55rem; font-weight: 950; opacity: 0.6; letter-spacing: 1px; margin-bottom: 0.4rem; display: block; color: var(--theme-text); }
     .input-group { margin-bottom: 1.25rem; }
+    
+    /* MODALS SYSTEM BASE */
+    .cc-modal-backdrop {
+      position: fixed; inset: 0; 
+      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    :host-context([data-theme="light"]) .cc-modal-backdrop {
+      background: rgba(255, 255, 255, 0.5);
+    }
+    
+    .cc-modal {
+      background: var(--theme-surface-solid);
+      border: 1px solid var(--theme-border);
+      border-radius: 20px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      position: relative;
+    }
+    :host-context([data-theme="light"]) .cc-modal {
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .modal-header h3 { margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 800; color: var(--theme-text); letter-spacing: -0.5px; }
+    .btn-close { background: transparent; border: none; font-size: 1.8rem; color: var(--theme-text-secondary); cursor: pointer; transition: color 0.2s; line-height: 1; }
+    .btn-close:hover { color: #ff4444; }
+    
+    .modal-footer { margin-top: 1.5rem; display: flex; justify-content: flex-end; }
+    
+    .btn-text-upload {
+      background: var(--theme-brand-neon); 
+      border: 1px solid rgba(0,0,0,0.1); 
+      color: #111;
+      border-radius: 12px;
+      padding: 0.8rem 1.5rem;
+      font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 1rem; 
+      cursor: pointer; transition: all 0.2s ease; letter-spacing: -0.5px;
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+    }
+    .btn-text-upload:disabled { 
+      background: rgba(255,255,255,0.05); border: 1px solid var(--theme-border);
+      color: var(--theme-text-secondary); opacity: 0.5; cursor: not-allowed; 
+    }
+    .btn-text-upload:not(:disabled):hover { 
+      background: #7cb342; /* A nicer, richer green on hover */
+      transform: translateY(-2px); 
+      box-shadow: 0 4px 15px rgba(154, 205, 50, 0.4);
+    }
+    
+    :host-context([data-theme="light"]) .btn-text-upload {
+      background: #6eaf0b; color: #fff; border: none;
+    }
+    :host-context([data-theme="light"]) .btn-text-upload:disabled {
+      background: rgba(0,0,0,0.05); color: rgba(0,0,0,0.4); border: 1px solid rgba(0,0,0,0.1);
+    }
+    :host-context([data-theme="light"]) .btn-text-upload:not(:disabled):hover {
+      background: #5c9309; box-shadow: 0 4px 15px rgba(110, 175, 11, 0.4); color: #fff;
+    }
+    
+    /* MODAL UPLOAD UX */
+    .combo-dropdown {
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+      background: var(--theme-surface-solid); border: 1px solid var(--theme-border);
+      border-radius: 8px; z-index: 10; max-height: 150px; overflow-y: auto;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .combo-item {
+      padding: 0.6rem 1rem; font-size: 0.8rem; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--theme-text);
+    }
+    .combo-item:last-child { border-bottom: none; }
+    .combo-item:hover { background: rgba(154, 205, 50, 0.1); color: var(--theme-brand-neon); }
+    .relative { position: relative; }
+
+    .kpi-banner { 
+      display: flex; justify-content: space-around; background: rgba(154, 205, 50, 0.05); 
+      border: 1px solid rgba(154, 205, 50, 0.2); border-radius: 12px; padding: 0.8rem 1.5rem; margin-bottom: 1rem;
+    }
+    .kpi-banner.error { background: rgba(255, 68, 68, 0.05); border-color: rgba(255, 68, 68, 0.2); }
+    .kpi-item { display: flex; flex-direction: column; align-items: center; }
+    .kpi-label { font-size: 0.65rem; font-family: 'Fira Code', monospace; opacity: 0.6; margin-bottom: 0.2rem; color: var(--theme-text); text-transform: uppercase; }
+    .kpi-val { font-size: 1.2rem; font-weight: 900; font-family: 'JetBrains Mono', monospace;  color: var(--theme-text); }
+    .kpi-banner.error .kpi-val.status-text { color: #ff4444; }
+    .kpi-banner:not(.error) .kpi-val.status-text { color: var(--theme-brand-neon); }
+
+    .payload-editor-container {
+      background: rgba(0,0,0,0.2); border: 1px solid var(--theme-border); border-radius: 12px; overflow: hidden;
+    }
+    :host-context([data-theme="light"]) .payload-editor-container {
+      background: rgba(0,0,0,0.02);
+    }
+    .editor-toolbar {
+      display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--theme-border); background: rgba(255,255,255,0.02);
+    }
+    :host-context([data-theme="light"]) .editor-toolbar {
+      background: rgba(0,0,0,0.02);
+    }
+    .btn-micro {
+      background: transparent; border: 1px solid var(--theme-border); color: var(--theme-text-secondary);
+      border-radius: 6px; padding: 0.2rem 0.6rem; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; font-family: 'JetBrains Mono', monospace;
+    }
+    .btn-micro:hover { background: rgba(154, 205, 50, 0.1); color: var(--theme-brand-neon); border-color: var(--theme-brand-neon); }
+    .cc-textarea {
+      width: 100%; height: 180px; padding: 1rem; background: transparent; border: none; color: var(--theme-text);
+      font-size: 0.85rem; resize: none;
+    }
+    .cc-textarea:focus { outline: none; }
+    .mono { font-family: 'Fira Code', monospace; line-height: 1.4; }
+    
+    .error-text { color: #ff4444; font-size: 0.75rem; text-align: center; margin-bottom: 1rem; font-weight: 600; }
+    
+    .row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .input-group.half { flex: 1; min-width: 200px; }
+
+    /* V2 COMPILER UI & TOGGLES */
+    .compiler-modal { padding: 3rem; }
+    .compiler-layout { display: grid; grid-template-columns: 1fr 1.3fr; gap: 3rem; }
+    @media (max-width: 1024px) {
+      .compiler-layout { grid-template-columns: 1fr; }
+      .compiler-modal { padding: 1.5rem; }
+    }
+    
+    .custom-select-wrapper { position: relative; width: 100%; }
+    .cc-select.with-icon { appearance: none; padding-right: 2.5rem; }
+    .select-arrow { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--theme-text-secondary); opacity: 0.7; }
+    
+    .magic-btn:hover { background: rgba(154, 205, 50, 0.15) !important; color: var(--theme-brand-neon) !important; border-color: var(--theme-brand-neon) !important; box-shadow: 0 0 15px rgba(154, 205, 50, 0.3); }
+
+    /* ANIMATED TOGGLES */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 26px;
+      margin: 0;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-switch .slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background-color: rgba(255, 255, 255, 0.15); 
+      transition: .3s cubic-bezier(0.4, 0.0, 0.2, 1);
+      border-radius: 34px;
+    }
+    .toggle-switch .slider:before {
+      position: absolute; content: "";
+      height: 18px; width: 18px;
+      left: 4px; bottom: 4px;
+      background-color: #333;
+      transition: .3s cubic-bezier(0.4, 0.0, 0.2, 1);
+      border-radius: 50%;
+    }
+    .toggle-switch input:checked + .slider {
+      background-color: var(--theme-brand-neon);
+    }
+    .toggle-switch input:checked + .slider:before {
+      transform: translateX(22px);
+      background-color: #fff;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256' fill='%239ACD32'%3E%3Cpath d='M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z'%3E%3C/path%3E%3C/svg%3E");
+      background-size: 10px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    :host-context([data-theme="light"]) .toggle-switch .slider { background-color: rgba(0, 0, 0, 0.15); }
+    :host-context([data-theme="light"]) .toggle-switch .slider:before { background-color: #fff; }
 
     @keyframes pulse { 0% { opacity: 0.2; transform: scale(0.95); } 50% { opacity: 0.6; transform: scale(1.05); } 100% { opacity: 0.2; transform: scale(0.95); } }
   `]
@@ -520,6 +1015,7 @@ export class CommandCenterComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly themeService = inject(ThemeService);
   isDark$ = this.themeService.isDark$;
+  icons = NAV_ICONS;
 
   // Dashboard Data
   dueModules: any[] = [];
@@ -537,15 +1033,80 @@ export class CommandCenterComponent implements OnInit {
 
   // UI State
   isDragging = false;
+  isCtrlPressed = false;
+  showUploadModal = false;
+  temporaryUploadPayload = '';
+  
+  availableThemes: FolderTheme[] = [];
+  filteredThemes: FolderTheme[] = [];
+  showThemeDropdown = false;
+  
+  uploadConfig = {
+    themeName: '',
+    themeId: '',
+    quizTitle: ''
+  };
+
+  uploadStats = {
+    nodeCount: 0,
+    isValid: false,
+    errorMessage: '',
+    charCount: 0
+  };
+  
   showCompiler = false;
   injectionStatus: 'idle' | 'success' | 'error' = 'idle';
   injectionMsg = '';
 
-  compiler = {
-    theme: '',
-    level: 'Intermedio' as DifficultyLevel,
-    count: 10
+  compiler: PromptConfigV2 = {
+    tema: '',
+    nivel: 'Intermedio',
+    totalPreguntas: 50,
+    auditor: 'Socrático',
+    idioma: 'Español',
+    tagsExtra: '',
+    adjuntarDocs: false,
+    incluirPistas: false,
+    forzarJsonRaw: false,
+    matrix: {
+      single_choice: 10,
+      cloze_deletion: 10,
+      ordering: 10,
+      optimization: 5,
+      feynman_synthesis: 5,
+      multi_choice: 2,
+      output_prediction: 4,
+      anomaly_detection: 2,
+      case_analysis: 2
+    }
   };
+
+  distribuirAzar() {
+    // Zero out matrix
+    const keys = Object.keys(this.compiler.matrix) as (keyof typeof this.compiler.matrix)[];
+    keys.forEach(k => this.compiler.matrix[k] = 0);
+    
+    let remaining = this.compiler.totalPreguntas;
+    while(remaining > 0) {
+      const idx = Math.floor(Math.random() * keys.length);
+      this.compiler.matrix[keys[idx]]++;
+      remaining--;
+    }
+  }
+
+  get matrixSum(): number {
+    return Object.values(this.compiler.matrix).reduce((a, b) => a + (b || 0), 0);
+  }
+
+  get isCompilerValid(): boolean {
+    return this.compiler.tema.trim().length > 0 && this.matrixSum === this.compiler.totalPreguntas;
+  }
+
+  get livePromptPreview(): string {
+    return this.isCompilerValid 
+      ? buildPromptV2(this.compiler) 
+      : '⚠️ ERROR DE VALIDACIÓN: La suma de preguntas en la matriz debe cuadrar matemáticamente con el Total de Preguntas, y el Tema no puede estar vacío.\\n\\nAjusta los valores para visualizar el prompt en vivo.';
+  }
 
   async ngOnInit() {
     await this.refreshAllData();
@@ -633,18 +1194,41 @@ export class CommandCenterComponent implements OnInit {
     this.showCompiler = true;
   }
 
-  async copyPrompt() {
-    const promptTemplate = `
-Eres la Matriz Maestra de NodeMesh. Transforma este texto en una taxonomía de ${this.compiler.count} retos cognitivos.
-NIVEL DE DIFICULTAD: ${this.compiler.level}
-TEMA: ${this.compiler.theme}
-Sigue estrictamente el esquema JSON definido.
-    `.trim();
-    await navigator.clipboard.writeText(promptTemplate);
+  async generateAndCopyPrompt() {
+    if (!this.isCompilerValid) return;
+    const finalPrompt = buildPromptV2(this.compiler);
+    await navigator.clipboard.writeText(finalPrompt);
+    this.injectionMsg = 'Prompt Copiado. Pégalo en tu IA.';
+    this.injectionStatus = 'success';
+    setTimeout(() => this.injectionStatus = 'idle', 3000);
     this.showCompiler = false;
-    alert('Prompt Copiado. Pégalo en tu IA.');
   }
 
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Control' || e.metaKey || e.ctrlKey) {
+      this.isCtrlPressed = true;
+    }
+  }
+
+  @HostListener('window:keyup', ['$event'])
+  onKeyUp(e: KeyboardEvent) {
+    if (e.key === 'Control' || (!e.ctrlKey && !e.metaKey)) {
+      this.isCtrlPressed = false;
+    }
+  }
+
+  @HostListener('window:paste', ['$event'])
+  onPaste(e: ClipboardEvent) {
+    if (this.showUploadModal) return; // Prevent overwriting if user is typing inside the modal
+    const text = e.clipboardData?.getData('text');
+    if (text) {
+      this.isCtrlPressed = false; // Release hover safely
+      this.openUploadModal(text);
+    }
+  }
+
+  onDragEnter(e: DragEvent) { e.preventDefault(); this.isDragging = true; }
   onDragOver(e: DragEvent) { e.preventDefault(); this.isDragging = true; }
   onDragLeave(e: DragEvent) { this.isDragging = false; }
   async onDrop(e: DragEvent) {
@@ -653,7 +1237,195 @@ Sigue estrictamente el esquema JSON definido.
     const file = e.dataTransfer?.files[0];
     if (file && file.name.endsWith('.json')) {
       const text = await file.text();
-      this.processInjection(text);
+      this.openUploadModal(text);
+    }
+  }
+
+  async onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file && file.name.endsWith('.json')) {
+      const text = await file.text();
+      this.openUploadModal(text);
+    }
+    event.target.value = ''; // Reset input
+  }
+
+  async openUploadModal(text: string) {
+    this.temporaryUploadPayload = text;
+    this.uploadConfig = { themeName: '', themeId: '', quizTitle: '' };
+    this.showUploadModal = true;
+    
+    // Load themes from DB
+    this.availableThemes = await this.db.getRecentFolders(100);
+    this.filteredThemes = [...this.availableThemes];
+    
+    this.analyzePayload();
+  }
+
+  hideThemeDropdownDelay() {
+    setTimeout(() => this.showThemeDropdown = false, 200);
+  }
+
+  filterThemes() {
+    this.showThemeDropdown = true;
+    const q = this.uploadConfig.themeName.toLowerCase();
+    this.filteredThemes = this.availableThemes.filter(t => t.nombre_tema.toLowerCase().includes(q));
+    
+    // Check if exact match to set ID or clear it
+    const exact = this.availableThemes.find(t => t.nombre_tema.toLowerCase() === q);
+    this.uploadConfig.themeId = exact ? exact.folder_id : '';
+  }
+
+  selectTheme(t: FolderTheme) {
+    this.uploadConfig.themeName = t.nombre_tema;
+    this.uploadConfig.themeId = t.folder_id;
+    this.showThemeDropdown = false;
+  }
+
+  onPayloadInput() {
+    this.analyzePayload();
+  }
+
+  analyzePayload() {
+    this.uploadStats.charCount = this.temporaryUploadPayload.length;
+    
+    // XSS and strict check based on RF.md / RNF.md
+    const maliciousPattern = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>|on\w+\s*=/gi;
+    if (maliciousPattern.test(this.temporaryUploadPayload)) {
+        this.uploadStats.isValid = false;
+        this.uploadStats.errorMessage = 'ALERTA SEGURIDAD: Payload bloqueado por contener código malicioso (XSS).';
+        this.uploadStats.nodeCount = 0;
+        return;
+    }
+
+    if (!this.temporaryUploadPayload.trim()) {
+      this.uploadStats.isValid = false;
+      this.uploadStats.errorMessage = 'El payload está vacío.';
+      this.uploadStats.nodeCount = 0;
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(this.temporaryUploadPayload);
+      const nodes = Array.isArray(parsed) ? parsed : (parsed.nodos || parsed.nodes || []);
+      
+      if (!Array.isArray(nodes) || nodes.length === 0) {
+         this.uploadStats.isValid = false;
+         this.uploadStats.errorMessage = 'Estructura inválida. No se detectó un arreglo de nodos.';
+         this.uploadStats.nodeCount = 0;
+         return;
+      }
+      
+      // Strict structural validation
+      const isStructurallyValid = nodes.every(n => typeof n === 'object' && n !== null && (!Array.isArray(n)) && ('pregunta' in n || 'tipo_reto' in n || 'contexto' in n));
+      
+      if (!isStructurallyValid) {
+         this.uploadStats.isValid = false;
+         this.uploadStats.errorMessage = 'Los datos no coinciden con la estructura esperada: cada nodo debe tener un "tipo_reto" o "pregunta".';
+         this.uploadStats.nodeCount = 0;
+         return;
+      }
+
+      this.uploadStats.nodeCount = nodes.length;
+      this.uploadStats.isValid = true;
+      this.uploadStats.errorMessage = '';
+    } catch (e) {
+      this.uploadStats.isValid = false;
+      this.uploadStats.errorMessage = 'Formato JSON Inválido. Error de parseo.';
+      this.uploadStats.nodeCount = 0;
+    }
+  }
+
+  normalizeJson() {
+    try {
+      let text = this.temporaryUploadPayload.trim();
+      
+      // Intentar extraer solo el bloque JSON (de { a } o de [ a ])
+      const firstBrace = text.indexOf('{');
+      const firstBracket = text.indexOf('[');
+      const lastBrace = text.lastIndexOf('}');
+      const lastBracket = text.lastIndexOf(']');
+      
+      let firstCharIndex = -1;
+      let lastCharIndex = -1;
+
+      if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
+         firstCharIndex = firstBrace;
+         lastCharIndex = lastBrace;
+      } else if (firstBracket !== -1) {
+         firstCharIndex = firstBracket;
+         lastCharIndex = lastBracket;
+      }
+
+      if (firstCharIndex !== -1 && lastCharIndex !== -1 && lastCharIndex > firstCharIndex) {
+         text = text.substring(firstCharIndex, lastCharIndex + 1);
+      }
+
+      // 1. Reemplazar comas sueltas antes de cerrar llaves/corchetes
+      text = text.replace(/,(?=\s*[}\]])/g, '');
+      
+      // 2. Intentar reemplazar comillas simples por dobles (riesgoso si hay texto con apostrofes, pero util si el JSON usa apostrofes para claves/valores)
+      // Lo dejaremos fuera por ahora y forzaremos agregar comillas a CLAVES de objeto sin comillas
+      text = text.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
+
+      // Comprobar si funciona
+      JSON.parse(text);
+      this.temporaryUploadPayload = text;
+      this.analyzePayload();
+      
+      // Sobreescribir feedback si fue exitoso (analyzePayload lo resetea a vacío)
+      if (this.uploadStats.isValid) {
+        this.uploadStats.errorMessage = '';
+      }
+    } catch {
+      this.uploadStats.errorMessage = 'Normalización fallida. El JSON necesita revisión manual.';
+    }
+  }
+
+  async confirmUpload() {
+    if (!this.uploadStats.isValid) return;
+    
+    let fId = this.uploadConfig.themeId;
+    if (!fId) {
+       fId = crypto.randomUUID();
+       // Save new folder
+       await this.db.saveFolder({
+          folder_id: fId,
+          nombre_tema: this.uploadConfig.themeName,
+          color_tag: '#9ACD32', // default neon theme
+          creado_en: new Date().toISOString()
+       });
+    }
+
+    try {
+      const parsed = JSON.parse(this.temporaryUploadPayload);
+      const nodesRaw = Array.isArray(parsed) ? parsed : (parsed.nodos || parsed.nodes);
+      
+      const quizId = crypto.randomUUID();
+      
+      // Inject IDs and Dates correctly
+      const nodesToSave = nodesRaw.map((n: any) => ({
+         ...n,
+         id_temp: n.id_temp || crypto.randomUUID(),
+         folder_id: fId,
+         quiz_id: quizId,
+         nextReviewDate: new Date(),
+         createdAt: new Date()
+      }));
+
+      await this.db.saveNodes(nodesToSave);
+      
+      this.showUploadModal = false;
+      this.injectionStatus = 'success';
+      this.injectionMsg = `¡${nodesToSave.length} Nodos cargados al sistema!`;
+      this.refreshAllData();
+      
+      // Hide toast
+      setTimeout(() => this.injectionStatus = 'idle', 4000);
+      
+    } catch (e) {
+      this.uploadStats.errorMessage = 'Error fatal al guardar los nodos en IndexedDB.';
+      this.uploadStats.isValid = false;
     }
   }
 

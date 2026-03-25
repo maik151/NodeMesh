@@ -48,6 +48,9 @@ Iconografía: Uso estricto de Material Symbols (Rounded). Se deben importar como
 
 Primary Button: Fondo Active Node, texto Void Black, radio de borde 8px (No circular para mantener el rigor).
 
+5. Variaciones Modos Claros (Light Mode)
+Los botones de acción positiva (ej. Cargar Quiz) adaptan su saturación. Se emplea un fondo inspirado en Active Node translucido (`rgba(154, 205, 50, 0.15)`) con texto/bordes en un verde hierba vibrante (`#558b2f`) para mantener contraste visual sin verse manchado u oscuro.
+
 5. Iconografía Definida
 Para garantizar que los iconos no cambien, se establece el set de Material Design:
 

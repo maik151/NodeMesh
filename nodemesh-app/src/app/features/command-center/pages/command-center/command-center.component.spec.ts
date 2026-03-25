@@ -20,7 +20,9 @@ describe('CommandCenterComponent', () => {
     getRecentFolders: () => Promise.resolve([]),
     getDailyActivity: () => Promise.resolve([]),
     getMasteryRatio: () => Promise.resolve(0),
-    getStreak: () => Promise.resolve(0)
+    getStreak: () => Promise.resolve(0),
+    saveFolder: () => Promise.resolve(),
+    saveNodes: () => Promise.resolve()
   };
 
   beforeEach(async () => {
@@ -46,9 +48,44 @@ describe('CommandCenterComponent', () => {
     expect(grid).toBeTruthy();
   });
 
-  it('debe contener los elementos clave (INJECT_PAYLOAD, FORZAR_SPRINT)', () => {
+  it('debe contener los elementos clave (Subir Preguntas, Generar Prompt, FORZAR_SPRINT)', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('INJECT_PAYLOAD');
+    expect(compiled.textContent).toContain('SUBIR PREGUNTAS');
+    expect(compiled.textContent).toContain('Generar Prompt');
     expect(compiled.textContent).toContain('FORZAR_SPRINT');
+  });
+
+  it('debe activar dragging state al hacer drag enter', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    const dropArea = compiled.querySelector('.card-ingest') as HTMLElement;
+    expect(dropArea.classList.contains('dragging')).toBe(false);
+    
+    dropArea.dispatchEvent(new Event('dragenter'));
+    fixture.detectChanges();
+    expect(component.isDragging).toBe(true);
+    expect(dropArea.classList.contains('dragging')).toBe(true);
+  });
+
+  describe('Modal de Ingesta (TDD)', () => {
+    it('debe rechazar payloads interactivos (XSS)', () => {
+      component.temporaryUploadPayload = '<script>alert(1)</script>';
+      component.analyzePayload();
+      expect(component.uploadStats.isValid).toBe(false);
+      expect(component.uploadStats.errorMessage).toContain('XSS');
+    });
+
+    it('debe aceptar y contar nodos válidos', () => {
+      component.temporaryUploadPayload = JSON.stringify({ nodos: [{ pregunta: 'A' }, { pregunta: 'B' }] });
+      component.analyzePayload();
+      expect(component.uploadStats.isValid).toBe(true);
+      expect(component.uploadStats.nodeCount).toBe(2);
+    });
+
+    it('debe normalizar JSON malformado (Markdown envolvente)', () => {
+      component.temporaryUploadPayload = '```json\n[{"pregunta": "Z"}]\n```';
+      component.normalizeJson();
+      expect(component.uploadStats.isValid).toBe(true);
+      expect(component.uploadStats.nodeCount).toBe(1);
+    });
   });
 });

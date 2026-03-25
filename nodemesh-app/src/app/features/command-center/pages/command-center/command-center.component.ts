@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, HostListener } from '@angular/core';
+import { Component, inject, OnInit, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DifficultyLevel, ChallengeType, FolderTheme } from '../../../../core/models/node.model';
@@ -980,8 +980,8 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
 
     /* V2 COMPILER UI & TOGGLES */
     .cc-label {
-      display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
-      font-weight: 700; color: var(--theme-text); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;
+      display: block; font-family: 'JetBrains Mono', monospace; font-size: 1.05rem;
+      font-weight: 800; color: var(--theme-text); margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 1px; opacity: 1;
     }
     
     .compiler-modal { padding: 3rem; box-sizing: border-box; overflow-x: hidden; background: #131313; border-color: rgba(255,255,255,0.05); }
@@ -1016,9 +1016,9 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     .opt-label { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--theme-text); font-size: 0.9rem; }
     .opt-desc { font-family: 'Open Sans', 'Inter', sans-serif; font-size: 0.75rem; color: var(--theme-text-secondary); opacity: 0.9; }
 
-    .select-arrow { color: #fff; opacity: 0.95; width: 18px; height: 18px; transition: transform 0.2s; }
-    .select-trigger.active .select-arrow { transform: rotate(180deg); }
-    :host-context([data-theme="light"]) .select-arrow { color: var(--theme-text) !important; opacity: 0.7 !important; }
+    .select-arrow { color: var(--theme-text); opacity: 0.95; width: 24px; height: 24px; transition: transform 0.2s; }
+    .select-trigger.active .select-arrow { transform: rotate(180deg); filter: drop-shadow(0 0 5px var(--theme-brand-neon)); }
+    :host-context([data-theme="light"]) .select-arrow { color: var(--theme-text) !important; opacity: 0.8 !important; }
     
     .magic-btn:hover { background: rgba(154, 205, 50, 0.15) !important; color: var(--theme-brand-neon) !important; border-color: var(--theme-brand-neon) !important; box-shadow: 0 0 15px rgba(154, 205, 50, 0.3); }
 
@@ -1029,37 +1029,39 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     .toggle-switch {
       position: relative;
       display: inline-block;
-      width: 48px;
-      height: 26px;
+      width: 46px;
+      height: 24px;
       margin: 0;
     }
     .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
     .toggle-switch .slider {
       position: absolute; cursor: pointer; inset: 0;
-      background-color: rgba(255, 255, 255, 0.15); 
+      background-color: rgba(255, 255, 255, 0.1); 
       transition: .3s cubic-bezier(0.4, 0.0, 0.2, 1);
       border-radius: 34px;
+      border: 1px solid rgba(255,255,255,0.05);
     }
     .toggle-switch .slider:before {
       position: absolute; content: "";
-      height: 18px; width: 18px;
-      left: 4px; bottom: 4px;
-      background-color: #333;
+      height: 16px; width: 16px;
+      left: 3px; bottom: 3px;
+      background-color: #e4e4e7;
       transition: .3s cubic-bezier(0.4, 0.0, 0.2, 1);
       border-radius: 50%;
     }
     .toggle-switch input:checked + .slider {
       background-color: var(--theme-brand-neon);
+      border-color: var(--theme-brand-neon);
     }
     .toggle-switch input:checked + .slider:before {
       transform: translateX(22px);
-      background-color: #fff;
+      background-color: #000;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256' fill='%239ACD32'%3E%3Cpath d='M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z'%3E%3C/path%3E%3C/svg%3E");
       background-size: 10px;
       background-repeat: no-repeat;
       background-position: center;
     }
-    :host-context([data-theme="light"]) .toggle-switch .slider { background-color: rgba(0, 0, 0, 0.15); }
+    :host-context([data-theme="light"]) .toggle-switch .slider { background-color: rgba(0, 0, 0, 0.1); border-color: rgba(0,0,0,0.1); }
     :host-context([data-theme="light"]) .toggle-switch .slider:before { background-color: #fff; }
 
     @keyframes pulse { 0% { opacity: 0.2; transform: scale(0.95); } 50% { opacity: 0.6; transform: scale(1.05); } 100% { opacity: 0.2; transform: scale(0.95); } }
@@ -1070,6 +1072,7 @@ export class CommandCenterComponent implements OnInit {
   private readonly db = inject(DatabaseService);
   private readonly router = inject(Router);
   private readonly themeService = inject(ThemeService);
+  private readonly cdr = inject(ChangeDetectorRef);
   isDark$ = this.themeService.isDark$;
   icons = NAV_ICONS;
 
@@ -1284,13 +1287,19 @@ export class CommandCenterComponent implements OnInit {
     this.showCompiler = true;
   }
 
-  async copyPromptBtn() {
+  copyPromptBtn() {
     if (!this.isCompilerValid || this.isCopied) return;
     const finalPrompt = buildPromptV2(this.compiler);
-    await navigator.clipboard.writeText(finalPrompt);
-    this.isCopied = true;
-    
-    setTimeout(() => this.isCopied = false, 2500);
+    navigator.clipboard.writeText(finalPrompt).then(() => {
+      this.isCopied = true;
+      this.cdr.detectChanges(); // Force angular lifecycle to update the checkmark immediately
+      setTimeout(() => { 
+        this.isCopied = false; 
+        this.cdr.detectChanges(); 
+      }, 2500);
+    }).catch(err => {
+      console.error('Failed to copy to clipboard', err);
+    });
   }
 
   @HostListener('window:keydown', ['$event'])

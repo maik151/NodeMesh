@@ -273,7 +273,7 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
       </div>
 
       <div class="cc-modal-backdrop" *ngIf="showCompiler">
-        <div class="cc-modal compiler-modal card-glass shadow-bloom" style="width: 95vw; max-width: 1400px; background: #131313; border-color: rgba(255,255,255,0.05); overflow: hidden;">
+        <div class="cc-modal compiler-modal card-glass shadow-bloom" style="width: 95%; max-width: 1300px; max-height: 90vh; overflow-y: auto; background: #131313; border-color: rgba(255,255,255,0.05);">
           
           <header class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1rem; margin-bottom: 1.5rem;">
             <h3 style="color: var(--theme-brand-neon); display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
@@ -443,7 +443,7 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
                 </button>
               </div>
               <div style="flex: 1; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 0.5rem; background: #000; position: relative;">
-                <textarea readonly class="cc-textarea mono scroll-hide" style="width: 100%; height: 100%; min-height: 600px; resize: none; font-size: 0.75rem; background: transparent; border: none; color: #a1a1aa; opacity: {{ isCompilerValid ? '1' : '0.4' }}" [value]="livePromptPreview"></textarea>
+                <textarea readonly class="cc-textarea mono scroll-hide" style="width: 100%; height: 100%; min-height: 400px; resize: none; font-size: 0.75rem; background: transparent; border: none; color: #a1a1aa; opacity: {{ isCompilerValid ? '1' : '0.4' }}" [value]="livePromptPreview"></textarea>
               </div>
             </div>
 
@@ -956,8 +956,8 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     .input-group.half { flex: 1; min-width: 200px; }
 
     /* V2 COMPILER UI & TOGGLES */
-    .compiler-modal { padding: 3rem; }
-    .compiler-layout { display: grid; grid-template-columns: 1fr 1.3fr; gap: 3rem; }
+    .compiler-modal { padding: 3rem; box-sizing: border-box; overflow-x: hidden; }
+    .compiler-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 3rem; }
     @media (max-width: 1024px) {
       .compiler-layout { grid-template-columns: 1fr; }
       .compiler-modal { padding: 1.5rem; }

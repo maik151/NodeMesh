@@ -289,48 +289,60 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
             <div class="compiler-controls" style="display: flex; flex-direction: column; gap: 1.2rem;">
               
               <div class="input-group">
-                  <label>Tema Central (Objetivo):</label>
-                  <input type="text" [(ngModel)]="compiler.tema" placeholder="Ej. Arquitectura Frontend React" class="cc-input" style="font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.5); border-radius: 8px;">
+                  <label class="cc-label">Tema Central (Objetivo):</label>
+                  <input type="text" [(ngModel)]="compiler.tema" placeholder="Ej. Arquitectura Frontend React" class="cc-input compiler-theme-input" style="font-family: 'JetBrains Mono', monospace; border-radius: 8px;">
               </div>
               
               <div class="row-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="input-group">
-                  <label title="El nivel definirá la complejidad teórica y práctica exigida por la IA a la hora de resolver el Quiz.">Nivel de Complejidad:</label>
-                  <div class="custom-select-wrapper">
-                    <select [(ngModel)]="compiler.nivel" class="cc-select with-icon" style="background: rgba(0,0,0,0.5); border-radius: 8px;">
-                      <option value="Aprendiz" title="Preguntas de retención teórica directa.">Junior</option>
-                      <option value="Intermedio" title="Preguntas de aplicación de conceptos en contextos medianos.">Medium</option>
-                      <option value="Senior" title="Preguntas de diseño de sistemas, arquitectura profunda y análisis de performance.">Senior</option>
-                    </select>
-                    <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm37.66-85.66a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L120,148.69V88a8,8,0,0,1,16,0v60.69l18.34-18.35A8,8,0,0,1,165.66,130.34Z"></path></svg>
+                  <label class="cc-label" title="El nivel definirá la complejidad teórica y práctica exigida por la IA a la hora de resolver el Quiz.">Nivel de Complejidad:</label>
+                  <div class="custom-select-wrapper" (click)="$event.stopPropagation(); showNivelSelect = !showNivelSelect; showAuditorSelect = false; showIdiomaSelect = false">
+                    <div class="cc-select select-trigger compiler-theme-input" [class.active]="showNivelSelect">
+                      <span>{{ getNivelLabel() }}</span>
+                      <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm37.66-85.66a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L120,148.69V88a8,8,0,0,1,16,0v60.69l18.34-18.35A8,8,0,0,1,165.66,130.34Z"></path></svg>
+                    </div>
+                    <div class="select-dropdown" *ngIf="showNivelSelect">
+                      <div class="select-option" *ngFor="let opt of niveles" (click)="$event.stopPropagation(); compiler.nivel = opt.value; showNivelSelect = false">
+                        <span class="opt-label">{{ opt.label }}</span>
+                        <span class="opt-desc">{{ opt.desc }}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="input-group">
-                  <label>Número de Preguntas:</label>
-                  <input type="number" [(ngModel)]="compiler.totalPreguntas" min="1" max="100" class="cc-input" style="text-align: center; background: rgba(0,0,0,0.5); border-radius: 8px; font-weight: bold;">
+                  <label class="cc-label">Número de Preguntas:</label>
+                  <input type="number" [(ngModel)]="compiler.totalPreguntas" min="1" max="100" class="cc-input compiler-theme-input" style="text-align: center; border-radius: 8px; font-weight: bold;">
                 </div>
               </div>
 
               <div class="row-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="input-group">
-                  <label title="Define cómo va a redactar la IA las explicaciones y las pistas.">Personalidad del Auditor:</label>
-                  <div class="custom-select-wrapper">
-                    <select [(ngModel)]="compiler.auditor" class="cc-select with-icon" style="background: rgba(0,0,0,0.5); border-radius: 8px;">
-                      <option value="Socrático" title="Socrático: Te guía a la respuesta con pistas lógicas deductivas.">Socrático</option>
-                      <option value="Implacable" title="Implacable: Estilo revisión de código en GitHub, directo y al grano.">Implacable</option>
-                      <option value="Académico" title="Académico: Cita documentación, RFCs y principios computacionales rigurosos.">Académico</option>
-                    </select>
-                    <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm37.66-85.66a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L120,148.69V88a8,8,0,0,1,16,0v60.69l18.34-18.35A8,8,0,0,1,165.66,130.34Z"></path></svg>
+                  <label class="cc-label" title="Define cómo va a redactar la IA las explicaciones y las pistas.">Personalidad del Auditor:</label>
+                  <div class="custom-select-wrapper" (click)="$event.stopPropagation(); showAuditorSelect = !showAuditorSelect; showNivelSelect = false; showIdiomaSelect = false">
+                    <div class="cc-select select-trigger compiler-theme-input" [class.active]="showAuditorSelect">
+                      <span>{{ getAuditorLabel() }}</span>
+                      <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm37.66-85.66a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L120,148.69V88a8,8,0,0,1,16,0v60.69l18.34-18.35A8,8,0,0,1,165.66,130.34Z"></path></svg>
+                    </div>
+                    <div class="select-dropdown" *ngIf="showAuditorSelect">
+                      <div class="select-option" *ngFor="let opt of auditores" (click)="$event.stopPropagation(); compiler.auditor = opt.value; showAuditorSelect = false">
+                        <span class="opt-label">{{ opt.label }}</span>
+                        <span class="opt-desc">{{ opt.desc }}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="input-group">
-                  <label>Idioma Salida:</label>
-                  <div class="custom-select-wrapper">
-                    <select [(ngModel)]="compiler.idioma" class="cc-select with-icon" style="background: rgba(0,0,0,0.5); border-radius: 8px;">
-                      <option value="Español">Español</option>
-                      <option value="Inglés">English</option>
-                    </select>
-                    <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm37.66-85.66a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L120,148.69V88a8,8,0,0,1,16,0v60.69l18.34-18.35A8,8,0,0,1,165.66,130.34Z"></path></svg>
+                  <label class="cc-label">Idioma Salida:</label>
+                  <div class="custom-select-wrapper" (click)="$event.stopPropagation(); showIdiomaSelect = !showIdiomaSelect; showNivelSelect = false; showAuditorSelect = false">
+                    <div class="cc-select select-trigger compiler-theme-input" [class.active]="showIdiomaSelect">
+                      <span>{{ getIdiomaLabel() }}</span>
+                      <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm37.66-85.66a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L120,148.69V88a8,8,0,0,1,16,0v60.69l18.34-18.35A8,8,0,0,1,165.66,130.34Z"></path></svg>
+                    </div>
+                    <div class="select-dropdown" *ngIf="showIdiomaSelect">
+                      <div class="select-option" *ngFor="let opt of idiomas" (click)="$event.stopPropagation(); compiler.idioma = opt.value; showIdiomaSelect = false">
+                        <span class="opt-label">{{ opt.label }}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -338,7 +350,7 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
               <!-- MATRIZ DE PREGUNTAS -->
               <div class="matrix-container" style="background: transparent; border-radius: 12px; display: flex; flex-direction: column; gap: 0.5rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <label style="margin: 0; display: flex; align-items: center; gap: 0.4rem;">Matriz de Preguntas:</label>
+                  <label class="cc-label" style="margin: 0; display: flex; align-items: center; gap: 0.4rem;">Matriz de Preguntas:</label>
                   <div style="display: flex; align-items: center; gap: 0.5rem;">
                     <span class="label-micro" style="margin-right: 0.5rem; opacity: 0.8;" [style.color]="matrixSum === compiler.totalPreguntas ? 'var(--theme-brand-neon)' : '#ff4444'">
                       {{ matrixSum }} / {{ compiler.totalPreguntas }}
@@ -353,43 +365,43 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
                   <!-- COLUMN 1 -->
                   <div class="matrix-item" title="Aislar una verdad absoluta entre distractores.">
                     <span>Single Choice</span>
-                    <input type="number" min="0" [(ngModel)]="compiler.matrix.single_choice" class="cc-input mini">
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.single_choice" class="cc-input mini compiler-theme-input">
                   </div>
-                  <div class="matrix-item" title="Compretar la palabra saltante para memoria muscular.">
+                  <div class="matrix-item" title="Completar la palabra saltante para memoria muscular.">
                     <span>Cloze Deletion</span>
-                    <input type="number" min="0" [(ngModel)]="compiler.matrix.cloze_deletion" class="cc-input mini">
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.cloze_deletion" class="cc-input mini compiler-theme-input">
                   </div>
                   <div class="matrix-item" title="Entender causalidad y ciclos de vida.">
                     <span>Ordering</span>
-                    <input type="number" min="0" [(ngModel)]="compiler.matrix.ordering" class="cc-input mini">
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.ordering" class="cc-input mini compiler-theme-input">
                   </div>
                   
                   <!-- COLUMN 2 -->
                   <div class="matrix-item" title="Refactorizar hacia eficiencia algorítmica.">
                     <span>Optimization</span>
-                    <input type="number" min="0" [(ngModel)]="compiler.matrix.optimization" class="cc-input mini">
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.optimization" class="cc-input mini compiler-theme-input">
                   </div>
                   <div class="matrix-item" title="Transferencia de conocimiento sin jerga.">
                     <span>Feynman Synth</span>
-                    <input type="number" min="0" [(ngModel)]="compiler.matrix.feynman_synthesis" class="cc-input mini">
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.feynman_synthesis" class="cc-input mini compiler-theme-input">
                   </div>
-                  <div class="matrix-item" title="Exige panorama completo; selección de un array de resupestas verdaderas.">
+                  <div class="matrix-item" title="Exige panorama completo; selección de un array de respuestas verdaderas.">
                     <span>Multi Choice</span>
-                    <input type="number" min="0" [(ngModel)]="compiler.matrix.multi_choice" class="cc-input mini">
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.multi_choice" class="cc-input mini compiler-theme-input">
                   </div>
                   
                   <!-- COLUMN 3 -->
                   <div class="matrix-item" title="Forzar ejecución y predecir lo que imprimiría.">
                     <span>Output Predict</span>
-                    <input type="number" min="0" [(ngModel)]="compiler.matrix.output_prediction" class="cc-input mini">
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.output_prediction" class="cc-input mini compiler-theme-input">
                   </div>
                   <div class="matrix-item" title="Detectar vulnerabilidades o errores ocultos.">
                     <span>Anomaly Detect</span>
-                    <input type="number" min="0" [(ngModel)]="compiler.matrix.anomaly_detection" class="cc-input mini">
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.anomaly_detection" class="cc-input mini compiler-theme-input">
                   </div>
                   <div class="matrix-item" title="Trade-offs y System Design global.">
                     <span>Case Analysis</span>
-                    <input type="number" min="0" [(ngModel)]="compiler.matrix.case_analysis" class="cc-input mini">
+                    <input type="number" min="0" [(ngModel)]="compiler.matrix.case_analysis" class="cc-input mini compiler-theme-input">
                   </div>
                 </div>
               </div>
@@ -397,7 +409,7 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
               <!-- TAGS EXTRA -->
               <div class="input-group" style="margin-top: 0.5rem;">
                 <div style="display: flex; flex-direction: column;">
-                  <label>Tags Extra</label>
+                  <label class="cc-label">Tags Extra</label>
                   <label class="label-micro" style="text-transform: none; opacity: 0.5;">(Escribe etiquetas extra para mejorar la calidad del quiz)</label>
                 </div>
                 <textarea [(ngModel)]="compiler.tagsExtra" placeholder="Ej. Específicamente céntrate en temas de Hooks y contextos concurrentes..." class="cc-textarea scroll-hide compiler-theme-input" style="min-height: 80px; border-radius: 8px; font-size: 0.8rem; padding: 0.8rem; margin-top: 0.5rem;"></textarea>
@@ -967,6 +979,11 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     .input-group.half { flex: 1; min-width: 200px; }
 
     /* V2 COMPILER UI & TOGGLES */
+    .cc-label {
+      display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+      font-weight: 700; color: var(--theme-text); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;
+    }
+    
     .compiler-modal { padding: 3rem; box-sizing: border-box; overflow-x: hidden; background: #131313; border-color: rgba(255,255,255,0.05); }
     :host-context([data-theme="light"]) .compiler-modal { background: var(--theme-surface-solid) !important; border-color: var(--theme-border) !important; }
     
@@ -975,10 +992,10 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     }
     :host-context([data-theme="light"]) .compiler-preview-text { color: var(--theme-text) !important; }
     
-    .compiler-theme-input { background: rgba(0,0,0,0.5); }
-    :host-context([data-theme="light"]) .compiler-theme-input { background: rgba(0,0,0,0.02) !important; color: var(--theme-text) !important; }
+    .compiler-theme-input { background: var(--glass-fill); border: 1px solid var(--theme-border); color: var(--theme-text); }
+    :host-context([data-theme="light"]) .compiler-theme-input { background: rgba(0,0,0,0.02) !important; color: var(--theme-text) !important; border: 1px solid rgba(0,0,0,0.1) !important; }
     
-    .compiler-matrix { border: 1px solid rgba(255,255,255,0.1); }
+    .compiler-matrix { border: 1px solid var(--theme-border); }
     :host-context([data-theme="light"]) .compiler-matrix { border-color: rgba(0,0,0,0.1) !important; }
 
     .compiler-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 3rem; }
@@ -987,9 +1004,20 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
       .compiler-modal { padding: 1.5rem; }
     }
     
-    .custom-select-wrapper { position: relative; width: 100%; }
-    .cc-select.with-icon { appearance: none; padding-right: 2.5rem; }
-    .select-arrow { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: #fff; opacity: 0.95; width: 20px; height: 20px; }
+    .custom-select-wrapper { position: relative; width: 100%; user-select: none; z-index: 10; }
+    .select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1rem; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600; }
+    .select-trigger:hover, .select-trigger.active { border-color: var(--theme-brand-neon); }
+    .select-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #1a1a1e; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; z-index: 1000; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+    :host-context([data-theme="light"]) .select-dropdown { background: #fff; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+    .select-option { padding: 0.8rem 1rem; display: flex; flex-direction: column; gap: 0.3rem; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.2s; }
+    :host-context([data-theme="light"]) .select-option { border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .select-option:last-child { border-bottom: none; }
+    .select-option:hover { background: rgba(154, 205, 50, 0.15); }
+    .opt-label { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--theme-text); font-size: 0.9rem; }
+    .opt-desc { font-family: 'Open Sans', 'Inter', sans-serif; font-size: 0.75rem; color: var(--theme-text-secondary); opacity: 0.9; }
+
+    .select-arrow { color: #fff; opacity: 0.95; width: 18px; height: 18px; transition: transform 0.2s; }
+    .select-trigger.active .select-arrow { transform: rotate(180deg); }
     :host-context([data-theme="light"]) .select-arrow { color: var(--theme-text) !important; opacity: 0.7 !important; }
     
     .magic-btn:hover { background: rgba(154, 205, 50, 0.15) !important; color: var(--theme-brand-neon) !important; border-color: var(--theme-brand-neon) !important; box-shadow: 0 0 15px rgba(154, 205, 50, 0.3); }
@@ -1054,6 +1082,39 @@ export class CommandCenterComponent implements OnInit {
   masteryRatio: number = 0;
   retentionPath: string = '';
   sparklinePath: string = '';
+
+  showNivelSelect = false;
+  showAuditorSelect = false;
+  showIdiomaSelect = false;
+
+  niveles: { value: any, label: string, desc: string }[] = [
+    { value: 'Aprendiz', label: 'Junior', desc: 'Preguntas de retención teórica directa y conceptos básicos.' },
+    { value: 'Intermedio', label: 'Medium', desc: 'Preguntas de aplicación de conceptos en contextos medianos y casos de uso.' },
+    { value: 'Senior', label: 'Senior', desc: 'Preguntas de diseño de sistemas, arquitectura profunda y performance.' }
+  ];
+  auditores: { value: any, label: string, desc: string }[] = [
+    { value: 'Socrático', label: 'Socrático', desc: 'Te guía a la respuesta con pistas lógicas deductivas y analogías.' },
+    { value: 'Implacable', label: 'Implacable', desc: 'Estilo revisión de código en GitHub, directo y al grano. Evalúa rudo.' },
+    { value: 'Académico', label: 'Académico', desc: 'Cita documentación oficial, RFCs y principios computacionales rigurosos.' }
+  ];
+  idiomas: { value: any, label: string, desc: string }[] = [
+    { value: 'Español', label: 'Español', desc: 'El prompt output será generado en Castellano/Español.' },
+    { value: 'Inglés', label: 'English', desc: 'Generates the rigorous structured prompt internally in English.' }
+  ];
+
+  getNivelLabel() { return this.niveles.find(n => n.value === this.compiler.nivel)?.label || 'Seleccionar...'; }
+  getAuditorLabel() { return this.auditores.find(a => a.value === this.compiler.auditor)?.label || 'Seleccionar...'; }
+  getIdiomaLabel() { return this.idiomas.find(i => i.value === this.compiler.idioma)?.label || 'Seleccionar...'; }
+
+  @HostListener('document:click', ['$event'])
+  closeSelectDropdowns(e: Event) {
+    const target = e.target as HTMLElement;
+    if (!target.closest('.custom-select-wrapper')) {
+      this.showNivelSelect = false;
+      this.showAuditorSelect = false;
+      this.showIdiomaSelect = false;
+    }
+  }
 
   // Pomodoro
   pomoTime: string = '25:00';

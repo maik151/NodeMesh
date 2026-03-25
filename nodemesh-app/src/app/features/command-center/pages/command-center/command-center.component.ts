@@ -501,8 +501,8 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     
     .command-center-container {
       padding: 3rem 2.5rem 1.5rem;
-      max-width: 1512px;
-      margin: 0 auto;
+      max-width: 1600px;
+      margin: 0;
       color: var(--theme-text);
       font-family: 'Inter', sans-serif;
     }

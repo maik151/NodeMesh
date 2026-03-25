@@ -968,18 +968,18 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
 
     /* V2 COMPILER UI & TOGGLES */
     .compiler-modal { padding: 3rem; box-sizing: border-box; overflow-x: hidden; background: #131313; border-color: rgba(255,255,255,0.05); }
-    :host-context([data-theme="light"]) .compiler-modal { background: var(--theme-surface-solid); border-color: var(--theme-border); }
+    :host-context([data-theme="light"]) .compiler-modal { background: var(--theme-surface-solid) !important; border-color: var(--theme-border) !important; }
     
     .compiler-preview-text {
       width: 100%; height: 100%; min-height: 400px; resize: none; font-size: 0.75rem; background: transparent; border: none; color: #a1a1aa; transition: opacity 0.5s ease;
     }
-    :host-context([data-theme="light"]) .compiler-preview-text { color: var(--theme-text); }
+    :host-context([data-theme="light"]) .compiler-preview-text { color: var(--theme-text) !important; }
     
     .compiler-theme-input { background: rgba(0,0,0,0.5); }
-    :host-context([data-theme="light"]) .compiler-theme-input { background: rgba(0,0,0,0.02); }
+    :host-context([data-theme="light"]) .compiler-theme-input { background: rgba(0,0,0,0.02) !important; color: var(--theme-text) !important; }
     
     .compiler-matrix { border: 1px solid rgba(255,255,255,0.1); }
-    :host-context([data-theme="light"]) .compiler-matrix { border-color: rgba(0,0,0,0.1); }
+    :host-context([data-theme="light"]) .compiler-matrix { border-color: rgba(0,0,0,0.1) !important; }
 
     .compiler-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 3rem; }
     @media (max-width: 1024px) {
@@ -990,7 +990,7 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     .custom-select-wrapper { position: relative; width: 100%; }
     .cc-select.with-icon { appearance: none; padding-right: 2.5rem; }
     .select-arrow { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: #fff; opacity: 0.95; width: 20px; height: 20px; }
-    :host-context([data-theme="light"]) .select-arrow { color: var(--theme-text); opacity: 0.7; }
+    :host-context([data-theme="light"]) .select-arrow { color: var(--theme-text) !important; opacity: 0.7 !important; }
     
     .magic-btn:hover { background: rgba(154, 205, 50, 0.15) !important; color: var(--theme-brand-neon) !important; border-color: var(--theme-brand-neon) !important; box-shadow: 0 0 15px rgba(154, 205, 50, 0.3); }
 

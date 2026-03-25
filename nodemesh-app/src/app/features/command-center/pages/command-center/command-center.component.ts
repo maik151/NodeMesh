@@ -433,17 +433,31 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
             <!-- COLUMNA DERECHA (Preview) -->
             <div class="compiler-preview" style="display: flex; flex-direction: column; gap: 0.5rem; height: 100%;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                <button class="btn-primary-neon" style="background: var(--theme-brand-neon); color: #000; border-radius: 8px; padding: 0.6rem 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;" [disabled]="!isCompilerValid" (click)="generateAndCopyPrompt()">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"></path></svg>
-                  Compilar PROMPT
+                <button class="btn-primary-neon compiler-btn" [class.loading]="isGenerating" [disabled]="!isCompilerValid || isGenerating" (click)="compilePromptBtn()" style="background: var(--theme-brand-neon); color: #000; border-radius: 8px; padding: 0.6rem 1.2rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.3s ease; width: 180px;">
+                  <ng-container *ngIf="!isGenerating">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"></path></svg>
+                    Compilar PROMPT
+                  </ng-container>
+                  <ng-container *ngIf="isGenerating">
+                    <span class="spinner-icon"></span> Generando...
+                  </ng-container>
                 </button>
-                <button class="btn-text-upload" (click)="generateAndCopyPrompt()" [disabled]="!isCompilerValid" style="background: transparent; border: none; color: var(--theme-text-secondary); display: flex; align-items: center; gap: 0.3rem;">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"></path></svg>
-                  Copiar
+                <button class="btn-text-upload copier-btn" (click)="copyPromptBtn()" [disabled]="!isCompilerValid || isGenerating || isCopied" style="background: transparent; border: none; color: var(--theme-text-secondary); display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 6px; transition: color 0.3s ease; width: 100px;">
+                  <ng-container *ngIf="!isCopied">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"></path></svg>
+                    Copiar
+                  </ng-container>
+                  <ng-container *ngIf="isCopied">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#9ACD32" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg>
+                    <span style="color: #9ACD32;">Copiado</span>
+                  </ng-container>
                 </button>
               </div>
               <div style="flex: 1; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 0.5rem; background: #000; position: relative;">
-                <textarea readonly class="cc-textarea mono scroll-hide" style="width: 100%; height: 100%; min-height: 400px; resize: none; font-size: 0.75rem; background: transparent; border: none; color: #a1a1aa; opacity: {{ isCompilerValid ? '1' : '0.4' }}" [value]="livePromptPreview"></textarea>
+                <textarea readonly class="cc-textarea mono scroll-hide" style="width: 100%; height: 100%; min-height: 400px; resize: none; font-size: 0.75rem; background: transparent; border: none; color: #a1a1aa; transition: opacity 0.5s ease;" [style.opacity]="isCompilerValid ? (isGenerating ? 0.3 : 1) : 0.4" [value]="livePromptPreview"></textarea>
+                <div *ngIf="isCopied" style="position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--theme-brand-neon); color: #000; padding: 0.6rem 1.2rem; border-radius: 100px; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 0.8rem; box-shadow: 0 4px 20px rgba(154,205,50,0.4); z-index: 100; animation: slideUpToast 0.3s ease-out;">
+                  ✅ Prompt copiado al portapapeles
+                </div>
               </div>
             </div>
 
@@ -965,9 +979,17 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     
     .custom-select-wrapper { position: relative; width: 100%; }
     .cc-select.with-icon { appearance: none; padding-right: 2.5rem; }
-    .select-arrow { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--theme-text-secondary); opacity: 0.7; }
+    .select-arrow { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: #fff; opacity: 0.95; width: 20px; height: 20px; }
     
     .magic-btn:hover { background: rgba(154, 205, 50, 0.15) !important; color: var(--theme-brand-neon) !important; border-color: var(--theme-brand-neon) !important; box-shadow: 0 0 15px rgba(154, 205, 50, 0.3); }
+
+    .copier-btn:not(:disabled):hover { color: #fff !important; transform: none !important; background: transparent !important; box-shadow: none !important; border: none !important; }
+    .spinner-icon {
+      width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.3); border-top-color: #000; border-radius: 50%;
+      animation: spin 0.8s linear infinite; display: inline-block; margin-right: 4px;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    @keyframes slideUpToast { 0% { opacity: 0; transform: translate(-50%, 20px); } 100% { opacity: 1; transform: translate(-50%, 0); } }
 
     /* ANIMATED TOGGLES */
     .toggle-switch {
@@ -1055,6 +1077,8 @@ export class CommandCenterComponent implements OnInit {
   };
   
   showCompiler = false;
+  isGenerating = false;
+  isCopied = false;
   injectionStatus: 'idle' | 'success' | 'error' = 'idle';
   injectionMsg = '';
 
@@ -1194,14 +1218,21 @@ export class CommandCenterComponent implements OnInit {
     this.showCompiler = true;
   }
 
-  async generateAndCopyPrompt() {
-    if (!this.isCompilerValid) return;
+  async compilePromptBtn() {
+    if (!this.isCompilerValid || this.isGenerating) return;
+    this.isGenerating = true;
+    setTimeout(() => {
+      this.isGenerating = false;
+    }, 1200);
+  }
+
+  async copyPromptBtn() {
+    if (!this.isCompilerValid || this.isGenerating || this.isCopied) return;
     const finalPrompt = buildPromptV2(this.compiler);
     await navigator.clipboard.writeText(finalPrompt);
-    this.injectionMsg = 'Prompt Copiado. Pégalo en tu IA.';
-    this.injectionStatus = 'success';
-    setTimeout(() => this.injectionStatus = 'idle', 3000);
-    this.showCompiler = false;
+    this.isCopied = true;
+    
+    setTimeout(() => this.isCopied = false, 2500);
   }
 
   @HostListener('window:keydown', ['$event'])

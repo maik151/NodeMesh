@@ -888,8 +888,14 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
     .modal-header h3 { margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 800; color: var(--theme-text); letter-spacing: -0.5px; }
-    .btn-close { background: transparent; border: none; font-size: 1.8rem; color: var(--theme-text-secondary); cursor: pointer; transition: color 0.2s; line-height: 1; }
-    .btn-close:hover { color: #ff4444; }
+    .btn-close { 
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      background: transparent; border: none; font-size: 1.8rem; color: var(--theme-text-secondary); 
+      cursor: pointer; transition: all 0.2s ease; line-height: 0;
+      width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding-bottom: 4px;
+    }
+    .btn-close:hover { background: rgba(255, 255, 255, 0.1); color: #ff4444; }
+    :host-context([data-theme="light"]) .btn-close:hover { background: rgba(0, 0, 0, 0.08); }
     
     .modal-footer { margin-top: 1.5rem; display: flex; justify-content: flex-end; }
     

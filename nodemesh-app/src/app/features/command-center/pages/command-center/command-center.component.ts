@@ -363,43 +363,43 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
                 
                 <div class="matrix-grid-v2" style="border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem;">
                   <!-- COLUMN 1 -->
-                  <div class="matrix-item" title="Aislar una verdad absoluta entre distractores.">
+                  <div class="matrix-item" title="Aislar una verdad absoluta entre distractores. (Recordar)">
                     <span>Single Choice</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.single_choice" class="cc-input mini compiler-theme-input">
                   </div>
-                  <div class="matrix-item" title="Completar la palabra saltante para memoria muscular.">
+                  <div class="matrix-item" title="Memoria muscular para sintaxis o fórmulas. (Aplicar)">
                     <span>Cloze Deletion</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.cloze_deletion" class="cc-input mini compiler-theme-input">
                   </div>
-                  <div class="matrix-item" title="Entender causalidad y ciclos de vida.">
+                  <div class="matrix-item" title="Entender causalidad y ciclos de vida. (Analizar)">
                     <span>Ordering</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.ordering" class="cc-input mini compiler-theme-input">
                   </div>
                   
                   <!-- COLUMN 2 -->
-                  <div class="matrix-item" title="Refactorizar hacia eficiencia algorítmica.">
+                  <div class="matrix-item" title="Refactorizar hacia la eficiencia matemática. (Evaluar)">
                     <span>Optimization</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.optimization" class="cc-input mini compiler-theme-input">
                   </div>
-                  <div class="matrix-item" title="Transferencia de conocimiento sin jerga.">
+                  <div class="matrix-item" title="Transferencia de conocimiento sin jerga. (Maestría)">
                     <span>Feynman Synth</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.feynman_synthesis" class="cc-input mini compiler-theme-input">
                   </div>
-                  <div class="matrix-item" title="Exige panorama completo; selección de un array de respuestas verdaderas.">
+                  <div class="matrix-item" title="Exige conocer el panorama completo; cero suerte. (Comprender)">
                     <span>Multi Choice</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.multi_choice" class="cc-input mini compiler-theme-input">
                   </div>
                   
                   <!-- COLUMN 3 -->
-                  <div class="matrix-item" title="Forzar ejecución y predecir lo que imprimiría.">
+                  <div class="matrix-item" title="Forzar ejecución mental (compilador humano). (Aplicar)">
                     <span>Output Predict</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.output_prediction" class="cc-input mini compiler-theme-input">
                   </div>
-                  <div class="matrix-item" title="Detectar vulnerabilidades o errores ocultos.">
+                  <div class="matrix-item" title="Detectar fallos lógicos ocultos que sí compilan. (Analizar)">
                     <span>Anomaly Detect</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.anomaly_detection" class="cc-input mini compiler-theme-input">
                   </div>
-                  <div class="matrix-item" title="Trade-offs y System Design global.">
+                  <div class="matrix-item" title="Diseño de sistemas, arquitectura y evaluación de trade-offs. (Crear)">
                     <span>Case Analysis</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.case_analysis" class="cc-input mini compiler-theme-input">
                   </div>

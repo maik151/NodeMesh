@@ -80,41 +80,40 @@ ${docsAppend}${tagsAppend}
 ${matrizTexto}
 
 ## REQUISITOS DEL PAYLOAD DE RESPUESTA
-El único resultado aceptable (OUTPUT) que me debes devolver consta EXCLUSIVAMENTE de 2 bloques JSON estrictos en formato RFC 8259${!config.forzarJsonRaw ? ', encerrados en bloques de markdown `json`' : ' (sin markdown ni identificadores de string envoltura)'}. 
+El único resultado aceptable (OUTPUT) que me debes devolver es UN SOLO OBJETO JSON ESTRICTO encapsulado en un bloque de código markdown \`json\`${config.forzarJsonRaw ? ' (omite el bloque markdown si se solicitó JSON RAW)' : ''}.
 
-NO añadas salutaciones, reflexiones o comentarios fuera de los bloques JSON. TODAS LAS KEYS y VALORES (Strings) DEBEN IR ENTRE COMILLAS DOBLES.
-
-### 1. El JSON de la Carpeta (Tema)
-${jsonWrapperStart}{
-  "folder_id": "fld_uuid_aleatorio",
-  "nombre_tema": "${config.tema}",
-  "color_tag": "#9FFF22",
-  "creado_en": "${new Date().toISOString()}"
-}${jsonWrapperEnd}
-
-### 2. El JSON del Quiz (Sesiones) y su Payload Maestro
-Para este segundo bloque, debes devolver ESTRICTAMENTE un arreglo JSON de objetos, donde cada objeto representa una pregunta (Nodo) validada y rellenada según tu matriz. 
-
-El modelo de Nodos que DEBES respetar milimétricamente es este:
-
-${jsonWrapperStart}[
-  {
-    "id_temp": "nodo_1",
-    "tipo_reto": "single_choice",
-    "requiere_ia": false,
-    "contexto": "Aquí va el contexto general, de código o de negocio (claro y específico).",
-    "pregunta": "Pregunta técnica concisa.",
-    "opciones": [
-      "Opcion 1",
-      "Opcion 2",
-      "Opcion 3",
-      "Opcion 4"
-    ],
-    "respuesta_esperada": "Opcion 1",${pistaKey}
-    "justificacion_correcta": "Justificación inmutable (Feedback acorde a tu personalidad cuando respondo bien).",
-    "justificacion_incorrecta": "Justificación inmutable (Feedback acorde a tu personalidad cuando fallo)."
-  }
-]${jsonWrapperEnd}
+### Estructura Maestra (Payload Único)
+\`\`\`json
+{
+  "metadata": {
+    "version": "1.1",
+    "signature": "nodemesh-v1",
+    "titulo_quiz": "Título creativo y técnico para este Quiz",
+    "tema_objetivo": "${config.tema}",
+    "nivel_exigido": "${config.nivel}",
+    "auditor_persona": "${config.auditor}"
+  },
+  "folder": {
+    "folder_id": "uuid_aleatorio",
+    "nombre_tema": "${config.tema}",
+    "color_tag": "#9FFF22"
+  },
+  "nodos": [
+    {
+      "id_temp": "nodo_1",
+      "tipo_reto": "...",
+      "requiere_ia": false,
+      "contexto": "...",
+      "pregunta": "...",
+      "opciones": [...],
+      "respuesta_esperada": "...",
+      "pista_opcional": "...",
+      "justificacion_correcta": "...",
+      "justificacion_incorrecta": "..."
+    }
+  ]
+}
+\`\`\`
 
 NOTAS ESTRATÉGICAS DE DATO:
 - Campos Condicionales (null): Si el tipo de reto no tiene opciones múltiples (ej: output_prediction, feynman_synthesis, anomaly_detection), el campo "opciones" DEBE viajar como null estrictamente.

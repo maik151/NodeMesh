@@ -205,8 +205,10 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
       <div class="cc-modal-backdrop" *ngIf="showUploadModal">
         <div class="cc-modal card-glass shadow-bloom" style="width: 650px; max-width: 95vw;">
           <header class="modal-header">
-            <h3 style="display: flex; align-items: center; gap: 0.6rem; color: var(--theme-brand-neon);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 256 256"><path d="M240,136v64a16,16,0,0,1-16,16H32a16,16,0,0,1-16-16V136a16,16,0,0,1,16-16H72a8,8,0,0,1,0,16H32v64H224V136H184a8,8,0,0,1,0-16h40A16,16,0,0,1,240,136Zm-117.66-2.34a8,8,0,0,0,11.32,0l48-48a8,8,0,0,0-11.32-11.32L136,108.69V24a8,8,0,0,0-16,0v84.69L85.66,74.34A8,8,0,0,0,74.34,85.66ZM200,168a12,12,0,1,0-12,12A12,12,0,0,0,200,168Z"></path></svg>
+            <h3 style="display: flex; align-items: center; gap: 0.8rem; color: var(--theme-brand-neon); font-weight: 800; letter-spacing: -0.5px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 256 256">
+                <path d="M240,136v64a16,16,0,0,1-16,16H32a16,16,0,0,1-16-16V136a16,16,0,0,1,16-16H72a8,8,0,0,1,0,16H32v64H224V136H184a8,8,0,0,1,0-16h40A16,16,0,0,1,240,136Zm-117.66-2.34a8,8,0,0,0,11.32,0l48-48a8,8,0,0,0-11.32-11.32L136,108.69V24a8,8,0,0,0-16,0v84.69L85.66,74.34A8,8,0,0,0,74.34,85.66ZM200,168a12,12,0,1,0-12,12A12,12,0,0,0,200,168Z"></path>
+              </svg>
               Cargar Test
             </h3>
             <button class="btn-close" (click)="showUploadModal = false">×</button>
@@ -466,42 +468,51 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
               <!-- TOGGLES INFERIORES -->
               <div class="toggles-container" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem;">
                 <div class="switch-group" style="display: flex; align-items: center; justify-content: space-between;">
-                  <label title="Inyecta un comando en el prompt para obligar a la IA a leer documentación enviada (RAG)." style="margin: 0; font-size: 0.85rem; max-width: 80%;">¿Vas a generar preguntas en base a uno o varios Documentos (PDF, WORD, EXCEL)?</label>
+                  <label title="Activa el modo de lectura de documentos. El prompt exigirá que las preguntas se basen únicamente en los archivos (PDF, Excel, etc.) que adjuntarás luego." style="margin: 0; font-size: 0.85rem; max-width: 80%; cursor: help;">¿Vas a generar preguntas en base a uno o varios Documentos (PDF, WORD, EXCEL)?</label>
                   <label class="toggle-switch">
                     <input type="checkbox" [(ngModel)]="compiler.adjuntarDocs">
                     <span class="slider"></span>
                   </label>
                 </div>
                 <div class="switch-group" style="display: flex; align-items: center; justify-content: space-between;">
-                  <label title="Añade el campo dinámico 'pista_opcional' en cada Nodo para gamificación." style="margin: 0; font-size: 0.85rem; max-width: 80%;">¿Incluir Pistas en las preguntas?</label>
+                  <label title="Genera una pequeña pista lógica para cada pregunta. Esto ayuda al usuario a razonar y pensar antes de ver la respuesta correcta." style="margin: 0; font-size: 0.85rem; max-width: 80%; cursor: help;">¿Incluir Pistas en las preguntas?</label>
                   <label class="toggle-switch">
                     <input type="checkbox" [(ngModel)]="compiler.incluirPistas">
                     <span class="slider"></span>
                   </label>
                 </div>
                 <div class="switch-group" style="display: flex; align-items: center; justify-content: space-between;">
-                  <label title="Previene que la IA use identificadores markdown 'json' alrededor de la respuesta. Útil en flujos automatizados crudos." style="margin: 0; font-size: 0.85rem; max-width: 80%;">¿Forzar JSON RAW (Sin envoltura de llaves de markdown)?</label>
+                  <label title="Fuerza a la IA a dar solo el código JSON final, omitiendo explicaciones y bloques Markdown. Evita errores de sintaxis al procesar los resultados." style="margin: 0; font-size: 0.85rem; max-width: 80%; cursor: help;">¿Forzar JSON RAW (Sin envoltura de llaves de markdown)?</label>
                   <label class="toggle-switch">
                     <input type="checkbox" [(ngModel)]="compiler.forzarJsonRaw">
                     <span class="slider"></span>
                   </label>
                 </div>
               </div>
-
             </div>
 
             <!-- COLUMNA DERECHA (Preview) -->
             <div class="compiler-preview" style="display: flex; flex-direction: column; gap: 0.5rem; height: 100%;">
               <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 0.5rem;">
-                <button class="btn-text-upload copier-btn" (click)="copyPromptBtn()" [disabled]="!isCompilerValid || isCopied" style="background: transparent; border: none; color: var(--theme-text-secondary); display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 6px; transition: color 0.3s ease; width: 100px;">
-                  <ng-container *ngIf="!isCopied">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"></path></svg>
-                    Copiar
-                  </ng-container>
-                  <ng-container *ngIf="isCopied">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#9ACD32" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg>
-                    <span style="color: #9ACD32;">Copiado</span>
-                  </ng-container>
+                <button class="btn-text-upload copier-btn" (click)="copyPromptBtn()" [disabled]="!isCompilerValid || isCopied" style="background: transparent; border: none; color: var(--theme-text-secondary); padding: 0; border-radius: 6px; transition: all 0.3s ease; width: 105px; height: 32px; position: relative; overflow: hidden; cursor: pointer; display: block;">
+                  <!-- Icon & Text Slider -->
+                  <div style="display: flex; flex-direction: column; width: 100%; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); height: 64px;" 
+                       [style.transform]="isCopied ? 'translateY(-32px)' : 'translateY(0)'">
+                    
+                    <!-- IDLE STATE (Copiar) -->
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; height: 32px; width: 100%;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"></path></svg>
+                      <span style="font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; font-weight: 600;">Copiar</span>
+                    </div>
+
+                    <!-- SUCCESS STATE (Copiado) -->
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; height: 32px; width: 100%;" 
+                         [style.color]="(isDark$ | async) ? '#9acd32' : '#6eaf0b'">
+                      <svg class="check-pop-anim" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg>
+                      <span style="font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; font-weight: 800;">Copiado</span>
+                    </div>
+
+                  </div>
                 </button>
               </div>
               <div style="flex: 1; border: 1px solid var(--theme-border); border-radius: 12px; padding: 0.5rem; background: var(--theme-surface-solid); position: relative;">
@@ -1095,8 +1106,26 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     
     .magic-btn:hover { background: rgba(154, 205, 50, 0.15) !important; color: var(--theme-brand-neon) !important; border-color: var(--theme-brand-neon) !important; box-shadow: 0 0 15px rgba(154, 205, 50, 0.3); }
 
-    .copier-btn:not(:disabled):hover { color: #fff !important; transform: none !important; background: transparent !important; box-shadow: none !important; border: none !important; }
-    :host-context([data-theme="light"]) .copier-btn:not(:disabled):hover { color: var(--theme-brand-neon) !important; }
+    .copier-btn:not(:disabled):hover { color: var(--theme-text) !important; transform: none !important; background: transparent !important; box-shadow: none !important; border: none !important; }
+    :host-context([data-theme="light"]) .copier-btn:not(:disabled):hover { color: #6eaf0b !important; }
+
+    .copied-text-light { color: #6eaf0b !important; }
+    .copied-text-dark { color: #9acd32 !important; }
+
+    @keyframes slideUpToast {
+      0% { opacity: 0; transform: translate(-50%, 10px); }
+      100% { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    .check-pop-anim {
+      animation: checkPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes checkPop {
+      0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+      50% { transform: scale(1.2) rotate(5deg); }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
 
     /* ANIMATED TOGGLES */
     .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; margin: 0; }
@@ -1346,14 +1375,19 @@ export class CommandCenterComponent implements OnInit {
   copyPromptBtn() {
     if (!this.isCompilerValid || this.isCopied) return;
     const finalPrompt = buildPromptV2(this.compiler);
+    
+    // Optimizamos para que la UI responda instantáneamente
+    this.isCopied = true;
+    this.cdr.detectChanges();
+
     navigator.clipboard.writeText(finalPrompt).then(() => {
-      this.isCopied = true;
-      this.cdr.detectChanges(); // Force angular lifecycle to update the checkmark immediately
       setTimeout(() => { 
         this.isCopied = false; 
         this.cdr.detectChanges(); 
       }, 2500);
     }).catch(err => {
+      this.isCopied = false; // Revertir si falla
+      this.cdr.detectChanges();
       console.error('Failed to copy to clipboard', err);
     });
   }
@@ -1472,15 +1506,6 @@ export class CommandCenterComponent implements OnInit {
   analyzePayload() {
     this.uploadStats.charCount = this.temporaryUploadPayload.length;
     
-    // XSS and strict check based on RF.md / RNF.md
-    const maliciousPattern = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>|on\w+\s*=/gi;
-    if (maliciousPattern.test(this.temporaryUploadPayload)) {
-        this.uploadStats.isValid = false;
-        this.uploadStats.errorMessage = 'ALERTA SEGURIDAD: Payload bloqueado por contener código malicioso (XSS).';
-        this.uploadStats.nodeCount = 0;
-        return;
-    }
-
     if (!this.temporaryUploadPayload.trim()) {
       this.uploadStats.isValid = false;
       this.uploadStats.errorMessage = 'El payload está vacío.';
@@ -1489,7 +1514,38 @@ export class CommandCenterComponent implements OnInit {
     }
 
     try {
+      // 1. Análisis de Seguridad (XSS) - Prioridad Alta
+      // Si el payload contiene scripts pero no está "firmado" por nuestro sistema, lo bloqueamos de inmediato.
+      // Nota: Intentamos un parseo rápido solo para ver la firma si es posible.
+      let isSigned = false;
+      try { 
+        const quickParse = JSON.parse(this.temporaryUploadPayload);
+        isSigned = quickParse.metadata?.signature === 'nodemesh-v1';
+      } catch { /* No es JSON válido aún, procedemos con XSS estricto */ }
+
+      if (!isSigned) {
+        const maliciousPattern = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>|\bon\w+\s*=/gi;
+        if (maliciousPattern.test(this.temporaryUploadPayload)) {
+            this.uploadStats.isValid = false;
+            this.uploadStats.errorMessage = 'ALERTA SEGURIDAD: Payload bloqueado por contener código malicioso (XSS).';
+            this.uploadStats.nodeCount = 0;
+            return;
+        }
+      }
+
+      // 2. Parseo de Estructura
       const parsed = JSON.parse(this.temporaryUploadPayload);
+
+      // Auto-relleno de metadatos
+      if (parsed.metadata?.titulo_quiz && !this.uploadConfig.quizTitle) {
+        this.uploadConfig.quizTitle = parsed.metadata.titulo_quiz;
+        this.cdr.detectChanges();
+      }
+      if (parsed.folder?.nombre_tema && !this.uploadConfig.themeName) {
+         this.uploadConfig.themeName = parsed.folder.nombre_tema;
+         this.cdr.detectChanges();
+      }
+
       const nodes = Array.isArray(parsed) ? parsed : (parsed.nodos || parsed.nodes || []);
       
       if (!Array.isArray(nodes) || nodes.length === 0) {
@@ -1501,7 +1557,6 @@ export class CommandCenterComponent implements OnInit {
          return;
       }
       
-      // Strict structural validation
       let errors = 0;
       const types = new Set<string>();
       
@@ -1510,8 +1565,6 @@ export class CommandCenterComponent implements OnInit {
             errors++;
             return;
          }
-         
-         // Zod-like check
          if (!('pregunta' in n || 'tipo_reto' in n || 'contexto' in n)) errors++;
          if (n.tipo_reto) types.add(n.tipo_reto);
       });

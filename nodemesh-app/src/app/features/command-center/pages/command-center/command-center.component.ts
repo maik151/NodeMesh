@@ -296,7 +296,7 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
               <div class="row-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="input-group">
                   <label class="cc-label" title="El nivel definirá la complejidad teórica y práctica exigida por la IA a la hora de resolver el Quiz.">Nivel de Complejidad:</label>
-                  <div class="custom-select-wrapper" (click)="$event.stopPropagation(); showNivelSelect = !showNivelSelect; showAuditorSelect = false; showIdiomaSelect = false">
+                  <div class="custom-select-wrapper" [class.active-wrapper]="showNivelSelect" (click)="$event.stopPropagation(); showNivelSelect = !showNivelSelect; showAuditorSelect = false; showIdiomaSelect = false">
                     <div class="cc-select select-trigger compiler-theme-input" [class.active]="showNivelSelect">
                       <span>{{ getNivelLabel() }}</span>
                       <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm37.66-85.66a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L120,148.69V88a8,8,0,0,1,16,0v60.69l18.34-18.35A8,8,0,0,1,165.66,130.34Z"></path></svg>
@@ -318,7 +318,7 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
               <div class="row-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="input-group">
                   <label class="cc-label" title="Define cómo va a redactar la IA las explicaciones y las pistas.">Personalidad del Auditor:</label>
-                  <div class="custom-select-wrapper" (click)="$event.stopPropagation(); showAuditorSelect = !showAuditorSelect; showNivelSelect = false; showIdiomaSelect = false">
+                  <div class="custom-select-wrapper" [class.active-wrapper]="showAuditorSelect" (click)="$event.stopPropagation(); showAuditorSelect = !showAuditorSelect; showNivelSelect = false; showIdiomaSelect = false">
                     <div class="cc-select select-trigger compiler-theme-input" [class.active]="showAuditorSelect">
                       <span>{{ getAuditorLabel() }}</span>
                       <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm37.66-85.66a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L120,148.69V88a8,8,0,0,1,16,0v60.69l18.34-18.35A8,8,0,0,1,165.66,130.34Z"></path></svg>
@@ -333,7 +333,7 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
                 </div>
                 <div class="input-group">
                   <label class="cc-label">Idioma Salida:</label>
-                  <div class="custom-select-wrapper" (click)="$event.stopPropagation(); showIdiomaSelect = !showIdiomaSelect; showNivelSelect = false; showAuditorSelect = false">
+                  <div class="custom-select-wrapper" [class.active-wrapper]="showIdiomaSelect" (click)="$event.stopPropagation(); showIdiomaSelect = !showIdiomaSelect; showNivelSelect = false; showAuditorSelect = false">
                     <div class="cc-select select-trigger compiler-theme-input" [class.active]="showIdiomaSelect">
                       <span>{{ getIdiomaLabel() }}</span>
                       <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm37.66-85.66a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L120,148.69V88a8,8,0,0,1,16,0v60.69l18.34-18.35A8,8,0,0,1,165.66,130.34Z"></path></svg>
@@ -1011,6 +1011,7 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     }
     
     .custom-select-wrapper { position: relative; width: 100%; user-select: none; z-index: 10; }
+    .custom-select-wrapper.active-wrapper { z-index: 1000; }
     .select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0.7rem; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 600; }
     .select-trigger:hover, .select-trigger.active { border-color: var(--theme-brand-neon); }
     .select-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #1a1a1e; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; z-index: 1000; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }

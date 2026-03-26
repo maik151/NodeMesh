@@ -214,8 +214,7 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
           
           <div class="modal-body">
             
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; align-items: start; margin-bottom: 1rem;">
-              <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                 <div class="input-group relative" style="margin: 0;">
                   <label class="cc-label" style="font-size: 0.85rem; letter-spacing: 0;">Tema:</label>
                   <div style="position: relative;">
@@ -233,35 +232,36 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
                   <label class="cc-label" style="font-size: 0.85rem; letter-spacing: 0;">Titulo del Quiz</label>
                   <input type="text" [(ngModel)]="uploadConfig.quizTitle" placeholder="Ej. Fundamentos de Programacion Basico - Python" class="cc-input" autocomplete="off">
                 </div>
-              </div>
+            </div>
 
-              <div style="background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem; height: 100%; justify-content: center;">
-                 <h4 style="margin: 0; font-size: 0.75rem; color: var(--theme-text-secondary); font-family: 'JetBrains Mono', monospace; letter-spacing: 0;">MÉTRICAS DEL PAYLOAD</h4>
-              <div style="background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem; height: 100%; justify-content: center;">
-                 <h4 style="margin: 0; font-size: 0.75rem; color: var(--theme-text-secondary); font-family: 'JetBrains Mono', monospace; letter-spacing: 0;">MÉTRICAS DEL PAYLOAD</h4>
-                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.8rem; opacity: 0.8;" title="Nodos Extraídos (Total)">Nodos JSON:</span>
-                    <span style="font-size: 1.1rem; font-weight: 800; font-family: 'Fira Code', monospace; transition: color 0.3s;" 
+            <div style="background: rgba(128,128,128,0.05); border: 1px dashed var(--theme-border-neon, rgba(110,175,11,0.3)); border-radius: 8px; padding: 0.8rem 1.5rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+                 <h4 style="margin: 0; font-size: 0.75rem; color: var(--theme-text-secondary); font-family: 'JetBrains Mono', monospace; letter-spacing: 0; flex-shrink: 0; padding-right: 1.5rem; border-right: 1px solid rgba(128,128,128,0.2);">MÉTRICAS</h4>
+                 
+                 <div style="display: flex; flex-direction: column; align-items: start; gap: 0.2rem; flex: 1; padding-left: 0.5rem;">
+                    <span style="font-size: 0.65rem; text-transform: uppercase; color: var(--theme-text-secondary); font-weight: 700; letter-spacing: 0.5px;" title="Nodos Extraídos (Total)">Nodos JSON</span>
+                    <span style="font-size: 1.2rem; font-weight: 800; font-family: 'Fira Code', monospace; transition: color 0.3s;" 
                           [style.color]="uploadStats.nodeCount && uploadStats.nodeCount === compiler.totalPreguntas ? 'var(--theme-brand-neon)' : 'var(--theme-alert-yellow)'">
                       {{ uploadStats.nodeCount || '0' }}
                     </span>
                  </div>
-                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.8rem; opacity: 0.8;" title="Diversidad Cognitiva">Tipos de Retos:</span>
-                    <span style="font-size: 1rem; font-weight: 800; font-family: 'Fira Code', monospace; color: var(--theme-brand-neon);">{{ uploadStats.uniqueTypes || '0' }}</span>
+                 
+                 <div style="display: flex; flex-direction: column; align-items: start; gap: 0.2rem; flex: 1;">
+                    <span style="font-size: 0.65rem; text-transform: uppercase; color: var(--theme-text-secondary); font-weight: 700; letter-spacing: 0.5px;" title="Diversidad Cognitiva">Tipos Retos</span>
+                    <span style="font-size: 1.2rem; font-weight: 800; font-family: 'Fira Code', monospace; color: var(--theme-brand-neon);">{{ uploadStats.uniqueTypes || '0' }}</span>
                  </div>
-                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.8rem; opacity: 0.8;" title="Alertas de Esquema (Zod)">Errores Zod:</span>
-                    <span style="font-size: 1rem; font-weight: 800; font-family: 'Fira Code', monospace; transition: color 0.3s;" 
+                 
+                 <div style="display: flex; flex-direction: column; align-items: start; gap: 0.2rem; flex: 1;">
+                    <span style="font-size: 0.65rem; text-transform: uppercase; color: var(--theme-text-secondary); font-weight: 700; letter-spacing: 0.5px;" title="Alertas de Esquema (Zod)">Errores Zod</span>
+                    <span style="font-size: 1.2rem; font-weight: 800; font-family: 'Fira Code', monospace; transition: color 0.3s;" 
                           [style.color]="uploadStats.schemaErrors === 0 ? 'var(--theme-text-secondary)' : '#ff4444'">
                       {{ uploadStats.schemaErrors || '0' }}
                     </span>
                  </div>
-                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.8rem; opacity: 0.8;">Caracteres totales:</span>
-                    <span style="font-size: 1rem; font-weight: 800; font-family: 'Fira Code', monospace; color: var(--theme-text-secondary);">{{ uploadStats.charCount || '0' }}</span>
+                 
+                 <div style="display: flex; flex-direction: column; align-items: start; gap: 0.2rem; flex: 1;">
+                    <span style="font-size: 0.65rem; text-transform: uppercase; color: var(--theme-text-secondary); font-weight: 700; letter-spacing: 0.5px;">Caracteres</span>
+                    <span style="font-size: 1.2rem; font-weight: 800; font-family: 'Fira Code', monospace; color: var(--theme-text-secondary);">{{ uploadStats.charCount || '0' }}</span>
                  </div>
-              </div>
             </div>
 
             <div class="input-group" style="margin-bottom: 0;">

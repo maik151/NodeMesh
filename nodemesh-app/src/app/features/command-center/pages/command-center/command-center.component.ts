@@ -253,12 +253,17 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
                  <label class="cc-label" style="margin: 0; font-size: 0.85rem; letter-spacing: 0;">JSON:</label>
                  
                  <div style="display: flex; gap: 0.5rem;">
-                   <button class="btn-micro" (click)="normalizeJson()" *ngIf="temporaryUploadPayload" title="Evaluar y reparar estructura JSON" style="color: var(--theme-brand-neon); border-color: rgba(110,175,11,0.3); background: rgba(110,175,11,0.05);">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M197.58,129.06,146,110l-19-51.62a15.92,15.92,0,0,0-29.88,0L78,110l-51.62,19a15.92,15.92,0,0,0,0,29.88L78,178l19,51.62a15.92,15.92,0,0,0,29.88,0L146,178l51.62-19a15.92,15.92,0,0,0,0-29.88ZM137,164.22a8,8,0,0,0-4.74,4.74L112,223.85,91.78,169A8,8,0,0,0,87,164.22L32.15,144,87,123.78A8,8,0,0,0,91.78,119L112,64.15,132.22,119a8,8,0,0,0,4.74,4.74L191.85,144ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z"></path></svg>
+                   <button class="btn-micro" (click)="normalizeJson()" *ngIf="temporaryUploadPayload" title="Evaluar y reparar estructura JSON" style="color: var(--theme-brand-neon); border-color: rgba(110,175,11,0.3); background: rgba(110,175,11,0.05); cursor: pointer;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M197.58,129.06,146,110l-19-51.62a15.92,15.92,0,0,0-29.88,0L78,110l-51.62,19a15.92,15.92,0,0,0,0,29.88L78,178l19,51.62a15.92,15.92,0,0,0,29.88,0L146,178l51.62-19a15.92,15.92,0,0,0,0-29.88ZM137,164.22a8,8,0,0,0-4.74,4.74L112,223.85,91.78,169A8,8,0,0,0,87,164.22L32.15,144,87,123.78A8,8,0,0,0,91.78,119L112,64.15,132.22,119a8,8,0,0,0,4.74,4.74L191.85,144ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z"></path></svg>
                       Evaluar JSON
                    </button>
-                   <button class="btn-micro" (click)="temporaryUploadPayload=''; onPayloadInput()" *ngIf="temporaryUploadPayload" title="Limpiar todo">
-                      <label style="cursor: pointer; padding: 0; margin: 0;">Limpiar</label>
+                   <button class="btn-micro" (click)="temporaryUploadPayload=''; onPayloadInput()" *ngIf="temporaryUploadPayload" title="Vaciar editor de payload" style="color: var(--theme-brand-neon); border-color: rgba(110,175,11,0.3); background: rgba(110,175,11,0.05); cursor: pointer;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M235.5,216.81c-22.56-11-35.5-34.58-35.5-64.8V134.73a15.94,15.94,0,0,0-10.09-14.87L165,110a8,8,0,0,1-4.48-10.34l21.32-53a28,28,0,0,0-16.1-37,28.14,28.14,0,0,0-35.82,16,.61.61,0,0,0,0,.12L108.9,79a8,8,0,0,1-10.37,4.49L73.11,73.14A15.89,15.89,0,0,0,55.74,76.8C34.68,98.45,24,123.75,24,152a111.45,111.45,0,0,0,31.18,77.53A8,8,0,0,0,61,232H232a8,8,0,0,0,3.5-15.19ZM67.14,88l25.41,10.3a24,24,0,0,0,31.23-13.45l21-53c2.56-6.11,9.47-9.27,15.43-7a12,12,0,0,1,6.88,15.92L145.69,93.76a24,24,0,0,0,13.43,31.14L184,134.73V152c0,.33,0,.66,0,1L55.77,101.71A108.84,108.84,0,0,1,67.14,88Zm48,128a87.53,87.53,0,0,1-24.34-42,8,8,0,0,0-15.49,4,105.16,105.16,0,0,0,18.36,38H64.44A95.54,95.54,0,0,1,40,152a85.9,85.9,0,0,1,7.73-36.29l137.8,55.12c3,18,10.56,33.48,21.89,45.16Z"></path></svg>
+                      Limpiar
+                   </button>
+                   <button class="btn-micro" (click)="formatPastedJson()" *ngIf="temporaryUploadPayload" title="Formatear indentación" style="color: var(--theme-brand-neon); border-color: rgba(110,175,11,0.3); background: rgba(110,175,11,0.05); cursor: pointer;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M201.54,54.46A104,104,0,0,0,54.46,201.54,104,104,0,0,0,201.54,54.46ZM190.23,65.78a88.18,88.18,0,0,1,11,13.48L167.55,119,139.63,40.78A87.34,87.34,0,0,1,190.23,65.78ZM155.59,133l-18.16,21.37-27.59-5L100.41,123l18.16-21.37,27.59,5ZM65.77,65.78a87.34,87.34,0,0,1,56.66-25.59l17.51,49L58.3,74.32A88,88,0,0,1,65.77,65.78ZM46.65,161.54a88.41,88.41,0,0,1,2.53-72.62l51.21,9.35Zm19.12,28.68a88.18,88.18,0,0,1-11-13.48L88.45,137l27.92,78.18A87.34,87.34,0,0,1,65.77,190.22Zm124.46,0a87.34,87.34,0,0,1-56.66,25.59l-17.51-49,81.64,14.91A88,88,0,0,1,190.23,190.22Zm-34.62-32.49,53.74-63.27a88.41,88.41,0,0,1-2.53,72.62Z"></path></svg>
+                      Formatear
                    </button>
                  </div>
                </div>
@@ -1487,6 +1492,25 @@ export class CommandCenterComponent implements OnInit {
       this.uploadStats.isValid = false;
       this.uploadStats.errorMessage = 'Formato JSON Inválido. Error de parseo.';
       this.uploadStats.nodeCount = 0;
+    }
+  }
+
+  formatPastedJson() {
+    try {
+      if (!this.temporaryUploadPayload.trim()) return;
+      const parsed = JSON.parse(this.temporaryUploadPayload);
+      this.temporaryUploadPayload = JSON.stringify(parsed, null, 2);
+      this.onPayloadInput(); // Re-trigger validation
+    } catch(e) {
+      // If invalid, try to use the normalizer first
+      this.normalizeJson();
+      try {
+         const parsed = JSON.parse(this.temporaryUploadPayload);
+         this.temporaryUploadPayload = JSON.stringify(parsed, null, 2);
+         this.onPayloadInput();
+      } catch(e2) {
+         // Silently ignore if formatting still fails
+      }
     }
   }
 

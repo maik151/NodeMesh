@@ -206,7 +206,7 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
         <div class="cc-modal card-glass shadow-bloom" style="width: 650px; max-width: 95vw;">
           <header class="modal-header">
             <h3 style="display: flex; align-items: center; gap: 0.6rem; color: var(--theme-brand-neon);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 256 256"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM216,56V96H40V56ZM40,200V112H216v88ZM184,144a12,12,0,1,1-12,12A12,12,0,0,1,184,144Z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 256 256"><path d="M240,136v64a16,16,0,0,1-16,16H32a16,16,0,0,1-16-16V136a16,16,0,0,1,16-16H72a8,8,0,0,1,0,16H32v64H224V136H184a8,8,0,0,1,0-16h40A16,16,0,0,1,240,136Zm-117.66-2.34a8,8,0,0,0,11.32,0l48-48a8,8,0,0,0-11.32-11.32L136,108.69V24a8,8,0,0,0-16,0v84.69L85.66,74.34A8,8,0,0,0,74.34,85.66ZM200,168a12,12,0,1,0-12,12A12,12,0,0,0,200,168Z"></path></svg>
               Cargar Test
             </h3>
             <button class="btn-close" (click)="showUploadModal = false">×</button>
@@ -214,34 +214,68 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
           
           <div class="modal-body">
             
-            <div class="input-group relative" style="margin-bottom: 1rem;">
-              <label class="cc-label" style="font-size: 0.85rem; letter-spacing: 0;">Tema:</label>
-              <input type="text" [(ngModel)]="uploadConfig.themeName" (focus)="showThemeDropdown=true" (blur)="hideThemeDropdownDelay()" (input)="filterThemes()" placeholder="Escribe o selecciona..." class="cc-input" autocomplete="off">
-              <div class="combo-dropdown" *ngIf="showThemeDropdown && filteredThemes.length > 0">
-                <div class="combo-item" *ngFor="let t of filteredThemes" (click)="selectTheme(t)">
-                   {{ t.nombre_tema }}
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; align-items: start; margin-bottom: 1rem;">
+              <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div class="input-group relative" style="margin: 0;">
+                  <label class="cc-label" style="font-size: 0.85rem; letter-spacing: 0;">Tema:</label>
+                  <div style="position: relative;">
+                    <input type="text" [(ngModel)]="uploadConfig.themeName" (focus)="showThemeDropdown=true" (blur)="hideThemeDropdownDelay()" (input)="filterThemes()" placeholder="Escribe o selecciona..." class="cc-input" style="padding-right: 2.5rem;" autocomplete="off">
+                    <svg style="position: absolute; right: 0.8rem; top: 50%; transform: translateY(-50%); color: var(--theme-text-secondary); pointer-events: none;" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
+                  </div>
+                  <div class="combo-dropdown" *ngIf="showThemeDropdown && filteredThemes.length > 0">
+                    <div class="combo-item" *ngFor="let t of filteredThemes" (click)="selectTheme(t)">
+                       {{ t.nombre_tema }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="input-group" style="margin: 0;">
+                  <label class="cc-label" style="font-size: 0.85rem; letter-spacing: 0;">Titulo del Quiz</label>
+                  <input type="text" [(ngModel)]="uploadConfig.quizTitle" placeholder="Ej. Fundamentos de Programacion Basico - Python" class="cc-input" autocomplete="off">
                 </div>
               </div>
-            </div>
 
-            <div class="input-group" style="margin-bottom: 1rem;">
-              <label class="cc-label" style="font-size: 0.85rem; letter-spacing: 0;">Titulo del Quiz</label>
-              <input type="text" [(ngModel)]="uploadConfig.quizTitle" placeholder="Ej. Fundamentos de Programacion Basico - Python" class="cc-input" autocomplete="off">
+              <div style="background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem; height: 100%; justify-content: center;">
+                 <h4 style="margin: 0; font-size: 0.75rem; color: var(--theme-text-secondary); font-family: 'JetBrains Mono', monospace; letter-spacing: 0;">MÉTRICAS DEL PAYLOAD</h4>
+                 <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.8rem; opacity: 0.8;">Nodos detectados:</span>
+                    <span style="font-size: 1.1rem; font-weight: 800; color: var(--theme-brand-neon);">{{ uploadStats.nodeCount || 0 }}</span>
+                 </div>
+                 <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.8rem; opacity: 0.8;">Caracteres totales:</span>
+                    <span style="font-size: 1rem; font-weight: 800; font-family: 'Fira Code', monospace; color: var(--accent);">{{ uploadStats.charCount || 0 }}</span>
+                 </div>
+              </div>
             </div>
 
             <div class="input-group" style="margin-bottom: 0;">
                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.5rem;">
                  <label class="cc-label" style="margin: 0; font-size: 0.85rem; letter-spacing: 0;">JSON:</label>
-                 <button class="btn-micro" (click)="temporaryUploadPayload=''" *ngIf="temporaryUploadPayload" title="Limpiar todo">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path></svg>
-                    Limpiar
-                 </button>
+                 
+                 <div style="display: flex; gap: 0.5rem;">
+                   <button class="btn-micro" (click)="normalizeJson()" *ngIf="temporaryUploadPayload" title="Evaluar y reparar estructura JSON" style="color: var(--theme-brand-neon); border-color: rgba(110,175,11,0.3); background: rgba(110,175,11,0.05);">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M197.58,129.06,146,110l-19-51.62a15.92,15.92,0,0,0-29.88,0L78,110l-51.62,19a15.92,15.92,0,0,0,0,29.88L78,178l19,51.62a15.92,15.92,0,0,0,29.88,0L146,178l51.62-19a15.92,15.92,0,0,0,0-29.88ZM137,164.22a8,8,0,0,0-4.74,4.74L112,223.85,91.78,169A8,8,0,0,0,87,164.22L32.15,144,87,123.78A8,8,0,0,0,91.78,119L112,64.15,132.22,119a8,8,0,0,0,4.74,4.74L191.85,144ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z"></path></svg>
+                      Evaluar JSON
+                   </button>
+                   <button class="btn-micro" (click)="temporaryUploadPayload=''; onPayloadInput()" *ngIf="temporaryUploadPayload" title="Limpiar todo">
+                      <label style="cursor: pointer; padding: 0; margin: 0;">Limpiar</label>
+                   </button>
+                 </div>
                </div>
                
                <div class="status-pill-validation" [ngClass]="{'esperando': !temporaryUploadPayload, 'success': uploadStats.isValid && temporaryUploadPayload, 'error': !uploadStats.isValid && temporaryUploadPayload }">
-                 <span *ngIf="!temporaryUploadPayload">⏳ Esperando Payload</span>
-                 <span *ngIf="uploadStats.isValid && temporaryUploadPayload">✅ Schema Zod validado. {{ uploadStats.nodeCount }} Preguntas listas.</span>
-                 <span *ngIf="!uploadStats.isValid && temporaryUploadPayload">❌ Error de Esquema: {{ uploadStats.errorMessage || 'Estructura Inválida' }}</span>
+                 <span *ngIf="!temporaryUploadPayload" style="display: flex; align-items: center; gap: 0.4rem;">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M184,24H72A16,16,0,0,0,56,40V76a16.07,16.07,0,0,0,6.4,12.8L114.67,128,62.4,167.2A16.07,16.07,0,0,0,56,180v36a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V180.36a16.09,16.09,0,0,0-6.35-12.77L141.27,128l52.38-39.6A16.05,16.05,0,0,0,200,75.64V40A16,16,0,0,0,184,24Zm0,16V56H72V40Zm0,176H72V180l56-42,56,42.35Zm-56-98L72,76V72H184v3.64Z"></path></svg>
+                     Esperando Payload...
+                 </span>
+                 <span *ngIf="uploadStats.isValid && temporaryUploadPayload" style="display: flex; align-items: center; gap: 0.4rem;">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path></svg>
+                     Schema Zod validado. {{ uploadStats.nodeCount }} Preguntas listas.
+                 </span>
+                 <span *ngIf="!uploadStats.isValid && temporaryUploadPayload" style="display: flex; align-items: center; gap: 0.4rem;">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M165.66,101.66,139.31,128l26.35,26.34a8,8,0,0,1-11.32,11.32L128,139.31l-26.34,26.35a8,8,0,0,1-11.32-11.32L116.69,128,90.34,101.66a8,8,0,0,1,11.32-11.32L128,116.69l26.34-26.35a8,8,0,0,1,11.32,11.32ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path></svg>
+                     Error de Esquema: {{ uploadStats.errorMessage || 'Estructura Inválida' }}
+                 </span>
                </div>
 
                <div class="payload-editor-container" style="position: relative; height: 260px; margin-top: 0.5rem; border-radius: 8px;">
@@ -354,43 +388,43 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
                 
                 <div class="matrix-grid-v2" style="border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem;">
                   <!-- COLUMN 1 -->
-                  <div class="matrix-item" title="Aislar una verdad absoluta entre distractores. (Recordar)">
+                  <div class="matrix-item" title="Preguntas de opción múltiple que sirven para evaluar conceptualización con una sola respuesta correcta.">
                     <span>Single Choice</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.single_choice" class="cc-input mini compiler-theme-input">
                   </div>
-                  <div class="matrix-item" title="Memoria muscular para sintaxis o fórmulas. (Aplicar)">
+                  <div class="matrix-item" title="Preguntas de completar espacios en blanco que sirven para obligar al usuario a recordar sintaxis exacta.">
                     <span>Cloze Deletion</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.cloze_deletion" class="cc-input mini compiler-theme-input">
                   </div>
-                  <div class="matrix-item" title="Entender causalidad y ciclos de vida. (Analizar)">
+                  <div class="matrix-item" title="Preguntas de ordenamiento que sirven para evaluar si conoces los pasos exactos o ciclos de vida de un proceso.">
                     <span>Ordering</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.ordering" class="cc-input mini compiler-theme-input">
                   </div>
                   
                   <!-- COLUMN 2 -->
-                  <div class="matrix-item" title="Refactorizar hacia la eficiencia matemática. (Evaluar)">
+                  <div class="matrix-item" title="Preguntas de optimización que sirven para darle al usuario código lento y forzarlo a pensar en cómo hacerlo más eficiente.">
                     <span>Optimization</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.optimization" class="cc-input mini compiler-theme-input">
                   </div>
-                  <div class="matrix-item" title="Transferencia de conocimiento sin jerga. (Maestría)">
+                  <div class="matrix-item" title="Preguntas abiertas de explicación (Feynman) que sirven para ver si puede explicarse un tema técnico complejo con palabras simples.">
                     <span>Feynman Synth</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.feynman_synthesis" class="cc-input mini compiler-theme-input">
                   </div>
-                  <div class="matrix-item" title="Exige conocer el panorama completo; cero suerte. (Comprender)">
+                  <div class="matrix-item" title="Preguntas de selección donde varias respuestas son correctas y sirven para evaluar el conocimiento completo del tema.">
                     <span>Multi Choice</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.multi_choice" class="cc-input mini compiler-theme-input">
                   </div>
                   
                   <!-- COLUMN 3 -->
-                  <div class="matrix-item" title="Forzar ejecución mental (compilador humano). (Aplicar)">
+                  <div class="matrix-item" title="Preguntas de análisis que sirven para dar un bloque de código y exigir que te digan exactamente qué imprimirá la consola.">
                     <span>Output Predict</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.output_prediction" class="cc-input mini compiler-theme-input">
                   </div>
-                  <div class="matrix-item" title="Detectar fallos lógicos ocultos que sí compilan. (Analizar)">
+                  <div class="matrix-item" title="Preguntas de trampa que sirven para dar código que compila bien pero tiene bugs lógicos escondidos que deben encontrarse.">
                     <span>Anomaly Detect</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.anomaly_detection" class="cc-input mini compiler-theme-input">
                   </div>
-                  <div class="matrix-item" title="Diseño de sistemas, arquitectura y evaluación de trade-offs. (Crear)">
+                  <div class="matrix-item" title="Preguntas de diseño de sistemas que sirven para poner problemas empresariales y preguntar qué arquitectura se usaría para mitigarlo.">
                     <span>Case Analysis</span>
                     <input type="number" min="0" [(ngModel)]="compiler.matrix.case_analysis" class="cc-input mini compiler-theme-input">
                   </div>

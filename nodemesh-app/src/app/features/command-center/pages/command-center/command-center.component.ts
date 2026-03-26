@@ -237,13 +237,29 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
 
               <div style="background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem; height: 100%; justify-content: center;">
                  <h4 style="margin: 0; font-size: 0.75rem; color: var(--theme-text-secondary); font-family: 'JetBrains Mono', monospace; letter-spacing: 0;">MÉTRICAS DEL PAYLOAD</h4>
+              <div style="background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem; height: 100%; justify-content: center;">
+                 <h4 style="margin: 0; font-size: 0.75rem; color: var(--theme-text-secondary); font-family: 'JetBrains Mono', monospace; letter-spacing: 0;">MÉTRICAS DEL PAYLOAD</h4>
                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.8rem; opacity: 0.8;">Nodos detectados:</span>
-                    <span style="font-size: 1.1rem; font-weight: 800; color: var(--theme-brand-neon);">{{ uploadStats.nodeCount || 0 }}</span>
+                    <span style="font-size: 0.8rem; opacity: 0.8;" title="Nodos Extraídos (Total)">Nodos JSON:</span>
+                    <span style="font-size: 1.1rem; font-weight: 800; font-family: 'Fira Code', monospace; transition: color 0.3s;" 
+                          [style.color]="uploadStats.nodeCount && uploadStats.nodeCount === compiler.totalPreguntas ? 'var(--theme-brand-neon)' : 'var(--theme-alert-yellow)'">
+                      {{ uploadStats.nodeCount || '0' }}
+                    </span>
+                 </div>
+                 <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.8rem; opacity: 0.8;" title="Diversidad Cognitiva">Tipos de Retos:</span>
+                    <span style="font-size: 1rem; font-weight: 800; font-family: 'Fira Code', monospace; color: var(--theme-brand-neon);">{{ uploadStats.uniqueTypes || '0' }}</span>
+                 </div>
+                 <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.8rem; opacity: 0.8;" title="Alertas de Esquema (Zod)">Errores Zod:</span>
+                    <span style="font-size: 1rem; font-weight: 800; font-family: 'Fira Code', monospace; transition: color 0.3s;" 
+                          [style.color]="uploadStats.schemaErrors === 0 ? 'var(--theme-text-secondary)' : '#ff4444'">
+                      {{ uploadStats.schemaErrors || '0' }}
+                    </span>
                  </div>
                  <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 0.8rem; opacity: 0.8;">Caracteres totales:</span>
-                    <span style="font-size: 1rem; font-weight: 800; font-family: 'Fira Code', monospace; color: var(--accent);">{{ uploadStats.charCount || 0 }}</span>
+                    <span style="font-size: 1rem; font-weight: 800; font-family: 'Fira Code', monospace; color: var(--theme-text-secondary);">{{ uploadStats.charCount || '0' }}</span>
                  </div>
               </div>
             </div>
@@ -251,17 +267,16 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
             <div class="input-group" style="margin-bottom: 0;">
                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.5rem;">
                  <label class="cc-label" style="margin: 0; font-size: 0.85rem; letter-spacing: 0;">JSON:</label>
-                 
                  <div style="display: flex; gap: 0.5rem;">
-                   <button class="btn-micro" (click)="normalizeJson()" *ngIf="temporaryUploadPayload" title="Evaluar y reparar estructura JSON" style="color: var(--theme-brand-neon); border-color: rgba(110,175,11,0.3); background: rgba(110,175,11,0.05); cursor: pointer;">
+                   <button class="btn-micro btn-json-tool" (click)="normalizeJson()" *ngIf="temporaryUploadPayload" title="Evaluar y reparar estructura JSON">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M197.58,129.06,146,110l-19-51.62a15.92,15.92,0,0,0-29.88,0L78,110l-51.62,19a15.92,15.92,0,0,0,0,29.88L78,178l19,51.62a15.92,15.92,0,0,0,29.88,0L146,178l51.62-19a15.92,15.92,0,0,0,0-29.88ZM137,164.22a8,8,0,0,0-4.74,4.74L112,223.85,91.78,169A8,8,0,0,0,87,164.22L32.15,144,87,123.78A8,8,0,0,0,91.78,119L112,64.15,132.22,119a8,8,0,0,0,4.74,4.74L191.85,144ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z"></path></svg>
                       Evaluar JSON
                    </button>
-                   <button class="btn-micro" (click)="temporaryUploadPayload=''; onPayloadInput()" *ngIf="temporaryUploadPayload" title="Vaciar editor de payload" style="color: var(--theme-brand-neon); border-color: rgba(110,175,11,0.3); background: rgba(110,175,11,0.05); cursor: pointer;">
+                   <button class="btn-micro btn-json-tool" (click)="temporaryUploadPayload=''; onPayloadInput()" *ngIf="temporaryUploadPayload" title="Vaciar editor de payload">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M235.5,216.81c-22.56-11-35.5-34.58-35.5-64.8V134.73a15.94,15.94,0,0,0-10.09-14.87L165,110a8,8,0,0,1-4.48-10.34l21.32-53a28,28,0,0,0-16.1-37,28.14,28.14,0,0,0-35.82,16,.61.61,0,0,0,0,.12L108.9,79a8,8,0,0,1-10.37,4.49L73.11,73.14A15.89,15.89,0,0,0,55.74,76.8C34.68,98.45,24,123.75,24,152a111.45,111.45,0,0,0,31.18,77.53A8,8,0,0,0,61,232H232a8,8,0,0,0,3.5-15.19ZM67.14,88l25.41,10.3a24,24,0,0,0,31.23-13.45l21-53c2.56-6.11,9.47-9.27,15.43-7a12,12,0,0,1,6.88,15.92L145.69,93.76a24,24,0,0,0,13.43,31.14L184,134.73V152c0,.33,0,.66,0,1L55.77,101.71A108.84,108.84,0,0,1,67.14,88Zm48,128a87.53,87.53,0,0,1-24.34-42,8,8,0,0,0-15.49,4,105.16,105.16,0,0,0,18.36,38H64.44A95.54,95.54,0,0,1,40,152a85.9,85.9,0,0,1,7.73-36.29l137.8,55.12c3,18,10.56,33.48,21.89,45.16Z"></path></svg>
                       Limpiar
                    </button>
-                   <button class="btn-micro" (click)="formatPastedJson()" *ngIf="temporaryUploadPayload" title="Formatear indentación" style="color: var(--theme-brand-neon); border-color: rgba(110,175,11,0.3); background: rgba(110,175,11,0.05); cursor: pointer;">
+                   <button class="btn-micro btn-json-tool" (click)="formatPastedJson()" *ngIf="temporaryUploadPayload" title="Formatear indentación">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M201.54,54.46A104,104,0,0,0,54.46,201.54,104,104,0,0,0,201.54,54.46ZM190.23,65.78a88.18,88.18,0,0,1,11,13.48L167.55,119,139.63,40.78A87.34,87.34,0,0,1,190.23,65.78ZM155.59,133l-18.16,21.37-27.59-5L100.41,123l18.16-21.37,27.59,5ZM65.77,65.78a87.34,87.34,0,0,1,56.66-25.59l17.51,49L58.3,74.32A88,88,0,0,1,65.77,65.78ZM46.65,161.54a88.41,88.41,0,0,1,2.53-72.62l51.21,9.35Zm19.12,28.68a88.18,88.18,0,0,1-11-13.48L88.45,137l27.92,78.18A87.34,87.34,0,0,1,65.77,190.22Zm124.46,0a87.34,87.34,0,0,1-56.66,25.59l-17.51-49,81.64,14.91A88,88,0,0,1,190.23,190.22Zm-34.62-32.49,53.74-63.27a88.41,88.41,0,0,1-2.53,72.62Z"></path></svg>
                       Formatear
                    </button>
@@ -1022,6 +1037,13 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     :host-context([data-theme="light"]) .status-pill-validation.success { background: #f1f8e9; color: #5c9309; border-color: #c5e1a5; }
     :host-context([data-theme="light"]) .status-pill-validation.error { background: #ffebee; color: #b71c1c; border-color: #ef9a9a; }
 
+    .btn-json-tool {
+      color: var(--theme-brand-neon) !important; border-color: rgba(110,175,11,0.3) !important; background: transparent !important; cursor: pointer; transition: all 0.2s ease;
+    }
+    .btn-json-tool:hover {
+      background: rgba(110,175,11,0.1) !important; color: #a4c866 !important; border-color: var(--theme-brand-neon) !important;
+      box-shadow: 0 0 10px rgba(110,175,11, 0.2); transform: translateY(-1px);
+    }
     
     .error-text { color: #ff4444; font-size: 0.75rem; text-align: center; margin-bottom: 1rem; font-weight: 600; }
     
@@ -1175,7 +1197,9 @@ export class CommandCenterComponent implements OnInit {
     nodeCount: 0,
     isValid: false,
     errorMessage: '',
-    charCount: 0
+    charCount: 0,
+    uniqueTypes: 0,
+    schemaErrors: 0
   };
   
   showCompiler = false;
@@ -1472,16 +1496,33 @@ export class CommandCenterComponent implements OnInit {
          this.uploadStats.isValid = false;
          this.uploadStats.errorMessage = 'Estructura inválida. No se detectó un arreglo de nodos.';
          this.uploadStats.nodeCount = 0;
+         this.uploadStats.schemaErrors = 0;
+         this.uploadStats.uniqueTypes = 0;
          return;
       }
       
       // Strict structural validation
-      const isStructurallyValid = nodes.every(n => typeof n === 'object' && n !== null && (!Array.isArray(n)) && ('pregunta' in n || 'tipo_reto' in n || 'contexto' in n));
+      let errors = 0;
+      const types = new Set<string>();
       
-      if (!isStructurallyValid) {
+      nodes.forEach((n: any) => {
+         if (typeof n !== 'object' || n === null || Array.isArray(n)) {
+            errors++;
+            return;
+         }
+         
+         // Zod-like check
+         if (!('pregunta' in n || 'tipo_reto' in n || 'contexto' in n)) errors++;
+         if (n.tipo_reto) types.add(n.tipo_reto);
+      });
+      
+      this.uploadStats.uniqueTypes = types.size;
+      this.uploadStats.schemaErrors = errors;
+
+      if (errors > 0 || types.size === 0) {
          this.uploadStats.isValid = false;
-         this.uploadStats.errorMessage = 'Los datos no coinciden con la estructura esperada: cada nodo debe tener un "tipo_reto" o "pregunta".';
-         this.uploadStats.nodeCount = 0;
+         this.uploadStats.errorMessage = `Se detectaron ${errors} nodos con errores críticos de Schema (llaves omitidas o incompletas).`;
+         this.uploadStats.nodeCount = nodes.length;
          return;
       }
 
@@ -1492,6 +1533,8 @@ export class CommandCenterComponent implements OnInit {
       this.uploadStats.isValid = false;
       this.uploadStats.errorMessage = 'Formato JSON Inválido. Error de parseo.';
       this.uploadStats.nodeCount = 0;
+      this.uploadStats.schemaErrors = 0;
+      this.uploadStats.uniqueTypes = 0;
     }
   }
 

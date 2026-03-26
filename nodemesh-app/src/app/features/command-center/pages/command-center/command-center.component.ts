@@ -205,68 +205,59 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
       <div class="cc-modal-backdrop" *ngIf="showUploadModal">
         <div class="cc-modal card-glass shadow-bloom" style="width: 650px; max-width: 95vw;">
           <header class="modal-header">
-            <h3 style="display: flex; align-items: center; gap: 0.6rem; color: rgba(255,255,255,0.85);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M237.66,86.34l-60-60a8,8,0,0,0-11.32,0L37.11,155.57a44.77,44.77,0,0,0,63.32,63.32L212.32,107l22.21-7.4a8,8,0,0,0,3.13-13.25ZM89.11,207.57a28.77,28.77,0,0,1-40.68-40.68l28.8-28.8c8.47-2.9,21.75-4,39.07,5,10.6,5.54,20.18,8,28.56,8.73ZM205.47,92.41a8,8,0,0,0-3.13,1.93l-39.57,39.57c-8.47,2.9-21.75,4-39.07-5-10.6-5.54-20.18-8-28.56-8.73L172,43.31,217.19,88.5Z"></path></svg>
-              TEST UPLOAD MODAL
+            <h3 style="display: flex; align-items: center; gap: 0.6rem; color: var(--theme-brand-neon);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 256 256"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM216,56V96H40V56ZM40,200V112H216v88ZM184,144a12,12,0,1,1-12,12A12,12,0,0,1,184,144Z"></path></svg>
+              Cargar Test
             </h3>
             <button class="btn-close" (click)="showUploadModal = false">×</button>
           </header>
           
           <div class="modal-body">
             
-            <div class="row">
-              <div class="input-group half relative">
-                <label>TEMA (FOLDER)</label>
-                <input type="text" [(ngModel)]="uploadConfig.themeName" (focus)="showThemeDropdown=true" (blur)="hideThemeDropdownDelay()" (input)="filterThemes()" placeholder="Escribe o selecciona..." class="cc-input" autocomplete="off">
-                <div class="combo-dropdown" *ngIf="showThemeDropdown && filteredThemes.length > 0">
-                  <div class="combo-item" *ngFor="let t of filteredThemes" (click)="selectTheme(t)">
-                     {{ t.nombre_tema }}
-                  </div>
+            <div class="input-group relative" style="margin-bottom: 1rem;">
+              <label class="cc-label" style="font-size: 0.85rem; letter-spacing: 0;">Tema:</label>
+              <input type="text" [(ngModel)]="uploadConfig.themeName" (focus)="showThemeDropdown=true" (blur)="hideThemeDropdownDelay()" (input)="filterThemes()" placeholder="Escribe o selecciona..." class="cc-input" autocomplete="off">
+              <div class="combo-dropdown" *ngIf="showThemeDropdown && filteredThemes.length > 0">
+                <div class="combo-item" *ngFor="let t of filteredThemes" (click)="selectTheme(t)">
+                   {{ t.nombre_tema }}
                 </div>
               </div>
-
-              <div class="input-group half">
-                <label>TÍTULO DEL QUIZ</label>
-                <input type="text" [(ngModel)]="uploadConfig.quizTitle" placeholder="Ej. Bases de microservicios" class="cc-input" autocomplete="off">
-              </div>
             </div>
 
-            <div class="kpi-banner" [class.error]="!uploadStats.isValid">
-               <div class="kpi-item">
-                 <span class="kpi-label">NODOS DETECTADOS</span>
-                 <span class="kpi-val">{{ uploadStats.nodeCount }}</span>
-               </div>
-               <div class="kpi-item">
-                 <span class="kpi-label">CARACTERES</span>
-                 <span class="kpi-val">{{ uploadStats.charCount }}</span>
-               </div>
-               <div class="kpi-item">
-                 <span class="kpi-label">ESTADO JSON</span>
-                 <span class="kpi-val status-text">{{ uploadStats.isValid ? 'VÁLIDO' : 'INVÁLIDO' }}</span>
-               </div>
-            </div>
-            
-            <div class="error-text" *ngIf="!uploadStats.isValid && uploadStats.errorMessage">
-                {{ uploadStats.errorMessage }}
+            <div class="input-group" style="margin-bottom: 1rem;">
+              <label class="cc-label" style="font-size: 0.85rem; letter-spacing: 0;">Titulo del Quiz</label>
+              <input type="text" [(ngModel)]="uploadConfig.quizTitle" placeholder="Ej. Fundamentos de Programacion Basico - Python" class="cc-input" autocomplete="off">
             </div>
 
-            <div class="payload-editor-container">
-               <div class="editor-toolbar">
-                  <span class="label-micro" style="margin: 0; padding: 0;">PAYLOAD_RAW</span>
-                  <button class="btn-micro" (click)="normalizeJson()" title="Intentar reparar JSON dañado o limpiar Markdown">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M48,64a8,8,0,0,1,8-8H72V40a8,8,0,0,1,16,0V56h16a8,8,0,0,1,0,16H88V88a8,8,0,0,1-16,0V72H56A8,8,0,0,1,48,64ZM184,192h-8v-8a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0v-8h8a8,8,0,0,0,0-16Zm56-48H224V128a8,8,0,0,0-16,0v16H192a8,8,0,0,0,0,16h16v16a8,8,0,0,0,16,0V160h16a8,8,0,0,0,0-16ZM219.31,80,80,219.31a16,16,0,0,1-22.62,0L36.68,198.63a16,16,0,0,1,0-22.63L176,36.69a16,16,0,0,1,22.63,0l20.68,20.68A16,16,0,0,1,219.31,80Zm-54.63,32L144,91.31l-96,96L68.68,208ZM208,68.69,187.31,48l-32,32L176,100.69Z"></path></svg>
-                     NORMALIZAR
-                  </button>
+            <div class="input-group" style="margin-bottom: 0;">
+               <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.5rem;">
+                 <label class="cc-label" style="margin: 0; font-size: 0.85rem; letter-spacing: 0;">JSON:</label>
+                 <button class="btn-micro" (click)="temporaryUploadPayload=''" *ngIf="temporaryUploadPayload" title="Limpiar todo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path></svg>
+                    Limpiar
+                 </button>
                </div>
-               <textarea class="cc-textarea mono scroll-hide" [(ngModel)]="temporaryUploadPayload" (ngModelChange)="onPayloadInput()" placeholder="Pega aquí tu lista JSON de nodos..."></textarea>
+               
+               <div class="status-pill-validation" [ngClass]="{'esperando': !temporaryUploadPayload, 'success': uploadStats.isValid && temporaryUploadPayload, 'error': !uploadStats.isValid && temporaryUploadPayload }">
+                 <span *ngIf="!temporaryUploadPayload">⏳ Esperando Payload</span>
+                 <span *ngIf="uploadStats.isValid && temporaryUploadPayload">✅ Schema Zod validado. {{ uploadStats.nodeCount }} Preguntas listas.</span>
+                 <span *ngIf="!uploadStats.isValid && temporaryUploadPayload">❌ Error de Esquema: {{ uploadStats.errorMessage || 'Estructura Inválida' }}</span>
+               </div>
+
+               <div class="payload-editor-container" style="position: relative; height: 260px; margin-top: 0.5rem; border-radius: 8px;">
+                 <div class="code-editor-backdrop" [innerHTML]="highlightedPayload"></div>
+                 <textarea class="cc-textarea code-editor-front" spellcheck="false" [(ngModel)]="temporaryUploadPayload" (ngModelChange)="onPayloadInput()" (scroll)="syncEditorScroll($event)" placeholder="(JSON ya pegado aqui)"></textarea>
+               </div>
             </div>
-            
           </div>
 
-          <footer class="modal-footer">
+          <footer class="modal-footer" style="justify-content: space-between; margin-top: 2rem;">
+             <button class="btn-micro" style="padding: 0.6rem 1.2rem; font-size: 0.9rem;" (click)="showUploadModal = false">
+               Cancelar
+             </button>
              <button class="btn-text-upload" [disabled]="!uploadStats.isValid || !uploadConfig.themeName || !uploadConfig.quizTitle" (click)="confirmUpload()">
                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z"></path></svg>
-               Cargar Quiz
+               Inyectar a la Bóveda
              </button>
           </footer>
         </div>
@@ -974,10 +965,24 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     .btn-micro:hover { background: rgba(154, 205, 50, 0.1); color: var(--theme-brand-neon); border-color: var(--theme-brand-neon); }
     .cc-textarea {
       width: 100%; height: 180px; padding: 1rem; background: transparent; border: none; color: var(--theme-text);
-      font-size: 0.85rem; resize: none;
+      font-size: 0.85rem; resize: none; margin: 0;
     }
     .cc-textarea:focus { outline: none; }
     .mono { font-family: 'Fira Code', monospace; line-height: 1.4; }
+    
+    .code-editor-backdrop { position: absolute; inset: 0; padding: 1rem; color: #d4d4d4; white-space: pre-wrap; font-family: 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.4; overflow-y: hidden; overflow-x: hidden; pointer-events: none; word-wrap: normal; word-break: break-all; margin: 0; text-rendering: optimizeLegibility; }
+    .code-editor-front { position: absolute; inset: 0; padding: 1rem; color: transparent !important; background: transparent !important; caret-color: #fff; font-family: 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.4; border: none; outline: none; resize: none; word-wrap: normal; word-break: break-all; margin: 0; }
+    :host-context([data-theme="light"]) .code-editor-front { caret-color: #000; }
+    :host-context([data-theme="light"]) .code-editor-backdrop { color: #333; }
+
+    .status-pill-validation { display: inline-flex; align-items: center; font-size: 0.7rem; padding: 0.3rem 0.6rem; border-radius: 6px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+    .status-pill-validation.esperando { background: rgba(255, 204, 0, 0.1); color: #ffcc00; border: 1px solid rgba(255,204,0,0.2); }
+    .status-pill-validation.success { background: rgba(110, 175, 11, 0.1); color: var(--theme-brand-neon); border: 1px solid rgba(110,175,11,0.2); }
+    .status-pill-validation.error { background: rgba(255, 68, 68, 0.1); color: #ff4444; border: 1px solid rgba(255,68,68,0.2); }
+    :host-context([data-theme="light"]) .status-pill-validation.esperando { background: #fff8e1; color: #f57f17; border-color: #ffe082; }
+    :host-context([data-theme="light"]) .status-pill-validation.success { background: #f1f8e9; color: #5c9309; border-color: #c5e1a5; }
+    :host-context([data-theme="light"]) .status-pill-validation.error { background: #ffebee; color: #b71c1c; border-color: #ef9a9a; }
+
     
     .error-text { color: #ff4444; font-size: 0.75rem; text-align: center; margin-bottom: 1rem; font-weight: 600; }
     
@@ -1370,6 +1375,35 @@ export class CommandCenterComponent implements OnInit {
 
   onPayloadInput() {
     this.analyzePayload();
+  }
+
+  syncEditorScroll(e: Event) {
+    const front = e.target as HTMLElement;
+    const back = front.previousElementSibling as HTMLElement;
+    if (back && back.classList.contains('code-editor-backdrop')) {
+      back.scrollTop = front.scrollTop;
+      back.scrollLeft = front.scrollLeft;
+    }
+  }
+
+  get highlightedPayload() {
+    if (!this.temporaryUploadPayload) return '';
+    let html = this.temporaryUploadPayload.replace(/[<>&]/g, (c: string) => {
+       const m: any = { '<': '&lt;', '>': '&gt;', '&': '&amp;' };
+       return m[c];
+    });
+    // Syntax Highlight Colors (VS Code style)
+    html = html.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+      let color = '#b5cea8';
+      let fontStyle = 'normal';
+      if (/^"/.test(match)) {
+          if (/:$/.test(match)) { color = '#9cdcfe'; fontStyle = 'normal'; }
+          else { color = '#ce9178'; fontStyle = 'normal'; }
+      } else if (/true|false/.test(match)) { color = '#569cd6'; fontStyle = 'normal'; }
+      else if (/null/.test(match)) { color = '#c586c0'; fontStyle = 'italic'; }
+      return `<span style="color: ${color}; font-style: ${fontStyle};">${match}</span>`;
+    });
+    return html;
   }
 
   analyzePayload() {

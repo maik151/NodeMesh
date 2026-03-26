@@ -276,8 +276,8 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
         <div class="cc-modal compiler-modal card-glass shadow-bloom" style="width: 95%; max-width: 1300px; max-height: 90vh; overflow-y: auto; background: #131313; border-color: rgba(255,255,255,0.05);">
           
           <header class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1rem; margin-bottom: 1.5rem;">
-            <h3 style="color: var(--theme-brand-neon); display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M128,128a8,8,0,0,1-3,6.25l-40,32a8,8,0,1,1-10-12.5L107.19,128,75,102.25a8,8,0,1,1,10-12.5l40,32A8,8,0,0,1,128,128Zm48,24H136a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm56-96V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56ZM216,200V56H40V200H216Z"></path></svg>
+            <h3 style="color: var(--theme-brand-neon); display: flex; align-items: center; gap: 0.8rem; font-size: 1.6rem; font-weight: 900; letter-spacing: -1px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 256 256"><path d="M128,128a8,8,0,0,1-3,6.25l-40,32a8,8,0,1,1-10-12.5L107.19,128,75,102.25a8,8,0,1,1,10-12.5l40,32A8,8,0,0,1,128,128Zm48,24H136a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm56-96V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56ZM216,200V56H40V200H216Z"></path></svg>
               Compilador de PROMPT
             </h3>
             <button class="btn-close" (click)="showCompiler = false">×</button>
@@ -854,8 +854,8 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
 
     /* MODAL UI */
     .cc-input, .cc-select {
-      width: 100%; padding: 0.55rem 0.8rem; background: var(--theme-input-bg); border: 1px solid var(--theme-border);
-      border-radius: 8px; color: var(--theme-text); font-family: 'Inter', sans-serif; font-size: 0.85rem;
+      width: 100%; padding: 0.45rem 0.7rem; background: var(--theme-input-bg); border: 1px solid var(--theme-border);
+      border-radius: 6px; color: var(--theme-text); font-family: 'Inter', sans-serif; font-size: 0.8rem;
     }
     .cc-input:focus, .cc-select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 15px rgba(154, 205, 50, 0.1); }
     .modal-body label { font-size: 0.55rem; font-weight: 950; opacity: 0.6; letter-spacing: 1px; margin-bottom: 0.4rem; display: block; color: var(--theme-text); }
@@ -980,8 +980,8 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
 
     /* V2 COMPILER UI & TOGGLES */
     .compiler-modal .cc-label {
-      display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
-      font-weight: 800; color: var(--theme-text); margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; opacity: 1;
+      display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+      font-weight: 800; color: var(--theme-text); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 1px; opacity: 1;
     }
     
     .compiler-modal { padding: 3rem; box-sizing: border-box; overflow-x: hidden; background: #131313; border-color: rgba(255,255,255,0.05); }
@@ -1005,7 +1005,7 @@ import { DatabaseService } from '../../../../core/services/storage/database.serv
     }
     
     .custom-select-wrapper { position: relative; width: 100%; user-select: none; z-index: 10; }
-    .select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 0.8rem; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600; }
+    .select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0.7rem; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 600; }
     .select-trigger:hover, .select-trigger.active { border-color: var(--theme-brand-neon); }
     .select-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #1a1a1e; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; z-index: 1000; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
     :host-context([data-theme="light"]) .select-dropdown { background: #fff; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 10px 40px rgba(0,0,0,0.1); }

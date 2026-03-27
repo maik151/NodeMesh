@@ -171,13 +171,13 @@ import { NAV_ICONS } from '../../constants/icons.constants';
       
       display: block;
       height: 100vh;
+      width: 240px; /* Reduced from default */
       background: var(--sidebar-bg);
-      border-radius: 0 24px 24px 0;
+      border-radius: 0 20px 20px 0;
       position: relative;
       z-index: 1000;
-      transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
-                  background-color 0.4s ease,
-                  transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  background-color 0.3s ease;
     }
 
     :host-context([data-theme="light"]) {
@@ -186,8 +186,7 @@ import { NAV_ICONS } from '../../constants/icons.constants';
     }
 
     :host.collapsed {
-      width: 72px;
-      overflow: visible;
+      width: 68px;
     }
 
     /* ── MOBILE RESPONSIVENESS ──────────────────────── */
@@ -257,7 +256,7 @@ import { NAV_ICONS } from '../../constants/icons.constants';
       }
       
       .sidebar-wrapper {
-        padding-top: 5rem; /* Space for the toggle */
+        padding-top: 5rem;
       }
     }
 
@@ -265,23 +264,18 @@ import { NAV_ICONS } from '../../constants/icons.constants';
       display: flex;
       flex-direction: column;
       height: 100%;
-      padding: 1.5rem 1rem;
-    }
-
-    :host.collapsed .sidebar-wrapper {
-      padding: 1rem 0.6rem;
+      padding: 1.25rem 0.75rem;
     }
 
     .sidebar-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 1rem 1.25rem;
-      margin: 0 -1rem 1.25rem;
-      height: 52px;
+      padding: 0 0.75rem 1rem;
+      margin: 0 -0.75rem 1rem;
+      height: 48px;
       position: relative;
-      gap: 0.75rem;
-      z-index: 2;
+      gap: 0.5rem;
       border-bottom: 1px solid var(--border-color);
     }
 

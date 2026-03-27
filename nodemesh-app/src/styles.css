@@ -62,10 +62,21 @@
 
 /* Configuración global para el Look & Feel */
 @layer base {
+    html {
+        font-size: 15px;
+    }
+    *, *::before, *::after {
+        transition:
+            background-color 0.22s ease,
+            color 0.22s ease,
+            border-color 0.22s ease,
+            box-shadow 0.22s ease;
+    }
     body {
         @apply bg-void text-white font-mono antialiased;
         background: var(--theme-bg);
         color: var(--theme-text);
-        transition: background-color 0.3s ease, color 0.3s ease;
+        transition: none;
+        line-height: 1.65;
     }
 }

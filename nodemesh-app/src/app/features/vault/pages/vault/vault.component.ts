@@ -28,56 +28,17 @@ import { VaultSidebarComponent } from '../../components/vault-sidebar/vault-side
 
       <!-- MAIN CONTENT AREA -->
       <main class="vault-main scroll-custom">
-        <div class="workspace-centered" *ngIf="!isCreating && !selectedTheme">
+        <div class="workspace-centered" *ngIf="!selectedTheme">
            <div class="empty-hero">
-              <span class="material-symbols-rounded">folder_zip</span>
-              <h2>Bóveda de Conocimiento</h2>
-              <p>Selecciona un tema en el explorador para gestionar sus tests o crea un nuevo núcleo.</p>
-              <button class="btn-primary-neon" (click)="openCreator()">CREAR_NUEVO_NÚCLEO</button>
+              <svg class="hero-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                <!-- A+ Quiz Icon -->
+                <path d="M216,40H40A16,16,0,0,0,24,56V216a8,8,0,0,0,11.58,7.16L64,208.94l28.42,14.22a8,8,0,0,0,7.16,0L128,208.94l28.42,14.22a8,8,0,0,0,7.16,0L192,208.94l28.42,14.22A8,8,0,0,0,232,216V56A16,16,0,0,0,216,40Zm0,163.06-20.42-10.22a8,8,0,0,0-7.16,0L160,207.06l-28.42-14.22a8,8,0,0,0-7.16,0L96,207.06,67.58,192.84a8,8,0,0,0-7.16,0L40,203.06V56H216ZM60.42,167.16a8,8,0,0,0,10.74-3.58L76.94,152h38.12l5.78,11.58a8,8,0,1,0,14.32-7.16l-32-64a8,8,0,0,0-14.32,0l-32,64A8,8,0,0,0,60.42,167.16ZM96,113.89,107.06,136H84.94ZM136,128a8,8,0,0,1,8-8h16V104a8,8,0,0,1,16,0v16h16a8,8,0,0,1,0,16H176v16a8,8,0,0,1-16,0V136H144A8,8,0,0,1,136,128Z"/>
+              </svg>
+              <h2>Abre un Test para comenzar</h2>
            </div>
         </div>
 
-        <!-- FORMULARIO DE EDICIÓN/CREACIÓN -->
-        <div class="workspace-content" *ngIf="isCreating">
-           <header class="workspace-header">
-              <h3>REGISTRAR_NUEVO_TEMA</h3>
-              <button class="btn-close-ws" (click)="closeCreator()"><span class="material-symbols-rounded">close</span></button>
-           </header>
-
-           <div class="form-glass">
-              <div class="input-field">
-                 <label>NOMBRE_DEL_TEMA</label>
-                 <input type="text" [(ngModel)]="folderForm.nombre_tema" placeholder="Ej. Lógica de Programación">
-              </div>
-
-              <div class="grid-form">
-                 <div class="input-field">
-                    <label>COLOR_IDENTIFICADOR</label>
-                    <div class="color-picker-v2">
-                       <input type="color" [(ngModel)]="folderForm.color_tag">
-                       <span class="color-hex mono">{{ folderForm.color_tag }}</span>
-                    </div>
-                 </div>
-                 <div class="input-field">
-                    <label>NIVEL_REQUERIDO</label>
-                    <select [(ngModel)]="folderForm.nivel">
-                       <option value="Aprendiz">Aprendiz</option>
-                       <option value="Iniciado">Iniciado</option>
-                       <option value="Maestro">Maestro</option>
-                    </select>
-                 </div>
-              </div>
-
-              <div class="form-actions">
-                 <button class="btn-secondary" (click)="closeCreator()">CANCELAR</button>
-                 <button class="btn-primary-neon" (click)="saveFolder()" [disabled]="!folderForm.nombre_tema">
-                    CREAR_NÚCLEO
-                 </button>
-              </div>
-           </div>
-        </div>
-
-        <!-- DETALLES DEL TEMA SELECCIONADO (Opcional, si se quiere ver mas que solo el Sidebar) -->
+        <!-- DETALLES DEL TEMA SELECCIONADO (Opcional) -->
         <!-- Por ahora mantenemos la UI limpia enfocada en el CRUD de la Bóveda -->
       </main>
     </div>
@@ -86,14 +47,14 @@ import { VaultSidebarComponent } from '../../components/vault-sidebar/vault-side
     .vault-shell {
       display: flex;
       height: 100vh;
-      background: #0d1117;
-      color: #fff;
+      background: var(--theme-surface-solid);
+      color: var(--theme-text);
       overflow: hidden;
     }
 
     .vault-main {
       flex: 1;
-      background: #010409; /* VS Code Main Area */
+      background: var(--theme-bg-base); /* VS Code Main Area */
       position: relative;
       overflow-y: auto;
     }
@@ -107,14 +68,29 @@ import { VaultSidebarComponent } from '../../components/vault-sidebar/vault-side
     }
 
     .empty-hero {
-      max-width: 400px;
-      opacity: 0.6;
+      max-width: 600px;
+      opacity: 0.4;
       animation: fadeIn 0.5s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .empty-hero span { font-size: 4rem; color: var(--theme-brand-neon); margin-bottom: 1rem; }
-    .empty-hero h2 { font-weight: 800; font-size: 1.5rem; margin-bottom: 0.5rem; }
-    .empty-hero p { font-size: 0.85rem; line-height: 1.6; margin-bottom: 2rem; }
+    .hero-icon {
+      width: 180px;
+      height: 180px;
+      fill: var(--theme-text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .empty-hero h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      font-size: 2rem;
+      color: var(--theme-text-muted);
+      margin: 0;
+      letter-spacing: 1px;
+    }
 
     .workspace-content {
       padding: 3rem;
@@ -138,56 +114,10 @@ import { VaultSidebarComponent } from '../../components/vault-sidebar/vault-side
 
     .input-field { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
     .input-field label { font-size: 0.7rem; font-weight: 800; opacity: 0.4; letter-spacing: 1px; }
-    .input-field input, .input-field select {
-      background: #0d1117;
-      border: 1px solid #30363d;
-      padding: 1rem;
-      border-radius: 10px;
-      color: #fff;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.9rem;
-    }
-    .input-field input:focus { outline: none; border-color: var(--theme-brand-neon); box-shadow: 0 0 10px rgba(159, 255, 34, 0.1); }
-
-    .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-
-    .color-picker-v2 { display: flex; align-items: center; gap: 1rem; background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding-left: 0.75rem; }
-    .color-picker-v2 input[type="color"] { width: 40px; height: 40px; border: none; background: transparent; cursor: pointer; padding: 0; }
-    .color-hex { font-size: 0.8rem; opacity: 0.6; }
-
-    .form-actions { display: flex; justify-content: flex-end; gap: 1.5rem; margin-top: 1rem; }
-
-    .btn-primary-neon {
-      background: var(--theme-brand-neon);
-      color: #000;
-      border: none;
-      padding: 0.8rem 2rem;
-      border-radius: 10px;
-      font-weight: 800;
-      font-family: inherit;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .btn-primary-neon:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(159, 255, 34, 0.3); }
-    .btn-primary-neon:disabled { opacity: 0.3; cursor: not-allowed; }
-
-    .btn-secondary {
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.1);
-      color: #fff;
-      padding: 0.8rem 2rem;
-      border-radius: 10px;
-      font-family: inherit;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .btn-secondary:hover { background: rgba(255,255,255,0.05); }
-
     .btn-close-ws { background: transparent; border: none; color: #fff; opacity: 0.4; cursor: pointer; }
     .btn-close-ws:hover { opacity: 1; }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
     .scroll-custom::-webkit-scrollbar { width: 8px; }
     .scroll-custom::-webkit-scrollbar-track { background: transparent; }
@@ -206,21 +136,10 @@ export class VaultComponent implements OnInit {
   selectedTheme: FolderTheme | null = null;
   selectedQuiz: QuizSession | null = null;
 
-  // CRUD State
-  isCreating = false;
-  folderForm: Partial<FolderTheme> = this.resetForm();
   isLoadingData = true;
 
   async ngOnInit() {
     await this.loadData();
-  }
-
-  resetForm(): Partial<FolderTheme> {
-    return {
-      nombre_tema: '',
-      color_tag: '#9FFF22',
-      nivel: 'Aprendiz'
-    };
   }
 
   async loadData() {
@@ -237,28 +156,6 @@ export class VaultComponent implements OnInit {
 
     this.isLoadingData = false;
     this.cdr.detectChanges(); // Force angular to update after async task
-  }
-
-  openCreator() {
-    this.isCreating = true;
-    this.folderForm = this.resetForm();
-    this.selectedTheme = null;
-  }
-
-  closeCreator() {
-    this.isCreating = false;
-  }
-
-  async saveFolder() {
-    const folder: FolderTheme = {
-      ...this.folderForm,
-      folder_id: crypto.randomUUID(),
-      creado_en: new Date().toISOString()
-    } as FolderTheme;
-
-    await this.db.saveFolder(folder);
-    await this.loadData();
-    this.closeCreator();
   }
 
   async createInlineTheme(data: {nombre_tema: string, color_tag: string}) {

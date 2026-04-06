@@ -157,12 +157,60 @@ export class DatabaseService {
 
     async getRecentFolders(limit: number = 3): Promise<FolderTheme[]> {
         if (!this.db) throw new Error('Database not initialized');
-        // Ordenar por creado_en descendente (asumiendo que es la fecha de última actividad o creación relevante)
         return await this.db.table('folders')
             .orderBy('creado_en')
             .reverse()
             .limit(limit)
             .toArray();
+    }
+
+    async saveQuiz(quiz: QuizSession): Promise<void> {
+        if (!this.db) throw new Error('Database not initialized');
+        await this.db.table('quizzes').put(quiz);
+    }
+
+    async getQuizzesByFolder(folder_id: string): Promise<QuizSession[]> {
+        if (!this.db) throw new Error('Database not initialized');
+        return await this.db.table('quizzes').where('folder_id').equals(folder_id).toArray();
+    }
+
+    async getAllFolders(): Promise<FolderTheme[]> {
+        if (!this.db) throw new Error('Database not initialized');
+        return await this.db.table('folders').reverse().toArray();
+    }
+
+    async deleteFolder(folderId: string): Promise<void> {
+        if (!this.db) throw new Error('Database not initialized');
+        
+        await this.db.transaction('rw', [this.db.table('folders'), this.db.table('quizzes'), this.db.table('nodes')], async () => {
+             // 1. Get all quizzes in this folder
+             const quizzes = await this.db.table('quizzes').where('folder_id').equals(folderId).toArray();
+             const quizIds = quizzes.map(q => q.quiz_id);
+
+             // 2. Delete all nodes in those quizzes
+             if (quizIds.length > 0) {
+                 await this.db.table('nodes').where('quiz_id').anyOf(quizIds).delete();
+             }
+
+             // 3. Delete all quizzes in the folder
+             await this.db.table('quizzes').where('folder_id').equals(folderId).delete();
+
+             // 4. Finally delete the folder
+             await this.db.table('folders').where('folder_id').equals(folderId).delete();
+        });
+    }
+
+    async deleteQuiz(quiz_id: string): Promise<void> {
+        if (!this.db) throw new Error('Database not initialized');
+        await this.db.transaction('rw', [this.db.table('quizzes'), this.db.table('nodes')], async () => {
+          await this.db.table('quizzes').where('quiz_id').equals(quiz_id).delete();
+          await this.db.table('nodes').where('quiz_id').equals(quiz_id).delete();
+        });
+    }
+
+    async getNodesInQuiz(quiz_id: string): Promise<NodeChallenge[]> {
+        if (!this.db) throw new Error('Database not initialized');
+        return await this.db.table('nodes').where('quiz_id').equals(quiz_id).toArray();
     }
 
     async getMasteryRatio(): Promise<number> {

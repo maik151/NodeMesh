@@ -35,7 +35,7 @@ Reresponde SOLO con un array JSON válido. Cada objeto DEBE seguir este esquema:
   "opciones": ["A", "B", "C", "D"] o null si no aplica,
   "respuesta_esperada": "string" o ["array", "de", "strings"],
   "justificacion_correcta": "Retroalimentación positiva detallada",
-  "justificacion_incorrecta": "Análisis del error y por qué falló"
+  "justificacion_incorrecta": "Análisis del error y por qué falló"  
 }
 
 - "requiere_ia" es true solo para los tipos 6, 7, 8 y 9.

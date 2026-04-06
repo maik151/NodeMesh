@@ -118,7 +118,7 @@ import { FolderTheme } from '../../../../core/models/node.model';
         <footer class="modal-footer" style="justify-content: flex-end; margin-top: 1.25rem;">
           <button class="btn-text-upload" [disabled]="!uploadStats.isValid || !uploadConfig.themeName || !uploadConfig.quizTitle" (click)="confirmUpload()">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z"></path></svg>
-            Inyectar a la Bóveda
+            Cargar Test
           </button>
         </footer>
       </div>
@@ -307,12 +307,13 @@ export class TestUploadComponent implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
 
   @Input() payload = '';
+  @Input() initialTheme?: FolderTheme;
   @Output() onCancel = new EventEmitter<void>();
   @Output() onUploadSuccess = new EventEmitter<string>();
 
   uploadConfig = { themeName: '', themeId: '', quizTitle: '' };
   uploadStats = { nodeCount: 0, isValid: false, errorMessage: '', charCount: 0, uniqueTypes: 0, schemaErrors: 0 };
-  
+
   availableThemes: FolderTheme[] = [];
   filteredThemes: FolderTheme[] = [];
   showThemeDropdown = false;
@@ -320,6 +321,12 @@ export class TestUploadComponent implements OnInit {
   async ngOnInit() {
     this.availableThemes = await this.db.getRecentFolders(100);
     this.filteredThemes = [...this.availableThemes];
+
+    if (this.initialTheme) {
+      this.uploadConfig.themeName = this.initialTheme.nombre_tema;
+      this.uploadConfig.themeId = this.initialTheme.folder_id;
+    }
+
     if (this.payload) this.analyzePayload();
   }
 
@@ -329,7 +336,7 @@ export class TestUploadComponent implements OnInit {
     this.uploadStats.isValid = false;
     this.uploadStats.errorMessage = '';
     this.uploadStats.charCount = this.payload.length;
-    
+
     if (!this.payload.trim()) {
       this.uploadStats.errorMessage = 'El payload está vacío.';
       return;
@@ -337,7 +344,7 @@ export class TestUploadComponent implements OnInit {
 
     try {
       const parsed = JSON.parse(this.payload);
-      
+
       // 1. EXTRAER METADATA (Auto-fill)
       const meta = parsed.metadata || {};
       const folder = parsed.folder || {};
@@ -347,47 +354,47 @@ export class TestUploadComponent implements OnInit {
         this.uploadConfig.quizTitle = meta.titulo_quiz;
       }
       if (folder.nombre_tema && !this.uploadConfig.themeName) {
-         this.uploadConfig.themeName = folder.nombre_tema;
-         this.uploadConfig.themeId = folder.folder_id || '';
+        this.uploadConfig.themeName = folder.nombre_tema;
+        this.uploadConfig.themeId = folder.folder_id || '';
       }
 
       // 2. VALIDACIÓN XSS (Permitir snippets técnicos en payloads firmados)
       if (!isSigned) {
         const HighRiskXSS = /<script\b[^>]*>([\s\S]*?)<\/script>|javascript:|onerror\s*=|onload\s*=/gi;
         if (HighRiskXSS.test(this.payload)) {
-            this.uploadStats.errorMessage = 'ALERTA SEGURIDAD: XSS Detectado.';
-            return;
+          this.uploadStats.errorMessage = 'ALERTA SEGURIDAD: XSS Detectado.';
+          return;
         }
       }
 
       // 3. DETECTAR NODOS
       const nodes = Array.isArray(parsed) ? parsed : (parsed.nodos || parsed.nodes || []);
       if (!Array.isArray(nodes) || nodes.length === 0) {
-         this.uploadStats.isValid = false;
-         this.uploadStats.errorMessage = 'No se detectó un flujo de nodos válido.';
-         return;
+        this.uploadStats.isValid = false;
+        this.uploadStats.errorMessage = 'No se detectó un flujo de nodos válido.';
+        return;
       }
-      
+
       let nodeErrors: string[] = [];
       const types = new Set<string>();
-      
+
       nodes.forEach((n: any, idx: number) => {
-         if (typeof n !== 'object' || n === null) { nodeErrors.push(`Nodo[${idx}]: No es objeto`); return; }
-         const hasContent = !!(n.pregunta || n.contexto || n.pregunta_cloze || n.pregunta_ordering);
-         const hasAnswer = !!(n.respuesta_esperada || n.respuesta_correcta || n.opciones || n.matriz_correcta);
-         if (!hasContent) nodeErrors.push(`Nodo[${idx}]: Falta pregunta/contexto`);
-         else if (!hasAnswer) nodeErrors.push(`Nodo[${idx}]: Falta respuesta/opciones`);
-         if (n.tipo_reto) types.add(n.tipo_reto);
+        if (typeof n !== 'object' || n === null) { nodeErrors.push(`Nodo[${idx}]: No es objeto`); return; }
+        const hasContent = !!(n.pregunta || n.contexto || n.pregunta_cloze || n.pregunta_ordering);
+        const hasAnswer = !!(n.respuesta_esperada || n.respuesta_correcta || n.opciones || n.matriz_correcta);
+        if (!hasContent) nodeErrors.push(`Nodo[${idx}]: Falta pregunta/contexto`);
+        else if (!hasAnswer) nodeErrors.push(`Nodo[${idx}]: Falta respuesta/opciones`);
+        if (n.tipo_reto) types.add(n.tipo_reto);
       });
-      
+
       this.uploadStats.uniqueTypes = types.size;
       this.uploadStats.schemaErrors = nodeErrors.length;
       this.uploadStats.nodeCount = nodes.length;
 
       if (nodeErrors.length > 0) {
-         this.uploadStats.isValid = nodeErrors.length < nodes.length; // Permitir carga parcial solo si hay mayoría válida
-         this.uploadStats.errorMessage = `${nodeErrors.length} errores: ${nodeErrors[0]}${nodeErrors.length > 1 ? '...' : ''}`;
-         if (nodeErrors.length === nodes.length) return;
+        this.uploadStats.isValid = nodeErrors.length < nodes.length; // Permitir carga parcial solo si hay mayoría válida
+        this.uploadStats.errorMessage = `${nodeErrors.length} errores: ${nodeErrors[0]}${nodeErrors.length > 1 ? '...' : ''}`;
+        if (nodeErrors.length === nodes.length) return;
       }
 
       this.uploadStats.isValid = true;
@@ -408,18 +415,18 @@ export class TestUploadComponent implements OnInit {
   }
 
   get highlightedPayload(): string {
-     if (!this.payload) return '';
-     return this.payload
-       .replace(/&/g, '&amp;')
-       .replace(/</g, '&lt;')
-       .replace(/>/g, '&gt;')
-       .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, (match) => {
-         let color = '#ce9178';
-         if (match.endsWith(':')) color = '#9cdcfe';
-         else if (/true|false/.test(match)) color = '#569cd6';
-         else if (/null/.test(match)) color = '#c586c0';
-         return `<span style="color: ${color};">${match}</span>`;
-       });
+    if (!this.payload) return '';
+    return this.payload
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, (match) => {
+        let color = '#ce9178';
+        if (match.endsWith(':')) color = '#9cdcfe';
+        else if (/true|false/.test(match)) color = '#569cd6';
+        else if (/null/.test(match)) color = '#c586c0';
+        return `<span style="color: ${color};">${match}</span>`;
+      });
   }
 
   syncEditorScroll(e: Event) {
@@ -448,7 +455,7 @@ export class TestUploadComponent implements OnInit {
       const parsed = JSON.parse(this.payload);
       this.payload = JSON.stringify(parsed, null, 2);
       this.analyzePayload(); // Re-analizar después de formatear
-    } catch {}
+    } catch { }
     this.cdr.detectChanges();
   }
 
@@ -458,7 +465,7 @@ export class TestUploadComponent implements OnInit {
       if (!text) return;
 
       // Si ya es JSON válido, no tocar nada
-      try { JSON.parse(text); return; } catch {}
+      try { JSON.parse(text); return; } catch { }
 
       const firstBrace = text.indexOf('{');
       const firstBracket = text.indexOf('[');
@@ -466,17 +473,17 @@ export class TestUploadComponent implements OnInit {
       const lastBracket = text.lastIndexOf(']');
       let firstCharIndex = -1;
       let lastCharIndex = -1;
-      
+
       if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) { firstCharIndex = firstBrace; lastCharIndex = lastBrace; }
       else if (firstBracket !== -1) { firstCharIndex = firstBracket; lastCharIndex = lastBracket; }
-      
-      if (firstCharIndex !== -1 && lastCharIndex !== -1 && lastCharIndex > firstCharIndex) { 
-        text = text.substring(firstCharIndex, lastCharIndex + 1); 
+
+      if (firstCharIndex !== -1 && lastCharIndex !== -1 && lastCharIndex > firstCharIndex) {
+        text = text.substring(firstCharIndex, lastCharIndex + 1);
       }
-      
+
       text = text.replace(/,(?=\s*[}\]])/g, '');
       text = text.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
-      
+
       JSON.parse(text);
       this.payload = text;
       this.analyzePayload();
@@ -489,36 +496,47 @@ export class TestUploadComponent implements OnInit {
     if (!this.uploadStats.isValid) return;
     const parsed = JSON.parse(this.payload);
     const folder = parsed.folder || {};
-    
+
     let fId = this.uploadConfig.themeId || folder.folder_id;
     if (!fId) {
-       fId = crypto.randomUUID();
-       await this.db.saveFolder({ 
-         folder_id: fId, 
-         nombre_tema: this.uploadConfig.themeName, 
-         color_tag: folder.color_tag || '#9ACD32', 
-         creado_en: new Date().toISOString() 
-       });
+      fId = crypto.randomUUID();
+      await this.db.saveFolder({
+        folder_id: fId,
+        nombre_tema: this.uploadConfig.themeName,
+        color_tag: folder.color_tag || '#9ACD32',
+        creado_en: new Date().toISOString()
+      });
     } else {
-       const existing = await this.db.getNodesBySource(fId); // Fallback probe to see if folder exists effectively
-       await this.db.saveFolder({ 
-         folder_id: fId, 
-         nombre_tema: this.uploadConfig.themeName, 
-         color_tag: folder.color_tag || '#9ACD32', 
-         creado_en: new Date().toISOString() 
-       });
+      const existing = await this.db.getNodesBySource(fId); // Fallback probe to see if folder exists effectively
+      await this.db.saveFolder({
+        folder_id: fId,
+        nombre_tema: this.uploadConfig.themeName,
+        color_tag: folder.color_tag || '#9ACD32',
+        creado_en: new Date().toISOString()
+      });
     }
 
     const nodesRaw = Array.isArray(parsed) ? parsed : (parsed.nodos || parsed.nodes);
     const quizId = parsed.metadata?.quiz_id || crypto.randomUUID();
+    const quizTitle = this.uploadConfig.quizTitle || parsed.metadata?.titulo_quiz || 'Imported Quiz';
 
-    const nodesToSave = nodesRaw.map((n: any) => ({ 
-      ...n, 
-      id_temp: n.id_temp || crypto.randomUUID(), 
-      folder_id: fId, 
+    // Guardar Metadata del Quiz
+    await this.db.saveQuiz({
       quiz_id: quizId,
-      nextReviewDate: new Date(), 
-      createdAt: new Date() 
+      folder_id: fId,
+      titulo_quiz: quizTitle,
+      dificultad_global: 'Aprendiz',
+      estadisticas_globales: { intentos: 0, ultimo_score_porcentaje: null },
+      creado_en: new Date()
+    });
+
+    const nodesToSave = nodesRaw.map((n: any) => ({
+      ...n,
+      id_temp: n.id_temp || crypto.randomUUID(),
+      folder_id: fId,
+      quiz_id: quizId,
+      nextReviewDate: new Date(),
+      createdAt: new Date()
     }));
 
     await this.db.saveNodes(nodesToSave);

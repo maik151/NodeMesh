@@ -47,4 +47,5 @@ export interface QuizSession {
         intentos: number;
         ultimo_score_porcentaje: number | null;
     };
+    creado_en?: Date;
 }

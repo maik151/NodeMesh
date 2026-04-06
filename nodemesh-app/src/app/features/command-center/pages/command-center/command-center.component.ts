@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ThemeService } from '../../../../core/services/ui/theme.service';
 import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass/liquid-glass.component';
-import { NAV_ICONS } from '../../../../shared/constants/icons.constants';
 import { Router } from '@angular/router';
 import { DatabaseService } from '../../../../core/services/storage/database.service';
 import { TestUploadComponent } from '../../components/test-upload/test-upload.component';
@@ -18,13 +17,14 @@ import { PromptCompilerComponent } from '../../components/prompt-compiler/prompt
       <header class="cc-header">
         <div class="header-left">
           <div style="display: flex; align-items: center; gap: 0.6rem;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256" style="color: var(--theme-brand-neon); flex-shrink:0;"><path d="M128,128a12,12,0,0,1-4.5,9.37l-40,32a12,12,0,1,1-15-18.75L100.28,128,68.5,102.62a12,12,0,1,1,15-18.75l40,32A12,12,0,0,1,128,128Zm60,12H136a12,12,0,0,0,0,24h52a12,12,0,0,0,0-24Zm44-100V216a20,20,0,0,1-20,20H44a20,20,0,0,1-20-20V40A20,20,0,0,1,44,20H212A20,20,0,0,1,232,40ZM208,212V44H48V212H208Z"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256" style="color: var(--theme-text); flex-shrink:0;"><path d="M128,128a12,12,0,0,1-4.5,9.37l-40,32a12,12,0,1,1-15-18.75L100.28,128,68.5,102.62a12,12,0,1,1,15-18.75l40,32A12,12,0,0,1,128,128Zm60,12H136a12,12,0,0,0,0,24h52a12,12,0,0,0,0-24Zm44-100V216a20,20,0,0,1-20,20H44a20,20,0,0,1-20-20V40A20,20,0,0,1,44,20H212A20,20,0,0,1,232,40ZM208,212V44H48V212H208Z"></path></svg>
             <h1 class="cc-title">Command Center</h1>
           </div>
           <div class="header-meta">
             <p class="cc-subtitle">Orquesta tu Flujo Cognitivo</p>
           </div>
         </div>
+
       </header>
 
       <div class="cc-grid">
@@ -165,7 +165,7 @@ import { PromptCompilerComponent } from '../../components/prompt-compiler/prompt
       <app-test-upload 
         *ngIf="showUploadModal" 
         [payload]="temporaryUploadPayload"
-        (onCancel)="showUploadModal = false"
+        (onCancel)="closeUploadModal()"
         (onUploadSuccess)="onUploadFinished($event)">
       </app-test-upload>
 
@@ -196,9 +196,20 @@ import { PromptCompilerComponent } from '../../components/prompt-compiler/prompt
     :host-context([data-theme="light"]) { --glass-fill: rgba(255, 255, 255, 0.15); --glass-fill-accent: rgba(154, 205, 50, 0.08); }
     .command-center-container { padding: 2rem 2rem 1rem; max-width: 1500px; margin: 0; }
     .cc-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; }
-    .cc-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.5px; margin: 0; line-height: 1; color: var(--theme-brand-neon); }
-    .header-meta { display: flex; align-items: center; gap: 1rem; margin-top: 0.4rem; }
-    .cc-subtitle { font-size: 0.85rem; opacity: 0.5; margin: 0; }
+    .cc-title { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.03em; margin: 0; line-height: 1; color: var(--theme-text); }
+    .header-meta { display: flex; align-items: center; gap: 1rem; margin-top: 0.25rem; }
+    .cc-subtitle { font-size: 0.85rem; opacity: 0.85; margin: 0; }
+    
+    .cc-tabs { display: flex; gap: 0.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 4px; border-radius: 12px; }
+    .nav-btn { 
+      background: transparent; border: none; color: var(--theme-text-secondary); 
+      padding: 0.6rem 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.6rem; 
+      font-family: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s; opacity: 0.7;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.05); opacity: 1; }
+    .nav-btn.active { background: rgba(159, 255, 34, 0.1); color: var(--theme-brand-neon); border: 1px solid rgba(159, 255, 34, 0.2); opacity: 1; }
+    .nav-btn .material-symbols-rounded { font-size: 1.25rem; }
+
     .status-pill { background: var(--theme-border); padding: 0.3rem 0.6rem; border-radius: 6px; display: flex; align-items: center; gap: 0.5rem; font-size: 0.6rem; font-weight: 800; border: 1px solid rgba(255,255,255,0.05); }
     .cc-grid { display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: minmax(50px, auto); gap: 10px; }
     .span-12 { grid-column: span 12; } .span-8 { grid-column: span 8; } .span-6 { grid-column: span 6; } .span-4 { grid-column: span 4; } .span-3 { grid-column: span 3; }
@@ -440,4 +451,8 @@ export class CommandCenterComponent implements OnInit {
 
   startInterleaving() { this.router.navigate(['/simulator'], { queryParams: { interleaving: 'true' } }); }
   startSprint(folderId: string) { this.router.navigate(['/simulator'], { queryParams: { folder: folderId } }); }
+
+  closeUploadModal() {
+    this.showUploadModal = false;
+  }
 }

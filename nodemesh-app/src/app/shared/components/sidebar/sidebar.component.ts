@@ -171,12 +171,14 @@ import { NAV_ICONS } from '../../constants/icons.constants';
       
       display: block;
       height: 100vh;
-      width: 240px; /* Reduced from default */
+      width: 240px;
       background: var(--sidebar-bg);
-      border-radius: 0 20px 20px 0;
+      border-radius: 0;
+      border-right: 1px solid var(--border-color);
+      overflow: hidden;
       position: relative;
       z-index: 1000;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
                   background-color 0.3s ease;
     }
 

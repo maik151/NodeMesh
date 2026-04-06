@@ -17,9 +17,9 @@ import { VaultSidebarComponent } from '../../components/vault-sidebar/vault-side
         [folders]="allFolders"
         [quizzesByFolder]="folderQuizzes"
         [activeThemeId]="selectedTheme?.folder_id || null"
-        (onNewTheme)="openCreator()"
+        (onCreateTheme)="createInlineTheme($event)"
+        (onUpdateTheme)="updateInlineTheme($event)"
         (onRefresh)="loadData()"
-        (onEditTheme)="editFolder($event)"
         (onDeleteTheme)="confirmDeleteFolder($event)"
         (onSelectQuiz)="playQuiz($event)"
         (onDeleteQuiz)="deleteQuiz($event)">
@@ -27,7 +27,7 @@ import { VaultSidebarComponent } from '../../components/vault-sidebar/vault-side
 
       <!-- MAIN CONTENT AREA -->
       <main class="vault-main scroll-custom">
-        <div class="workspace-centered" *ngIf="!isCreating && !editingFolder && !selectedTheme">
+        <div class="workspace-centered" *ngIf="!isCreating && !selectedTheme">
            <div class="empty-hero">
               <span class="material-symbols-rounded">folder_zip</span>
               <h2>Bóveda de Conocimiento</h2>
@@ -37,9 +37,9 @@ import { VaultSidebarComponent } from '../../components/vault-sidebar/vault-side
         </div>
 
         <!-- FORMULARIO DE EDICIÓN/CREACIÓN -->
-        <div class="workspace-content" *ngIf="isCreating || editingFolder">
+        <div class="workspace-content" *ngIf="isCreating">
            <header class="workspace-header">
-              <h3>{{ editingFolder ? 'MODIFICAR_NÚCLEO' : 'REGISTRAR_NUEVO_TEMA' }}</h3>
+              <h3>REGISTRAR_NUEVO_TEMA</h3>
               <button class="btn-close-ws" (click)="closeCreator()"><span class="material-symbols-rounded">close</span></button>
            </header>
 
@@ -70,7 +70,7 @@ import { VaultSidebarComponent } from '../../components/vault-sidebar/vault-side
               <div class="form-actions">
                  <button class="btn-secondary" (click)="closeCreator()">CANCELAR</button>
                  <button class="btn-primary-neon" (click)="saveFolder()" [disabled]="!folderForm.nombre_tema">
-                    {{ editingFolder ? 'ACTUALIZAR_DATOS' : 'CREAR_NÚCLEO' }}
+                    CREAR_NÚCLEO
                  </button>
               </div>
            </div>
@@ -206,7 +206,6 @@ export class VaultComponent implements OnInit {
 
   // CRUD State
   isCreating = false;
-  editingFolder: FolderTheme | null = null;
   folderForm: Partial<FolderTheme> = this.resetForm();
 
   async ngOnInit() {
@@ -230,33 +229,42 @@ export class VaultComponent implements OnInit {
 
   openCreator() {
     this.isCreating = true;
-    this.editingFolder = null;
     this.folderForm = this.resetForm();
     this.selectedTheme = null;
   }
 
-  editFolder(folder: FolderTheme) {
-    this.editingFolder = folder;
-    this.isCreating = false;
-    this.folderForm = { ...folder };
-    this.selectedTheme = folder;
-  }
-
   closeCreator() {
     this.isCreating = false;
-    this.editingFolder = null;
   }
 
   async saveFolder() {
     const folder: FolderTheme = {
       ...this.folderForm,
-      folder_id: this.editingFolder?.folder_id || crypto.randomUUID(),
-      creado_en: this.editingFolder?.creado_en || new Date()
+      folder_id: crypto.randomUUID(),
+      creado_en: new Date().toISOString()
     } as FolderTheme;
 
     await this.db.saveFolder(folder);
     await this.loadData();
     this.closeCreator();
+  }
+
+  async createInlineTheme(data: {nombre_tema: string, color_tag: string}) {
+    const folder: FolderTheme = {
+      nombre_tema: data.nombre_tema,
+      color_tag: data.color_tag,
+      nivel: 'Aprendiz',
+      folder_id: crypto.randomUUID(),
+      creado_en: new Date().toISOString()
+    } as FolderTheme;
+
+    await this.db.saveFolder(folder);
+    await this.loadData();
+  }
+
+  async updateInlineTheme(folder: FolderTheme) {
+    await this.db.saveFolder(folder);
+    await this.loadData();
   }
 
   async confirmDeleteFolder(folder: FolderTheme) {

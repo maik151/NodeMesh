@@ -27,14 +27,23 @@ import { FolderTheme } from '../../../../core/models/node.model';
             <div class="input-group" style="position: relative;">
               <label class="cc-label">Tema:</label>
               <div style="position: relative; display: flex; align-items: center;">
-                 <input type="text" [(ngModel)]="uploadConfig.themeName" (input)="filterThemes()" (focus)="showThemeDropdown = true" (blur)="hideThemeDropdownDelay()" placeholder="Nombre del Tema / Carpeta..." class="cc-input" style="width: 100%; border-radius: 8px; padding-right: 3.5rem;">
+                 <input type="text" [(ngModel)]="uploadConfig.themeName" (input)="filterThemes()" (focus)="onFocusTheme()" (blur)="hideThemeDropdownDelay()" placeholder="Nombre del Tema / Carpeta..." class="cc-input" style="width: 100%; border-radius: 8px; padding-right: 3.5rem;">
                  <svg style="position: absolute; right: 16px; opacity: 0.6; color: var(--theme-brand-neon);" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
               </div>
               
-              <div class="theme-dropdown card-glass shadow-bloom" *ngIf="showThemeDropdown && filteredThemes.length > 0">
-                 <div class="theme-option" *ngFor="let theme of filteredThemes" (click)="selectTheme(theme)">
-                    <span class="theme-dot" [style.background]="theme.color_tag"></span>
-                    <span class="theme-name">{{ theme.nombre_tema }}</span>
+              <div class="theme-dropdown card-glass shadow-bloom" *ngIf="showThemeDropdown">
+                 <div *ngIf="isLoadingThemes" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; opacity: 0.6;">
+                    <svg class="dropdown-spinner" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="var(--theme-brand-neon)" viewBox="0 0 256 256"><path d="M224,128a96,96,0,0,1-94.71,96H128A95.38,95.38,0,0,1,62.1,194.22a8,8,0,1,1,11.53-11.06A79.45,79.45,0,0,0,128,208h1.29A80,80,0,0,0,208,128c0-42.34-33-77.49-74.83-79.85V72a8,8,0,0,1-13.66,5.66l-24-24a8,8,0,0,1,0-11.32l24-24A8,8,0,0,1,136,24V48.16C185.34,50.64,224,91,224,128ZM164,103.31l-32-32a8,8,0,0,0-11.32,11.32L147.31,108,120.69,134.63a8,8,0,0,0,11.32,11.32l32-32A8,8,0,0,0,164,103.31Z"/></svg>
+                    <span style="font-size: 0.7rem; margin-top: 0.5rem; margin-bottom: 0px; font-weight: 700; font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">Cargando Bóveda...</span>
+                 </div>
+                 <ng-container *ngIf="!isLoadingThemes && filteredThemes.length > 0">
+                    <div class="theme-option" *ngFor="let theme of filteredThemes" (click)="selectTheme(theme)">
+                       <span class="theme-dot" [style.background]="theme.color_tag"></span>
+                       <span class="theme-name">{{ theme.nombre_tema }}</span>
+                    </div>
+                 </ng-container>
+                 <div *ngIf="!isLoadingThemes && filteredThemes.length === 0" style="padding: 1rem; text-align: center; opacity: 0.5; font-size: 0.8rem; font-style: italic;">
+                    No hay temas guardados...
                  </div>
               </div>
             </div>
@@ -144,6 +153,8 @@ import { FolderTheme } from '../../../../core/models/node.model';
     .cc-input { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: var(--theme-text); padding: 0.6rem 0.8rem; font-family: inherit; font-size: 0.85rem; transition: all 0.2s; box-sizing: border-box; }
     .cc-input:focus { outline: none; border-color: var(--theme-brand-neon); background: rgba(159, 255, 34, 0.05); }
     .theme-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; z-index: 50; max-height: 200px; overflow-y: auto; background: #151515; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 0.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .dropdown-spinner { animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .theme-option { display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 0.8rem; border-radius: 8px; cursor: pointer; transition: 0.2s; }
     .theme-option:hover { background: rgba(255,255,255,0.05); }
     .theme-dot { width: 10px; height: 10px; border-radius: 50%; }
@@ -317,6 +328,8 @@ export class TestUploadComponent implements OnInit {
   availableThemes: FolderTheme[] = [];
   filteredThemes: FolderTheme[] = [];
   showThemeDropdown = false;
+  isLoadingThemes = false;
+  themesLoadedOnce = false;
 
   async ngOnInit() {
     this.availableThemes = await this.db.getRecentFolders(100);
@@ -439,6 +452,24 @@ export class TestUploadComponent implements OnInit {
     this.showThemeDropdown = true;
     const q = this.uploadConfig.themeName.toLowerCase();
     this.filteredThemes = this.availableThemes.filter(t => t.nombre_tema.toLowerCase().includes(q));
+  }
+
+  async onFocusTheme() {
+    this.showThemeDropdown = true;
+    if (!this.themesLoadedOnce || this.availableThemes.length === 0) {
+      this.isLoadingThemes = true;
+      this.cdr.detectChanges();
+      
+      this.availableThemes = await this.db.getRecentFolders(100);
+      this.filteredThemes = [...this.availableThemes];
+      
+      // Artificial delay for UX perception
+      await new Promise(resolve => setTimeout(resolve, 600));
+      
+      this.isLoadingThemes = false;
+      this.themesLoadedOnce = true;
+      this.cdr.detectChanges();
+    }
   }
 
   hideThemeDropdownDelay() { setTimeout(() => this.showThemeDropdown = false, 200); }

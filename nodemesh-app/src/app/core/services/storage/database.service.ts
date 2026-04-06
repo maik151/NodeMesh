@@ -175,7 +175,8 @@ export class DatabaseService {
 
     async getAllFolders(): Promise<FolderTheme[]> {
         if (!this.db) throw new Error('Database not initialized');
-        return await this.db.table('folders').reverse().toArray();
+        const folders = await this.db.table('folders').toArray();
+        return folders.sort((a, b) => new Date(b.creado_en).getTime() - new Date(a.creado_en).getTime());
     }
 
     async deleteFolder(folderId: string): Promise<void> {

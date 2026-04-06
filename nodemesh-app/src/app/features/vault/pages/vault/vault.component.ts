@@ -154,18 +154,22 @@ export class VaultComponent implements OnInit {
 
   async loadData() {
     this.isLoadingData = true;
-    this.cdr.markForCheck(); // In case we use OnPush, mark for check
+    this.cdr.detectChanges(); // Force angular to show loading state
 
-    this.allFolders = await this.db.getAllFolders();
-    for (const f of this.allFolders) {
-      this.folderQuizzes[f.folder_id] = await this.db.getQuizzesByFolder(f.folder_id);
+    try {
+      this.allFolders = await this.db.getAllFolders();
+      for (const f of this.allFolders) {
+        this.folderQuizzes[f.folder_id] = await this.db.getQuizzesByFolder(f.folder_id);
+      }
+      
+      // Retraso artificial para que la animación de "Sincronizando Bóveda" se aprecie
+      await new Promise(resolve => setTimeout(resolve, 800));
+    } catch (err) {
+      console.error('[Vault] Error loading data:', err);
+    } finally {
+      this.isLoadingData = false;
+      this.cdr.detectChanges(); // Force angular to update after async task
     }
-    
-    // Retraso artificial para que la animación de "Sincronizando Bóveda" se aprecie
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    this.isLoadingData = false;
-    this.cdr.detectChanges(); // Force angular to update after async task
   }
 
   async createInlineTheme(data: {nombre_tema: string, color_tag: string}) {

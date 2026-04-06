@@ -94,11 +94,11 @@ import { VaultSidebarComponent } from '../../components/vault-sidebar/vault-side
     }
 
     .empty-hero p {
-      font-size: 0.95rem;
+      font-size: 1.1rem;
       color: var(--theme-text-muted);
-      opacity: 0.6;
+      opacity: 0.8;
       margin-top: 1.5rem;
-      max-width: 450px;
+      max-width: 550px;
       line-height: 1.6;
     }
 

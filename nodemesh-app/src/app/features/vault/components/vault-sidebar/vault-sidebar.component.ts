@@ -64,8 +64,17 @@ import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
 
       <!-- TREE EXPLORER -->
       <div class="v-tree scroll-custom">
-        <!-- INLINE CREATE ROW -->
-        <div class="tree-row inline-create-row" *ngIf="isCreatingTheme">
+        <!-- Opcional: estado de carga general sobre el sidebar -->
+        <div class="global-loading" *ngIf="isLoading && !isCollapsed">
+          <svg class="loading-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+             <path d="M88,104H40a8,8,0,0,1-8-8V48a8,8,0,0,1,16,0V76.69L62.63,62.06A95.43,95.43,0,0,1,130,33.94h.53a95.36,95.36,0,0,1,67.07,27.33,8,8,0,0,1-11.18,11.44,79.52,79.52,0,0,0-55.89-22.77h-.45A79.56,79.56,0,0,0,73.94,73.37L59.31,88H88a8,8,0,0,1,0,16Zm128,48H168a8,8,0,0,0,0,16h28.69l-14.63,14.63a79.56,79.56,0,0,1-56.13,23.43h-.45a79.52,79.52,0,0,1-55.89-22.77,8,8,0,1,0-11.18,11.44,95.36,95.36,0,0,0,67.07,27.33H126a95.43,95.43,0,0,0,67.36-28.12L208,179.31V208a8,8,0,0,0,16,0V160A8,8,0,0,0,216,152Z"/>
+          </svg>
+          <p>Sincronizando la bóveda</p>
+        </div>
+
+        <ng-container *ngIf="!isLoading">
+          <!-- INLINE CREATE ROW -->
+          <div class="tree-row inline-create-row" *ngIf="isCreatingTheme">
           <div class="row-left">
             <svg class="chevron-svg" style="opacity:0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"></svg>
             <svg class="folder-svg" [style.color]="newThemeColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
@@ -180,9 +189,10 @@ import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
             </div>
           </div>
         </ng-container>
+        </ng-container>
 
         <!-- GLOBAL EMPTY -->
-        <div class="global-empty" *ngIf="filteredFolders.length === 0">
+        <div class="global-empty" *ngIf="!isLoading && filteredFolders.length === 0">
           <p>Sin temas registrados</p>
         </div>
       </div>
@@ -652,7 +662,8 @@ import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
     .v-sidebar.collapsed .v-separator,
     .v-sidebar.collapsed .v-toolbar,
     .v-sidebar.collapsed .v-search,
-    .v-sidebar.collapsed .v-tree {
+    .v-sidebar.collapsed .v-tree,
+    .v-sidebar.collapsed .global-loading {
       display: none;
     }
 
@@ -666,6 +677,34 @@ import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
       margin: 0;
       justify-content: center;
       width: 100%;
+    }
+
+    /* ═══════════════════════════════════════ LOADING */
+    .global-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 1.5rem;
+      opacity: 0.6;
+    }
+    .loading-icon {
+      width: 32px;
+      height: 32px;
+      fill: var(--theme-brand-neon);
+      margin-bottom: 1rem;
+      animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    .global-loading p {
+      font-size: 0.75rem;
+      color: var(--theme-text-muted);
+      margin: 0;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     /* ═══════════════════════════════════════ ANIMATIONS */
@@ -718,6 +757,7 @@ export class VaultSidebarComponent {
   @Input() quizzesByFolder: { [key: string]: QuizSession[] } = {};
   @Input() activeThemeId: string | null = null;
   @Input() activeQuizId: string | null = null;
+  @Input() isLoading = false;
 
   @Output() onSelectTheme = new EventEmitter<FolderTheme>();
   @Output() onSelectQuiz = new EventEmitter<QuizSession>();

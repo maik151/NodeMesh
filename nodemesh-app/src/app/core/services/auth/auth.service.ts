@@ -147,10 +147,11 @@ export class AuthService {
             const vaultKey = await this.deriveStorageKey(user.uid);
             await this.dbService.initializeVault(vaultKey);
 
-            sessionStorage.setItem('nodemesh_session', JSON.stringify({
+            localStorage.setItem('nodemesh_session', JSON.stringify({
                 user,
                 token: accessToken,
-                expiresAt: Date.now() + 3600 * 1000 // 1 hour approx validity
+                // Extendimos la sesión local a 7 días para un entorno offline/permanente
+                expiresAt: Date.now() + (7 * 24 * 3600 * 1000) 
             }));
 
             this.pendingResolve?.(user);
@@ -181,16 +182,16 @@ export class AuthService {
     }
 
     /**
-     * Checks if a valid session exists in sessionStorage.
+     * Checks if a valid session exists in localStorage.
      * This fulfills RNF-SEG-01's client-side validation requirement.
      */
     isAuthenticated(): boolean {
-        const sessionStr = sessionStorage.getItem('nodemesh_session');
+        const sessionStr = localStorage.getItem('nodemesh_session');
         if (!sessionStr) return false;
 
         try {
             const session = JSON.parse(sessionStr);
-            // Verify if token is theoretically expired (1 hr validity max)
+            // Verify if local session is expired
             if (Date.now() > session.expiresAt) {
                 this.logout();
                 return false;
@@ -207,7 +208,7 @@ export class AuthService {
     getCurrentUser(): UserProfile | null {
         if (!this.isAuthenticated()) return null;
         try {
-            const session = JSON.parse(sessionStorage.getItem('nodemesh_session')!);
+            const session = JSON.parse(localStorage.getItem('nodemesh_session')!);
             return session.user as UserProfile;
         } catch {
             return null;
@@ -215,10 +216,36 @@ export class AuthService {
     }
 
     /**
+     * Restores DB state from current session if missing.
+     * Required to survive hard reloads (F5) or HMR.
+     */
+    async restoreSession(): Promise<boolean> {
+        if (!this.isAuthenticated()) return false;
+        
+        if (!this.dbService.db || !this.dbService.db.isOpen()) {
+            const user = this.getCurrentUser();
+            if (user && user.uid) {
+                try {
+                    const vaultKey = await this.deriveStorageKey(user.uid);
+                    await this.dbService.initializeVault(vaultKey);
+                    return true;
+                } catch (e) {
+                    console.error('[AuthService] Falló la restauración de sesión (DB):', e);
+                    this.logout();
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Clears the current session and vault connection.
      */
     logout(): void {
-        sessionStorage.removeItem('nodemesh_session');
+        localStorage.removeItem('nodemesh_session');
         this.dbService.db?.close();
     }
 

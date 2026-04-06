@@ -45,7 +45,6 @@ export class LoginComponent implements OnInit {
     async onGoogleLogin() {
         if (this.isLoading || this.loginSuccess) return;
         this.isLoading = true;
-        this.cdr.detectChanges();
 
         try {
             await this.authService.loginWithGoogle();

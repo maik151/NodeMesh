@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DatabaseService } from '../../../../core/services/storage/database.service';
@@ -17,6 +17,7 @@ import { VaultSidebarComponent } from '../../components/vault-sidebar/vault-side
         [folders]="allFolders"
         [quizzesByFolder]="folderQuizzes"
         [activeThemeId]="selectedTheme?.folder_id || null"
+        [isLoading]="isLoadingData"
         (onCreateTheme)="createInlineTheme($event)"
         (onUpdateTheme)="updateInlineTheme($event)"
         (onRefresh)="loadData()"
@@ -196,6 +197,7 @@ import { VaultSidebarComponent } from '../../components/vault-sidebar/vault-side
 export class VaultComponent implements OnInit {
   private readonly db = inject(DatabaseService);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   allFolders: FolderTheme[] = [];
   folderQuizzes: { [key: string]: QuizSession[] } = {};
@@ -207,6 +209,7 @@ export class VaultComponent implements OnInit {
   // CRUD State
   isCreating = false;
   folderForm: Partial<FolderTheme> = this.resetForm();
+  isLoadingData = true;
 
   async ngOnInit() {
     await this.loadData();
@@ -221,10 +224,16 @@ export class VaultComponent implements OnInit {
   }
 
   async loadData() {
+    this.isLoadingData = true;
+    this.cdr.markForCheck(); // In case we use OnPush, mark for check
+
     this.allFolders = await this.db.getAllFolders();
     for (const f of this.allFolders) {
       this.folderQuizzes[f.folder_id] = await this.db.getQuizzesByFolder(f.folder_id);
     }
+
+    this.isLoadingData = false;
+    this.cdr.detectChanges(); // Force angular to update after async task
   }
 
   openCreator() {

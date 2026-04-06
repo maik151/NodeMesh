@@ -157,11 +157,10 @@ export class DatabaseService {
 
     async getRecentFolders(limit: number = 3): Promise<FolderTheme[]> {
         if (!this.db) throw new Error('Database not initialized');
-        return await this.db.table('folders')
-            .orderBy('creado_en')
-            .reverse()
-            .limit(limit)
-            .toArray();
+        const all = await this.db.table('folders').toArray();
+        return all
+            .sort((a, b) => new Date(b.creado_en).getTime() - new Date(a.creado_en).getTime())
+            .slice(0, limit);
     }
 
     async saveQuiz(quiz: QuizSession): Promise<void> {

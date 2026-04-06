@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common'; // Force angular compiler to un-stuck
 import { FormsModule } from '@angular/forms';
 import { DatabaseService } from '../../../../core/services/storage/database.service';
 import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
@@ -231,6 +231,9 @@ export class VaultComponent implements OnInit {
     for (const f of this.allFolders) {
       this.folderQuizzes[f.folder_id] = await this.db.getQuizzesByFolder(f.folder_id);
     }
+    
+    // Retraso artificial para que la animación de "Sincronizando Bóveda" se aprecie
+    await new Promise(resolve => setTimeout(resolve, 800));
 
     this.isLoadingData = false;
     this.cdr.detectChanges(); // Force angular to update after async task

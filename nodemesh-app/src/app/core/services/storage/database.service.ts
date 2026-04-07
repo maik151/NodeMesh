@@ -81,7 +81,9 @@ export class DatabaseService {
 
     async getNodesBySource(sourceId: string): Promise<NodeChallenge[]> {
         if (!this.db) throw new Error('Database not initialized');
-        return await this.db.table('nodes').where('sourceId').equals(sourceId).toArray();
+        // In-memory filter for cross-version schema compatibility (sourceId not indexed in v2)
+        const all = await this.db.table('nodes').toArray();
+        return all.filter((n: any) => n.sourceId === sourceId);
     }
 
     async saveFolder(folder: FolderTheme): Promise<void> {

@@ -83,10 +83,22 @@ import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
             <input type="text" [(ngModel)]="newThemeName" placeholder="Nuevo tema...." class="inline-input" (keydown.enter)="confirmCreatingTheme()" (keydown.escape)="cancelCreatingTheme()" #themeInput autofocus>
           </div>
           <div class="row-right action-icons">
-            <label class="icon-label-picker" title="Color Picker">
-               <input type="color" [(ngModel)]="newThemeColor" class="hidden-picker">
-               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="inline-icon picker-icon"><path d="M224,67.3a35.79,35.79,0,0,0-11.26-25.66c-14-13.28-36.72-12.78-50.62,1.13L142.8,62.2a24,24,0,0,0-33.14.77l-9,9a16,16,0,0,0,0,22.64l2,2.06-51,51a39.75,39.75,0,0,0-10.53,38l-8,18.41A13.65,13.65,0,0,0,36,219.29a15.9,15.9,0,0,0,17.71,3.36L71.24,215a39.9,39.9,0,0,0,37.05-10.75l51-51,2.06,2.06a16,16,0,0,0,22.62,0l9-9a24,24,0,0,0,.74-33.18l19.75-19.87A35.75,35.75,0,0,0,224,67.3ZM97,193a24,24,0,0,1-24,6,8,8,0,0,0-5.55.31l-18.1,7.9L57,189.41a8,8,0,0,0,.25-5.75,24,24,0,0,1,.1-15.69H122Zm41-41H70.07l44-44,33.94,34Zm64.18-70-25.37,25.52a8,8,0,0,0,0,11.31l4.89,4.88a8,8,0,0,1,0,11.32l-9,9L112,83.26l9-9a8,8,0,0,1,11.31,0l4.89,4.89a8,8,0,0,0,5.65,2.34h0a8,8,0,0,0,5.66-2.36l24.94-25.09c7.81-7.82,20.5-8.18,28.29-.81a20,20,0,0,1,.39,28.7Z"></path></svg>
-            </label>
+            <div class="swatch-picker-wrap">
+              <button class="inline-btn brush-btn" (click)="toggleSwatchPicker('create')" title="Elegir Color">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="inline-icon picker-icon"><path d="M224,67.3a35.79,35.79,0,0,0-11.26-25.66c-14-13.28-36.72-12.78-50.62,1.13L142.8,62.2a24,24,0,0,0-33.14.77l-9,9a16,16,0,0,0,0,22.64l2,2.06-51,51a39.75,39.75,0,0,0-10.53,38l-8,18.41A13.65,13.65,0,0,0,36,219.29a15.9,15.9,0,0,0,17.71,3.36L71.24,215a39.9,39.9,0,0,0,37.05-10.75l51-51,2.06,2.06a16,16,0,0,0,22.62,0l9-9a24,24,0,0,0,.74-33.18l19.75-19.87A35.75,35.75,0,0,0,224,67.3ZM97,193a24,24,0,0,1-24,6,8,8,0,0,0-5.55.31l-18.1,7.9L57,189.41a8,8,0,0,0,.25-5.75,24,24,0,0,1,.1-15.69H122Zm41-41H70.07l44-44,33.94,34Zm64.18-70-25.37,25.52a8,8,0,0,0,0,11.31l4.89,4.88a8,8,0,0,1,0,11.32l-9,9L112,83.26l9-9a8,8,0,0,1,11.31,0l4.89,4.89a8,8,0,0,0,5.65,2.34h0a8,8,0,0,0,5.66-2.36l24.94-25.09c7.81-7.82,20.5-8.18,28.29-.81a20,20,0,0,1,.39,28.7Z"></path></svg>
+              </button>
+              
+              <div class="swatch-popover card-glass" *ngIf="showSwatchPicker === 'create'">
+                <div class="palette-grid">
+                  <div *ngFor="let color of COLOR_PALETTE" 
+                       class="swatch-item" 
+                       [style.background]="color"
+                       [class.swatch-active]="newThemeColor === color"
+                       (click)="selectColor(color, 'create')">
+                  </div>
+                </div>
+              </div>
+            </div>
             <button class="inline-btn confirm-btn" (click)="confirmCreatingTheme()" title="Guardar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="inline-icon"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path></svg></button>
             <button class="inline-btn cancel-btn" (click)="cancelCreatingTheme()" title="Cancelar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="inline-icon"><path d="M165.66,101.66,139.31,128l26.35,26.34a8,8,0,0,1-11.32,11.32L128,139.31l-26.34,26.35a8,8,0,0,1-11.32-11.32L116.69,128,90.34,101.66a8,8,0,0,1,11.32-11.32L128,116.69l26.34-26.35a8,8,0,0,1,11.32,11.32ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path></svg></button>
           </div>
@@ -104,10 +116,22 @@ import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
               <input type="text" [(ngModel)]="editThemeName" placeholder="Editando tema...." class="inline-input" (keydown.enter)="confirmEditingTheme(folder)" (keydown.escape)="cancelEditingTheme()" autofocus>
             </div>
             <div class="row-right action-icons">
-              <label class="icon-label-picker" title="Color Picker">
-                 <input type="color" [(ngModel)]="editThemeColor" class="hidden-picker">
-                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="inline-icon picker-icon"><path d="M224,67.3a35.79,35.79,0,0,0-11.26-25.66c-14-13.28-36.72-12.78-50.62,1.13L142.8,62.2a24,24,0,0,0-33.14.77l-9,9a16,16,0,0,0,0,22.64l2,2.06-51,51a39.75,39.75,0,0,0-10.53,38l-8,18.41A13.65,13.65,0,0,0,36,219.29a15.9,15.9,0,0,0,17.71,3.36L71.24,215a39.9,39.9,0,0,0,37.05-10.75l51-51,2.06,2.06a16,16,0,0,0,22.62,0l9-9a24,24,0,0,0,.74-33.18l19.75-19.87A35.75,35.75,0,0,0,224,67.3ZM97,193a24,24,0,0,1-24,6,8,8,0,0,0-5.55.31l-18.1,7.9L57,189.41a8,8,0,0,0,.25-5.75,24,24,0,0,1,.1-15.69H122Zm41-41H70.07l44-44,33.94,34Zm64.18-70-25.37,25.52a8,8,0,0,0,0,11.31l4.89,4.88a8,8,0,0,1,0,11.32l-9,9L112,83.26l9-9a8,8,0,0,1,11.31,0l4.89,4.89a8,8,0,0,0,5.65,2.34h0a8,8,0,0,0,5.66-2.36l24.94-25.09c7.81-7.82,20.5-8.18,28.29-.81a20,20,0,0,1,.39,28.7Z"></path></svg>
-              </label>
+              <div class="swatch-picker-wrap">
+                <button class="inline-btn brush-btn" (click)="toggleSwatchPicker('edit')" title="Elegir Color">
+                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="inline-icon picker-icon"><path d="M224,67.3a35.79,35.79,0,0,0-11.26-25.66c-14-13.28-36.72-12.78-50.62,1.13L142.8,62.2a24,24,0,0,0-33.14.77l-9,9a16,16,0,0,0,0,22.64l2,2.06-51,51a39.75,39.75,0,0,0-10.53,38l-8,18.41A13.65,13.65,0,0,0,36,219.29a15.9,15.9,0,0,0,17.71,3.36L71.24,215a39.9,39.9,0,0,0,37.05-10.75l51-51,2.06,2.06a16,16,0,0,0,22.62,0l9-9a24,24,0,0,0,.74-33.18l19.75-19.87A35.75,35.75,0,0,0,224,67.3ZM97,193a24,24,0,0,1-24,6,8,8,0,0,0-5.55.31l-18.1,7.9L57,189.41a8,8,0,0,0,.25-5.75,24,24,0,0,1,.1-15.69H122Zm41-41H70.07l44-44,33.94,34Zm64.18-70-25.37,25.52a8,8,0,0,0,0,11.31l4.89,4.88a8,8,0,0,1,0,11.32l-9,9L112,83.26l9-9a8,8,0,0,1,11.31,0l4.89,4.89a8,8,0,0,0,5.65,2.34h0a8,8,0,0,0,5.66-2.36l24.94-25.09c7.81-7.82,20.5-8.18,28.29-.81a20,20,0,0,1,.39,28.7Z"></path></svg>
+                </button>
+                
+                <div class="swatch-popover card-glass animate-pop-in" *ngIf="showSwatchPicker === 'edit'">
+                  <div class="palette-grid">
+                    <div *ngFor="let color of COLOR_PALETTE" 
+                         class="swatch-item" 
+                         [style.background]="color"
+                         [class.swatch-active]="editThemeColor === color"
+                         (click)="selectColor(color, 'edit')">
+                    </div>
+                  </div>
+                </div>
+              </div>
               <button class="inline-btn confirm-btn" (click)="confirmEditingTheme(folder)" title="Actualizar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="inline-icon"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path></svg></button>
               <button class="inline-btn cancel-btn" (click)="cancelEditingTheme()" title="Cancelar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="inline-icon"><path d="M165.66,101.66,139.31,128l26.35,26.34a8,8,0,0,1-11.32,11.32L128,139.31l-26.34,26.35a8,8,0,0,1-11.32-11.32L116.69,128,90.34,101.66a8,8,0,0,1,11.32-11.32L128,116.69l26.34-26.35a8,8,0,0,1,11.32,11.32ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path></svg></button>
             </div>
@@ -218,6 +242,72 @@ import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
       color: var(--theme-text);
       overflow: hidden;
       transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    /* ═══════════════════════════════════════ COLOR SWATCHES */
+    .swatch-picker-wrap {
+      position: relative;
+    }
+
+    .swatch-popover {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      z-index: 200;
+      background: var(--theme-surface-modal);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--theme-border);
+      border-radius: 14px;
+      padding: 0.8rem;
+      width: 156px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    }
+
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.4rem;
+    }
+
+    .swatch-item {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      border: 2px solid transparent;
+      box-sizing: border-box;
+    }
+
+    .swatch-item:hover {
+      transform: scale(1.3);
+      z-index: 10;
+    }
+
+    .swatch-active {
+      border-color: #fff;
+      box-shadow: 0 0 12px rgba(255,255,255,0.4);
+      transform: scale(1.15);
+    }
+
+    .animate-pop-in {
+      animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) both;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(-10px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .brush-btn {
+      padding: 0.4rem;
+      border-radius: 8px;
+    }
+    
+    .brush-btn:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--theme-brand-neon);
     }
 
     /* ═══════════════════════════════════════ HEADER */
@@ -824,6 +914,31 @@ export class VaultSidebarComponent implements OnInit {
       });
       this.isCreatingTheme = false;
     }
+  }
+
+  readonly COLOR_PALETTE = [
+    '#9FFF22', // Brand Neon
+    '#22D3EE', // Cyan
+    '#A855F7', // Purple
+    '#F43F5E', // Rose
+    '#EA580C', // Orange
+    '#10B981', // Emerald
+    '#4B105A', // Deep Purple
+    '#005C6E', // Dark Teal
+    '#3F9098', // Muted Teal
+    '#B7D98C'  // Soft Sage
+  ];
+
+  showSwatchPicker: 'create' | 'edit' | null = null;
+
+  toggleSwatchPicker(type: 'create' | 'edit') {
+    this.showSwatchPicker = this.showSwatchPicker === type ? null : type;
+  }
+
+  selectColor(color: string, type: 'create' | 'edit') {
+    if (type === 'create') this.newThemeColor = color;
+    else this.editThemeColor = color;
+    this.showSwatchPicker = null;
   }
 
   editingThemeId: string | null = null;

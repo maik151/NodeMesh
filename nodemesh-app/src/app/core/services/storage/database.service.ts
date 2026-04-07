@@ -89,6 +89,16 @@ export class DatabaseService {
         await this.db.table('folders').put(folder);
     }
 
+    async deleteNode(nodeId: number): Promise<void> {
+        if (!this.db) throw new Error('Database not initialized');
+        await this.db.table('nodes').delete(nodeId);
+    }
+
+    table(name: string) {
+        if (!this.db) throw new Error('Database not initialized');
+        return this.db.table(name);
+    }
+
     async getDueNodesSummary(): Promise<{ folder_id: string, nombre_tema: string, count: number, status: 'overdue' | 'due' }[]> {
         if (!this.db) throw new Error('Database not initialized');
         

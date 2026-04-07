@@ -556,7 +556,8 @@ export class TestUploadComponent implements OnInit {
       quiz_id: quizId,
       folder_id: fId,
       titulo_quiz: quizTitle,
-      dificultad_global: 'Aprendiz',
+      dificultad_global: (parsed.metadata?.nivel_exigido as any) || 'Aprendiz',
+      auditor_persona: parsed.metadata?.auditor_persona || undefined,
       estadisticas_globales: { intentos: 0, ultimo_score_porcentaje: null },
       creado_en: new Date()
     });

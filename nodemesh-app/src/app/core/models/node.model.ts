@@ -43,6 +43,7 @@ export interface QuizSession {
     folder_id: string;
     titulo_quiz: string;
     dificultad_global: DifficultyLevel;
+    auditor_persona?: string;
     estadisticas_globales: {
         intentos: number;
         ultimo_score_porcentaje: number | null;

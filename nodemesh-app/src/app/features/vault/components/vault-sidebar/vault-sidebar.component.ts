@@ -19,7 +19,7 @@ import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
             </svg>
             <h1>Temas y Tests</h1>
           </div>
-          <button class="icon-btn" title="Menú" (click)="isCollapsed = !isCollapsed">
+          <button class="icon-btn" title="Menú" (click)="onToggleCollapse.emit()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
               <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,152H56a8,8,0,0,0,0-16H40V120H56a8,8,0,0,0,0-16H40V88H56a8,8,0,0,0,0-16H40V56H80V200H40Zm176,48H96V56H216V200Z"></path>
             </svg>
@@ -241,7 +241,7 @@ import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
       font-family: 'JetBrains Mono', monospace;
       color: var(--theme-text);
       overflow: hidden;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
     }
 
@@ -744,16 +744,13 @@ import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
 
     /* ═══════════════════════════════════════ COLLAPSED STATE */
     .v-sidebar.collapsed {
-      width: 60px;
+      width: 0;
+      border-right-width: 0;
+      opacity: 0;
+      pointer-events: none;
     }
     
-    .v-sidebar.collapsed .h-title,
-    .v-sidebar.collapsed .h-subtitle,
-    .v-sidebar.collapsed .v-separator,
-    .v-sidebar.collapsed .v-toolbar,
-    .v-sidebar.collapsed .v-search,
-    .v-sidebar.collapsed .v-tree,
-    .v-sidebar.collapsed .global-loading {
+    .v-sidebar.collapsed * {
       display: none;
     }
 
@@ -866,7 +863,8 @@ export class VaultSidebarComponent implements OnInit {
   showSearch = false;
   searchTerm = '';
   menuOpenId: string | null = null;
-  isCollapsed = false;
+  @Input() isCollapsed = false;
+  @Output() onToggleCollapse = new EventEmitter<void>();
 
   ngOnInit() {}
 

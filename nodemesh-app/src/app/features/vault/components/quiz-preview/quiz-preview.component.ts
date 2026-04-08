@@ -24,6 +24,17 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
 
       <!-- BREADCRUMB -->
       <div class="breadcrumb">
+        <!-- Sidebar Toggle (Only visible when collapsed) -->
+        <button 
+          *ngIf="isSidebarCollapsed" 
+          class="bc-toggle-btn" 
+          (click)="onToggleSidebar.emit()"
+          title="Mostrar Sidebar">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+            <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,152H56a8,8,0,0,0,0-16H40V120H56a8,8,0,0,0,0-16H40V88H56a8,8,0,0,0,0-16H40V56H80V200H40Zm176,48H96V56H216V200Z"></path>
+          </svg>
+        </button>
+
         <svg class="breadcrumb-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M216,72H131.31L104,44.69A15.86,15.86,0,0,0,92.69,40H40A16,16,0,0,0,24,56V200.62A15.4,15.4,0,0,0,39.38,216H216.89A15.13,15.13,0,0,0,232,200.89V88A16,16,0,0,0,216,72ZM40,56H92.69l16,16H40ZM216,200H40V88H216Z"/></svg>
         <span class="bc-folder">{{ folder.nombre_tema }}</span>
         <span class="bc-sep">›</span>
@@ -191,6 +202,29 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
     .bc-sep { opacity: 0.4; }
     .bc-folder, .bc-quiz { opacity: 0.9; }
     .bc-quiz { opacity: 1; color: var(--theme-text); }
+
+    .bc-toggle-btn {
+      background: transparent;
+      border: none;
+      padding: 4px;
+      margin-right: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--theme-text-muted);
+      transition: all 0.2s;
+    }
+    .bc-toggle-btn:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--theme-brand-neon);
+    }
+    .bc-toggle-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
 
     /* HEADER */
     .qp-header {
@@ -532,10 +566,12 @@ export class QuizPreviewComponent implements OnChanges {
 
   @Input() quiz: QuizSession | null = null;
   @Input() folder: FolderTheme | null = null;
+  @Input() isSidebarCollapsed = false;
 
   @Output() onPlayQuiz = new EventEmitter<QuizSession>();
   @Output() onEditQuiz = new EventEmitter<QuizSession>();
   @Output() onDeleteNode = new EventEmitter<NodeChallenge>();
+  @Output() onToggleSidebar = new EventEmitter<void>();
 
   nodes: NodeChallenge[] = [];
   isLoadingNodes = false;

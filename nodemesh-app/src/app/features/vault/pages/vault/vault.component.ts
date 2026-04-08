@@ -32,6 +32,17 @@ import { QuizPreviewComponent } from '../../components/quiz-preview/quiz-preview
 
       <!-- MAIN CONTENT AREA -->
       <main class="vault-main scroll-custom">
+        <!-- Persistent Toggle Button (Only in Empty State, QuizPreview has its own) -->
+        <button 
+          class="floating-sidebar-trigger" 
+          *ngIf="sidebarCollapsed && !selectedQuiz" 
+          (click)="sidebarCollapsed = false"
+          title="Mostrar Sidebar">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+            <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,152H56a8,8,0,0,0,0-16H40V120H56a8,8,0,0,0,0-16H40V88H56a8,8,0,0,0,0-16H40V56H80V200H40Zm176,48H96V56H216V200Z"></path>
+          </svg>
+        </button>
+
         <!-- Empty State -->
         <div class="workspace-centered" *ngIf="!selectedQuiz">
            <div class="empty-hero">
@@ -111,6 +122,35 @@ import { QuizPreviewComponent } from '../../components/quiz-preview/quiz-preview
     .scroll-custom::-webkit-scrollbar { width: 8px; }
     .scroll-custom::-webkit-scrollbar-track { background: transparent; }
     .scroll-custom::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+    .floating-sidebar-trigger {
+      position: absolute;
+      top: 2.62rem;
+      left: 1.4rem;
+      z-index: 1000;
+      width: 28px;
+      height: 28px;
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--theme-text-muted);
+      cursor: pointer;
+      opacity: 0.35;
+      transition: all 0.2s ease;
+    }
+    .floating-sidebar-trigger:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--theme-brand-neon);
+      opacity: 1;
+    }
+    .floating-sidebar-trigger svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
   `]
 })
 export class VaultComponent implements OnInit {

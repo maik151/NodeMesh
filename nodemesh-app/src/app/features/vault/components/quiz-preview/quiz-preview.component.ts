@@ -1,7 +1,12 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { DatabaseService } from '../../../../core/services/storage/database.service';
-import { FolderTheme, NodeChallenge, QuizSession } from '../../../../core/models/node.model';
+import { FolderTheme, NodeChallenge, QuizSession, DifficultyLevel } from '../../../../core/models/node.model';
+import { MOTOR_ICONS, TYPE_ICONS } from '../../../../shared/constants/icons.constants';
+import { LEVEL_FACES } from '../../../../shared/constants/faces.constants';
+import { QuizEditModalComponent } from '../quiz-edit-modal/quiz-edit-modal.component';
+import { NodeEditModalComponent } from '../node-edit-modal/node-edit-modal.component';
 
 const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
   single_choice:    { emoji: '🎯', label: 'Single Choice' },
@@ -18,7 +23,7 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
 @Component({
   selector: 'app-quiz-preview',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, QuizEditModalComponent, NodeEditModalComponent],
   template: `
     <div class="qp-shell" *ngIf="quiz && folder">
 
@@ -49,7 +54,7 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
           <h1 class="qp-title">{{ quiz.titulo_quiz }}</h1>
         </div>
         <div class="qp-actions">
-          <button class="btn-edit" (click)="onEditQuiz.emit(quiz)">
+          <button class="btn-edit" (click)="showEditModal = true">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM51.31,160,136,75.31,152.69,92,68,176.68ZM48,179.31,76.69,208H48Zm48,25.38L79.31,188,164,103.31,180.69,120Zm96-96L147.31,64l24-24L216,84.68Z"/></svg>
             Editar
           </button>
@@ -64,7 +69,9 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-icon-wrap">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M248,124a56.11,56.11,0,0,0-32-50.61V72a48,48,0,0,0-88-26.49A48,48,0,0,0,40,72v1.39a56,56,0,0,0,0,101.2V176a48,48,0,0,0,88,26.49A48,48,0,0,0,216,176v-1.41A56.09,56.09,0,0,0,248,124ZM88,208a32,32,0,0,1-31.81-28.56A55.87,55.87,0,0,0,64,180h8a8,8,0,0,0,0-16H64A40,40,0,0,1,50.67,86.27,8,8,0,0,0,56,78.73V72a32,32,0,0,1,64,0v68.26A47.8,47.8,0,0,0,88,128a8,8,0,0,0,0,16,32,32,0,0,1,0,64Zm104-44h-8a8,8,0,0,0,0,16h8a55.87,55.87,0,0,0,7.81-.56A32,32,0,1,1,168,144a8,8,0,0,0,0-16,47.8,47.8,0,0,0-32,12.26V72a32,32,0,0,1,64,0v6.73a8,8,0,0,0,5.33,7.54A40,40,0,0,1,192,164Zm16-52a8,8,0,0,1-8,8h-4a36,36,0,0,1-36-36V80a8,8,0,0,1,16,0v4a20,20,0,0,0,20,20h4A8,8,0,0,1,208,112ZM60,120H56a8,8,0,0,1,0-16h4A20,20,0,0,0,80,84V80a8,8,0,0,1,16,0v4A36,36,0,0,1,60,120Z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+              <path [attr.d]="MOTOR_ICONS.ia"/>
+            </svg>
           </div>
           <div class="kpi-value">{{ retentionPercent }}%</div>
           <div class="kpi-label">Retención</div>
@@ -103,7 +110,7 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
               Auditor: {{ auditorPersona }}
             </div>
             <div class="badge-nivel" [class]="nivelClass">
-              <span class="nivel-face">{{ nivelFace }}</span>
+              <span class="nivel-face" [innerHTML]="getNivelFaceSvg()"></span>
               Nivel: {{ quiz.dificultad_global }}
             </div>
           </div>
@@ -130,7 +137,9 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
               <tr *ngFor="let node of nodes; let i = index" class="node-row" [class.row-even]="i % 2 === 0">
                 <td class="col-tipo">
                   <div class="tipo-chip">
-                    <span class="tipo-emoji">{{ getTipoEmoji(node.tipo_reto) }}</span>
+                    <svg class="tipo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                      <path [attr.d]="getTipoIcon(node.tipo_reto)"/>
+                    </svg>
                     <span class="tipo-label">{{ getTipoLabel(node.tipo_reto) }}</span>
                   </div>
                 </td>
@@ -139,8 +148,12 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
                 </td>
                 <td class="col-motor">
                   <div class="motor-chip" [class.motor-ia]="node.requiere_ia">
-                    <svg *ngIf="node.requiere_ia" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M248,124a56.11,56.11,0,0,0-32-50.61V72a48,48,0,0,0-88-26.49A48,48,0,0,0,40,72v1.39a56,56,0,0,0,0,101.2V176a48,48,0,0,0,88,26.49A48,48,0,0,0,216,176v-1.41A56.09,56.09,0,0,0,248,124ZM88,208a32,32,0,0,1-31.81-28.56A55.87,55.87,0,0,0,64,180h8a8,8,0,0,0,0-16H64A40,40,0,0,1,50.67,86.27,8,8,0,0,0,56,78.73V72a32,32,0,0,1,64,0v68.26A47.8,47.8,0,0,0,88,128a8,8,0,0,0,0,16,32,32,0,0,1,0,64Zm104-44h-8a8,8,0,0,0,0,16h8a55.87,55.87,0,0,0,7.81-.56A32,32,0,1,1,168,144a8,8,0,0,0,0-16,47.8,47.8,0,0,0-32,12.26V72a32,32,0,0,1,64,0v6.73a8,8,0,0,0,5.33,7.54A40,40,0,0,1,192,164Zm16-52a8,8,0,0,1-8,8h-4a36,36,0,0,1-36-36V80a8,8,0,0,1,16,0v4a20,20,0,0,0,20,20h4A8,8,0,0,1,208,112ZM60,120H56a8,8,0,0,1,0-16h4A20,20,0,0,0,80,84V80a8,8,0,0,1,16,0v4A36,36,0,0,1,60,120Z"/></svg>
-                    <svg *ngIf="!node.requiere_ia" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" style="fill:var(--theme-brand-neon)"><path d="M232,128a104,104,0,1,1-104-104A104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Zm-80-52V128a4,4,0,0,0,4,4h36a4,4,0,0,0,0-8H144V76a4,4,0,0,0-8,0Z"/></svg>
+                    <svg *ngIf="node.requiere_ia" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                      <path [attr.d]="MOTOR_ICONS.ia"/>
+                    </svg>
+                    <svg *ngIf="!node.requiere_ia" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                      <path [attr.d]="MOTOR_ICONS.local"/>
+                    </svg>
                     <span>{{ node.requiere_ia ? 'IA' : 'Local' }}</span>
                   </div>
                 </td>
@@ -155,7 +168,7 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
                     <button class="action-btn delete-btn" (click)="onDeleteNode.emit(node)" title="Eliminar nodo">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg>
                     </button>
-                    <button class="action-btn edit-btn" title="Ver detalle">
+                    <button class="action-btn edit-btn" (click)="selectedNode = node" title="Editar nodo">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM51.31,160,136,75.31,152.69,92,68,176.68ZM48,179.31,76.69,208H48Zm48,25.38L79.31,188,164,103.31,180.69,120Zm96-96L147.31,64l24-24L216,84.68Z"/></svg>
                     </button>
                   </div>
@@ -170,6 +183,22 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
           </table>
         </div>
       </div>
+
+      <!-- EDIT MODAL -->
+      <app-quiz-edit-modal 
+        *ngIf="showEditModal && quiz" 
+        [quiz]="quiz" 
+        (onClose)="showEditModal = false"
+        (onSave)="handleUpdateQuiz($event)">
+      </app-quiz-edit-modal>
+
+      <!-- NODE EDIT MODAL -->
+      <app-node-edit-modal 
+        *ngIf="selectedNode" 
+        [node]="selectedNode" 
+        (onClose)="selectedNode = null"
+        (onSave)="handleUpdateNode($event)">
+      </app-node-edit-modal>
     </div>
   `,
   styles: [`
@@ -313,11 +342,12 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
     }
     .kpi-card:hover { border-color: rgba(255,255,255,0.15); }
     .kpi-icon-wrap {
-      width: 32px; height: 32px;
-      opacity: 0.4;
-      margin-bottom: 0.5rem;
+      width: 26px; height: 26px;
+      opacity: 0.6;
+      margin-bottom: 0.75rem;
+      color: var(--theme-text);
     }
-    .kpi-icon-wrap svg { width: 100%; height: 100%; fill: var(--theme-text); }
+    .kpi-icon-wrap svg { width: 100%; height: 100%; fill: currentColor; }
     .kpi-value {
       font-size: 2.5rem;
       font-weight: 900;
@@ -389,7 +419,17 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
     }
 
     /* Nivel badges with face */
-    .nivel-face { font-size: 1rem; }
+    .nivel-face { 
+      width: 20px; 
+      height: 20px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+    }
+    .nivel-face ::ng-deep svg {
+      width: 100%;
+      height: 100%;
+    }
     .badge-nivel.nivel-aprendiz {
       background: rgba(34, 197, 94, 0.12);
       border: 1px solid rgba(34, 197, 94, 0.3);
@@ -406,9 +446,9 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
       color: #fb923c;
     }
     .badge-nivel.nivel-senior {
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #f87171;
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      color: #c084fc;
     }
 
     /* LOADING */
@@ -458,11 +498,17 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
     /* TIPO CHIP */
     .col-tipo { white-space: nowrap; }
     .tipo-chip {
-      display: flex; align-items: center; gap: 0.5rem;
+      display: flex; align-items: center; gap: 0.6rem;
       font-weight: 700;
     }
-    .tipo-emoji { font-size: 1rem; }
-    .tipo-label { font-size: 0.75rem; color: var(--theme-text-secondary); white-space: nowrap; }
+    .tipo-icon {
+      width: 20px;
+      height: 20px;
+      fill: var(--theme-text);
+      opacity: 0.9;
+      flex-shrink: 0;
+    }
+    .tipo-label { font-size: 0.78rem; color: var(--theme-text-secondary); white-space: nowrap; opacity: 0.9; }
 
     /* PREGUNTA */
     .col-pregunta { max-width: 340px; }
@@ -561,25 +607,38 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
   `]
 })
 export class QuizPreviewComponent implements OnChanges {
+  protected readonly MOTOR_ICONS = MOTOR_ICONS;
+  protected readonly TYPE_ICONS = TYPE_ICONS;
   private readonly db = inject(DatabaseService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly sanitizer = inject(DomSanitizer);
 
   @Input() quiz: QuizSession | null = null;
   @Input() folder: FolderTheme | null = null;
   @Input() isSidebarCollapsed = false;
 
   @Output() onPlayQuiz = new EventEmitter<QuizSession>();
-  @Output() onEditQuiz = new EventEmitter<QuizSession>();
+  @Output() onQuizUpdated = new EventEmitter<QuizSession>();
   @Output() onDeleteNode = new EventEmitter<NodeChallenge>();
   @Output() onToggleSidebar = new EventEmitter<void>();
 
   nodes: NodeChallenge[] = [];
   isLoadingNodes = false;
+  showEditModal = false;
+  selectedNode: NodeChallenge | null = null;
   auditorPersona: string | null = null;
 
   async ngOnChanges(changes: SimpleChanges) {
-    if (changes['quiz'] && this.quiz) {
-      await this.loadNodes();
+    const qChange = changes['quiz'];
+    if (qChange && this.quiz) {
+      const prevId = qChange.previousValue?.quiz_id;
+      const currId = qChange.currentValue?.quiz_id;
+
+      // Solo recargar nodos si el test físicamente es otro o es la primera carga.
+      // Si solo cambió el título o la dificultad, no hace falta re-consultar la DB de nodos.
+      if (prevId !== currId || qChange.isFirstChange()) {
+        await this.loadNodes();
+      }
     }
   }
 
@@ -632,14 +691,9 @@ export class QuizPreviewComponent implements OnChanges {
     return map[this.quiz?.dificultad_global || 'Aprendiz'] || 'badge-nivel nivel-aprendiz';
   }
 
-  get nivelFace(): string {
-    const map: Record<string, string> = {
-      'Aprendiz': '😊',
-      'Intermedio': '😐',
-      'Avanzado': '😤',
-      'Senior': '💀'
-    };
-    return map[this.quiz?.dificultad_global || 'Aprendiz'] || '😊';
+  getNivelFaceSvg(): SafeHtml {
+    const rawSvg = LEVEL_FACES[this.quiz?.dificultad_global || 'Aprendiz'] || LEVEL_FACES['Aprendiz'];
+    return this.sanitizer.bypassSecurityTrustHtml(rawSvg);
   }
 
   getTipoEmoji(tipo: string): string {
@@ -648,6 +702,11 @@ export class QuizPreviewComponent implements OnChanges {
 
   getTipoLabel(tipo: string): string {
     return TIPO_MAP[tipo]?.label || tipo;
+  }
+
+  getTipoIcon(tipo: string): string {
+    // Manejo de alias si es necesario o fallback
+    return (TYPE_ICONS as any)[tipo] || '';
   }
 
   truncate(text: string, len = 65): string {
@@ -672,5 +731,42 @@ export class QuizPreviewComponent implements OnChanges {
     if (days > 7) return 'Alta';
     if (days > 1) return 'Med';
     return 'Baja';
+  }
+
+  async handleUpdateQuiz(data: { title: string, difficulty: string }) {
+    if (!this.quiz) return;
+    
+    try {
+      const updatedQuiz: QuizSession = {
+        ...this.quiz,
+        titulo_quiz: data.title,
+        dificultad_global: data.difficulty as DifficultyLevel
+      };
+      
+      await this.db.saveQuiz(updatedQuiz);
+      
+      // Cerramos modal y avisamos al padre. 
+      // El padre actualizará el [quiz] y ngOnChanges se encargará de refrescar la vista
+      // SIN disparar loadNodes() gracias al check de ID que acabamos de poner.
+      this.showEditModal = false;
+      this.onQuizUpdated.emit(updatedQuiz);
+      this.cdr.detectChanges();
+    } catch (e) {
+      console.error('[QuizPreview] Error updating quiz:', e);
+    }
+  }
+
+  async handleUpdateNode(updatedNode: NodeChallenge) {
+    if (!updatedNode.id) return;
+    
+    try {
+      await this.db.saveNode(updatedNode);
+      this.selectedNode = null;
+      // Refrescar lista localmente
+      this.nodes = this.nodes.map(n => n.id === updatedNode.id ? updatedNode : n);
+      this.cdr.detectChanges();
+    } catch (e) {
+      console.error('[QuizPreview] Error updating node:', e);
+    }
   }
 }

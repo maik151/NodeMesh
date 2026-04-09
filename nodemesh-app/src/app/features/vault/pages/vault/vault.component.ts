@@ -62,7 +62,7 @@ import { QuizPreviewComponent } from '../../components/quiz-preview/quiz-preview
           [isSidebarCollapsed]="sidebarCollapsed"
           (onToggleSidebar)="sidebarCollapsed = !sidebarCollapsed"
           (onPlayQuiz)="playQuiz($event)"
-          (onEditQuiz)="editQuiz($event)"
+          (onQuizUpdated)="onQuizUpdated($event)"
           (onDeleteNode)="deleteNode($event)">
         </app-quiz-preview>
       </main>
@@ -230,6 +230,20 @@ export class VaultComponent implements OnInit {
 
   playQuiz(quiz: QuizSession) {
     this.router.navigate(['/simulator'], { queryParams: { quiz: quiz.quiz_id, folder: quiz.folder_id } });
+  }
+
+  onQuizUpdated(updatedQuiz: QuizSession) {
+    this.selectedQuiz = updatedQuiz;
+    this.refreshQuizzesInFolder(updatedQuiz.folder_id);
+  }
+
+  private async refreshQuizzesInFolder(folderId: string) {
+    try {
+      this.folderQuizzes[folderId] = await this.db.getQuizzesByFolder(folderId);
+      this.cdr.detectChanges();
+    } catch (e) {
+      console.error('[Vault] Error refreshing folder quizzes:', e);
+    }
   }
 
   editQuiz(quiz: QuizSession) {

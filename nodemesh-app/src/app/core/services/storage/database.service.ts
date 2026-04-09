@@ -74,6 +74,11 @@ export class DatabaseService {
         await this.db.table('nodes').bulkAdd(nodes);
     }
 
+    async saveNode(node: NodeChallenge): Promise<void> {
+        if (!this.db) throw new Error('Database not initialized');
+        await this.db.table('nodes').put(node);
+    }
+
     async getNodes(): Promise<NodeChallenge[]> {
         if (!this.db) throw new Error('Database not initialized');
         return await this.db.table('nodes').toArray();

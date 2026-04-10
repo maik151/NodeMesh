@@ -100,7 +100,7 @@ El único resultado aceptable (OUTPUT) que me debes devolver es UN SOLO OBJETO J
   "nodos": [
     {
       "id_temp": "nodo_1",
-      "tipo_reto": "...",
+      "tipo_reto": "DEBE ser uno de: single_choice, multi_choice, cloze_deletion, output_prediction, ordering, anomaly_detection, optimization, case_analysis, feynman_synthesis",
       "requiere_ia": false,
       "contexto": "...",
       "pregunta": "...",

@@ -8,17 +8,16 @@ import { LEVEL_FACES } from '../../../../shared/constants/faces.constants';
 import { QuizEditModalComponent } from '../quiz-edit-modal/quiz-edit-modal.component';
 import { NodeEditModalComponent } from '../node-edit-modal/node-edit-modal.component';
 
-const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
-  single_choice:    { emoji: '🎯', label: 'Single Choice' },
-  multi_choice:     { emoji: '🔳', label: 'Multiple Choice' },
-  multiple_choice:  { emoji: '🔳', label: 'Multiple Choice' },
-  cloze_deletion:   { emoji: '🔤', label: 'Cloze Deletion' },
-  output_prediction:{ emoji: '💻', label: 'Output Prediction' },
-  ordering:         { emoji: '↕️', label: 'Ordering' },
-  anomaly_detection:{ emoji: '🐛', label: 'Anomaly Detection' },
-  optimization:     { emoji: '⚙️', label: 'Optimization' },
-  case_analysis:    { emoji: '⚖️', label: 'Case Analysis' },
-  feynman_synthesis:{ emoji: '🎓', label: 'Feynman Synthesis' },
+const TIPO_MAP: Record<string, { label: string }> = {
+  single_choice:    { label: 'Desafío Único' },
+  multi_choice:     { label: 'Selección Múltiple' },
+  cloze_deletion:   { label: 'Completar Espacios' },
+  output_prediction:{ label: 'Predicción de Salida' },
+  ordering:         { label: 'Ordenamiento Lógico' },
+  anomaly_detection:{ label: 'Detección de Anomalías' },
+  optimization:     { label: 'Optimización de Código' },
+  case_analysis:    { label: 'Análisis de Casos' },
+  feynman_synthesis:{ label: 'Síntesis de Feynman' },
 };
 
 @Component({
@@ -749,22 +748,20 @@ export class QuizPreviewComponent implements OnChanges {
     return this.sanitizer.bypassSecurityTrustHtml(rawSvg);
   }
 
-  getTipoEmoji(tipo: string): string {
-    return TIPO_MAP[tipo]?.emoji || '📋';
-  }
+  // Removiendo método obsoleto que usaba emojis
 
   getTipoLabel(tipo: string): string {
-    if (!tipo) return 'Unknown';
+    if (!tipo) return 'Desconocido';
     const key = tipo.toLowerCase().trim().replace(/ /g, '_');
-    if (key.includes('single')) return 'Single Choice';
-    if (key.includes('multi')) return 'Multiple Choice';
-    if (key.includes('cloze')) return 'Cloze Deletion';
-    if (key.includes('output')) return 'Output Prediction';
-    if (key.includes('order')) return 'Ordering';
-    if (key.includes('anomaly')) return 'Anomaly Detection';
-    if (key.includes('optimiz')) return 'Optimization';
-    if (key.includes('case')) return 'Case Analysis';
-    if (key.includes('feynman')) return 'Feynman Synthesis';
+    if (key.includes('single')) return 'Desafío Único';
+    if (key.includes('multi')) return 'Selección Múltiple';
+    if (key.includes('cloze')) return 'Completar Espacios';
+    if (key.includes('output')) return 'Predicción de Salida';
+    if (key.includes('order')) return 'Ordenamiento Lógico';
+    if (key.includes('anomaly')) return 'Detección de Anomalías';
+    if (key.includes('optimiz')) return 'Optimización de Código';
+    if (key.includes('case')) return 'Análisis de Casos';
+    if (key.includes('feynman')) return 'Síntesis de Feynman';
 
     return TIPO_MAP[tipo]?.label || tipo;
   }

@@ -8,6 +8,7 @@ import { VaultSidebarComponent } from '../../components/vault-sidebar/vault-side
 import { QuizPreviewComponent } from '../../components/quiz-preview/quiz-preview.component';
 import { QuizSessionComponent } from '../../components/quiz-session/quiz-session.component';
 import { LayoutService } from '../../../../core/services/ui/layout.service';
+import { ToastService } from '../../../../core/services/ui/toast.service';
 
 @Component({
   selector: 'app-vault',
@@ -167,6 +168,7 @@ export class VaultComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly layoutService = inject(LayoutService);
+  private readonly toast = inject(ToastService);
 
   allFolders: FolderTheme[] = [];
   folderQuizzes: { [key: string]: QuizSession[] } = {};
@@ -212,6 +214,7 @@ export class VaultComponent implements OnInit {
       creado_en: new Date().toISOString()
     } as FolderTheme;
     await this.db.saveFolder(folder);
+    this.toast.success(`Tema "${data.nombre_tema}" forjado correctamente.`);
     await this.loadData();
   }
 
@@ -233,6 +236,7 @@ export class VaultComponent implements OnInit {
     if (quizzesCount > 0) msg += `\nESTO BORRARÁ TAMBIÉN ${quizzesCount} TEST(S) Y TODOS SUS NODOS.`;
     if (confirm(msg)) {
       await this.db.deleteFolder(folder.folder_id);
+      this.toast.warning(`Tema "${folder.nombre_tema}" eliminado de la bóveda.`);
       await this.loadData();
       if (this.selectedTheme?.folder_id === folder.folder_id) {
         this.selectedTheme = null;
@@ -291,6 +295,7 @@ export class VaultComponent implements OnInit {
   async deleteQuiz(quiz: QuizSession) {
     if (confirm(`¿Eliminar el test "${quiz.titulo_quiz}"?`)) {
       await this.db.deleteQuiz(quiz.quiz_id);
+      this.toast.warning(`Test "${quiz.titulo_quiz}" purgado con éxito.`);
       if (this.selectedQuiz?.quiz_id === quiz.quiz_id) {
         this.selectedQuiz = null;
         this.selectedFolder = null;

@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, inject, ChangeDetectorRef, OnIn
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DatabaseService } from '../../../../core/services/storage/database.service';
+import { ToastService } from '../../../../core/services/ui/toast.service';
 import { FolderTheme } from '../../../../core/models/node.model';
 
 @Component({
@@ -347,6 +348,7 @@ import { FolderTheme } from '../../../../core/models/node.model';
 export class TestUploadComponent implements OnInit {
   private readonly db = inject(DatabaseService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly toast = inject(ToastService);
 
   @Input() payload = '';
   @Input() initialTheme?: FolderTheme;
@@ -636,6 +638,8 @@ export class TestUploadComponent implements OnInit {
     }));
 
     await this.db.saveNodes(nodesToSave);
-    this.onUploadSuccess.emit(`¡${nodesToSave.length} Nodos inyectados con éxito!`);
+    const successMsg = `¡${nodesToSave.length} Nodos inyectados con éxito en "${this.uploadConfig.themeName}"!`;
+    this.toast.success(successMsg);
+    this.onUploadSuccess.emit(successMsg);
   }
 }

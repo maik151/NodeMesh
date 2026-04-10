@@ -2,15 +2,17 @@ import { Component, signal, inject } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
+import { NotificationComponent } from './shared/components/notification/notification.component';
 import { AuthService } from './core/services/auth/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent],
+  imports: [CommonModule, RouterOutlet, SidebarComponent, NotificationComponent],
   template: `
     <div class="app-container" [class.authenticated]="auth.isAuthenticated()">
       <app-sidebar *ngIf="showSidebar()"></app-sidebar>
+      <app-notification />
       
       <main class="content-area">
         <router-outlet />

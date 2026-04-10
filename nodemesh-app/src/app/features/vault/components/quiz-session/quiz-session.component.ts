@@ -36,11 +36,15 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
         <!-- MODERN GLASS HEADER -->
         <header class="qs-header">
           <div class="qs-header-left">
-            <button class="qs-exit-btn-alt" (click)="onClose.emit()" title="Salir">
+            <button 
+              class="qs-exit-btn-alt" 
+              [class.confirming]="isConfirmingExit"
+              (click)="handleExit()" 
+              [title]="isConfirmingExit ? 'Clic de nuevo para confirmar' : 'Salir'">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
                 <path d="M112,216a8,8,0,0,1-8,8H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32h56a8,8,0,0,1,0,16H48V208h56A8,8,0,0,1,112,216Zm117.66-93.66L192,84.69a8,8,0,0,0-13.66,5.65V120H104a8,8,0,0,0,0,16h74.34v29.66a8,8,0,0,0,13.66,5.65l37.66-37.65A8,8,0,0,0,229.66,122.34Z"/>
               </svg>
-              <span>Salir</span>
+              <span>{{ isConfirmingExit ? '¡Confirmar Salida!' : 'Salir' }}</span>
             </button>
             <div class="qs-quiz-info-set">
               <div class="qs-quiz-icon-wrap">
@@ -227,6 +231,7 @@ const TIPO_MAP: Record<string, { label: string; emoji: string }> = {
       font-family: 'JetBrains Mono'; font-size: 0.85rem;
     }
     .qs-exit-btn-alt:hover { color: #f87171; transform: translateX(-2px); }
+    .qs-exit-btn-alt.confirming { color: #ff6b6b; background: rgba(255, 107, 107, 0.1); padding: 4px 12px; border-radius: 8px; font-weight: 800; border: 1px solid rgba(255, 107, 107, 0.2); }
     .qs-exit-btn-alt svg { width: 22px; height: 22px; fill: currentColor; }
 
     .qs-quiz-info-set { display: flex; align-items: center; gap: 0.8rem; }
@@ -296,6 +301,7 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
   @Output() onClose = new EventEmitter<void>();
 
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly toast = inject(ToastService);
   readonly ICONS = TYPE_ICONS;
 
   currentPage = 0;
@@ -309,6 +315,8 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
 
   nodeStates: { [nodeId: number]: NodeState } = {};
   hintsVisible: { [nodeId: number]: boolean } = {};
+  isConfirmingExit = false;
+  private exitTimeout: any;
 
   ngOnInit() {
     this.initStates();
@@ -321,8 +329,9 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
 
   initStates() {
     this.nodes.forEach(node => {
+        const type = this.normalizeType(node.tipo_reto);
         this.nodeStates[node.id!] = {
-            userAnswer: node.tipo_reto === 'multi_choice' ? [] : '',
+            userAnswer: type.includes('multi') ? [] : '',
             isCorrect: null,
             showFeedback: false,
             history: []
@@ -391,51 +400,26 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     if (container) container.scrollTop = 0;
   }
 
-  getTypeName(tipo: string): string {
-    if (!tipo) return 'Unknown';
-    const key = tipo.toLowerCase().trim().replace(/ /g, '_');
-    if (key.includes('single')) return 'Single Choice';
-    if (key.includes('multi')) return 'Multiple Choice';
-    if (key.includes('cloze')) return 'Cloze Deletion';
-    if (key.includes('output')) return 'Output Prediction';
-    if (key.includes('order')) return 'Ordering';
-    if (key.includes('anomaly')) return 'Anomaly Detection';
-    if (key.includes('optimiz')) return 'Optimization';
-    if (key.includes('case')) return 'Case Analysis';
-    if (key.includes('feynman')) return 'Feynman Synthesis';
-
-    return TIPO_MAP[tipo]?.label || tipo;
-  }
-
-  getSafeIcon(tipo: string): string {
-    if (!tipo) return this.ICONS['single_choice'];
-    const key = tipo.toLowerCase().trim().replace(/ /g, '_');
-    
-    if (key.includes('single'))  return this.ICONS['single_choice'];
-    if (key.includes('multi'))   return this.ICONS['multiple_choice'];
-    if (key.includes('cloze'))   return this.ICONS['cloze_deletion'];
-    if (key.includes('output'))  return this.ICONS['output_prediction'];
-    if (key.includes('order'))   return this.ICONS['ordering'];
-    if (key.includes('anomaly')) return this.ICONS['anomaly_detection'];
-    if (key.includes('optimiz')) return this.ICONS['optimization'];
-    if (key.includes('case'))    return this.ICONS['case_analysis'];
-    if (key.includes('feynman')) return this.ICONS['feynman_synthesis'];
-
-    return (this.ICONS as any)[key] || this.ICONS['single_choice'];
+  private normalizeType(tipo: string): string {
+    if (!tipo) return '';
+    return tipo.toLowerCase().trim().replace(/ /g, '_');
   }
 
   isChoiceType(node: NodeChallenge): boolean {
-    return ['single_choice', 'multi_choice', 'ordering'].includes(node.tipo_reto);
+    const t = this.normalizeType(node.tipo_reto);
+    return t.includes('single') || t.includes('multi') || t.includes('order');
   }
 
   isInputType(node: NodeChallenge): boolean {
-    return ['output_prediction', 'cloze_deletion'].includes(node.tipo_reto);
+    const t = this.normalizeType(node.tipo_reto);
+    return t.includes('output') || t.includes('cloze');
   }
 
   selectOption(node: NodeChallenge, opt: string) {
     if (this.isVerified) return;
     const state = this.nodeStates[node.id!];
-    if (node.tipo_reto === 'single_choice') {
+    const type = this.normalizeType(node.tipo_reto);
+    if (type.includes('single')) {
       state.userAnswer = opt;
     } else {
       const current = state.userAnswer as string[];
@@ -465,9 +449,10 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
   verifyPageAnswers() {
     this.visibleNodes.forEach(node => {
       const state = this.nodeStates[node.id!];
+      const type = this.normalizeType(node.tipo_reto);
       let correct = false;
       if (this.isChoiceType(node)) {
-        if (node.tipo_reto === 'single_choice') {
+        if (type.includes('single')) {
           correct = state.userAnswer === node.respuesta_esperada;
         } else {
           const uArr = state.userAnswer as string[];
@@ -489,5 +474,51 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
   finishQuiz() {
     this.stopTimer();
     this.isFinished = true;
+  }
+
+  handleExit() {
+    if (this.isConfirmingExit) {
+      this.onClose.emit();
+    } else {
+      this.isConfirmingExit = true;
+      this.toast.warning('⚠️ ¿Seguro que quieres abandonar? Perderás el progreso de este quiz.', 6000);
+      
+      if (this.exitTimeout) clearTimeout(this.exitTimeout);
+      this.exitTimeout = setTimeout(() => {
+        this.isConfirmingExit = false;
+        this.cdr.detectChanges();
+      }, 5000);
+    }
+  }
+
+  getTypeName(tipo: string): string {
+    if (!tipo) return 'Unknown';
+    const key = this.normalizeType(tipo);
+    if (key.includes('single')) return 'Single Choice';
+    if (key.includes('multi')) return 'Multiple Choice';
+    if (key.includes('cloze')) return 'Cloze Deletion';
+    if (key.includes('output')) return 'Output Prediction';
+    if (key.includes('order')) return 'Ordering';
+    if (key.includes('anomaly')) return 'Anomaly Detection';
+    if (key.includes('optimiz')) return 'Optimization';
+    if (key.includes('case')) return 'Case Analysis';
+    if (key.includes('feynman')) return 'Feynman Synthesis';
+
+    return TIPO_MAP[tipo]?.label || tipo;
+  }
+
+  getSafeIcon(tipo: string): string {
+    const key = this.normalizeType(tipo);
+    if (key.includes('single'))  return this.ICONS['single_choice'];
+    if (key.includes('multi'))   return this.ICONS['multiple_choice'];
+    if (key.includes('cloze'))   return this.ICONS['cloze_deletion'];
+    if (key.includes('output'))  return this.ICONS['output_prediction'];
+    if (key.includes('order'))   return this.ICONS['ordering'];
+    if (key.includes('anomaly')) return this.ICONS['anomaly_detection'];
+    if (key.includes('optimiz')) return this.ICONS['optimization'];
+    if (key.includes('case'))    return this.ICONS['case_analysis'];
+    if (key.includes('feynman')) return this.ICONS['feynman_synthesis'];
+
+    return (this.ICONS as any)[key] || this.ICONS['single_choice'];
   }
 }

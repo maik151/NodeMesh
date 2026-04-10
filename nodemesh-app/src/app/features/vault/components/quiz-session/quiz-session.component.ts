@@ -108,23 +108,25 @@ const TIPO_MAP: Record<string, { label: string }> = {
                 
                 <div class="qs-node-body">
                   <div class="qs-node-meta">
-                    <div class="qs-type-badge">
-                      <svg class="qs-type-icon" viewBox="0 0 256 256">
-                        <path [attr.d]="getSafeIcon(node.tipo_reto)"/>
-                      </svg>
-                      <span class="qs-type-tag">{{ getTypeName(node.tipo_reto) }}</span>
-                    </div>
-                    
-                    <!-- MODERN PISTA BUTTON -->
-                    <div class="qs-hint-container" *ngIf="node.pista">
-                      <button class="qs-hint-trigger" (click)="toggleHint(node.id!)">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-                          <path d="M112,184H96a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm48-16H144a8,8,0,0,0,0,16h16a8,8,0,0,0,0-16Zm40-16H56a16,16,0,0,0-16,16v32a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V168A16,16,0,0,0,200,152Zm0,48H56V168H200v32ZM128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Z"/>
+                    <div class="qs-meta-left">
+                      <div class="qs-type-badge">
+                        <svg class="qs-type-icon" viewBox="0 0 256 256">
+                          <path [attr.d]="getSafeIcon(node.tipo_reto)"/>
                         </svg>
-                        <span>Pista</span>
-                      </button>
-                      <div class="qs-hint-glass" [class.is-visible]="hintsVisible[node.id!]">
-                         <p>{{ node.pista }}</p>
+                        <span class="qs-type-tag">{{ getTypeName(node.tipo_reto) }}</span>
+                      </div>
+                      
+                      <!-- PISTA BUTTON GROUPED -->
+                      <div class="qs-hint-wrap" *ngIf="node.pista">
+                        <button class="qs-hint-trigger" (click)="toggleHint(node.id!)" [class.active]="hintsVisible[node.id!]">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                            <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm48-88a8,8,0,0,1-8,8H112a8,8,0,0,1,0-16h56A8,8,0,0,1,176,128Zm-24,40a8,8,0,0,1-8,8H112a8,8,0,0,1,0-16h32A8,8,0,0,1,152,168Z"/>
+                          </svg>
+                          <span>Pista</span>
+                        </button>
+                        <div class="qs-hint-glass" [class.is-visible]="hintsVisible[node.id!]">
+                           <p>{{ node.pista }}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -282,10 +284,11 @@ const TIPO_MAP: Record<string, { label: string }> = {
 
     .qs-node-body { flex: 1; display: flex; flex-direction: column; gap: 0.8rem; }
 
-    .qs-node-meta { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-    .qs-type-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 2px 8px; background: rgba(192, 132, 252, 0.05); border-radius: 4px; border: 1px solid rgba(192, 132, 252, 0.1); width: fit-content; }
-    .qs-type-icon { width: 12px; height: 12px; fill: #c084fc; }
-    .qs-type-tag { font-size: 0.5rem; text-transform: uppercase; font-weight: 800; color: #c084fc; }
+    .qs-node-meta { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .qs-meta-left { display: flex; align-items: center; gap: 0.8rem; }
+    .qs-type-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 4px 10px; background: rgba(192, 132, 252, 0.08); border-radius: 6px; border: 1px solid rgba(192, 132, 252, 0.2); width: fit-content; }
+    .qs-type-icon { width: 13px; height: 13px; fill: #c084fc; }
+    .qs-type-tag { font-size: 0.65rem; text-transform: uppercase; font-weight: 800; color: #c084fc; letter-spacing: 0.02em; }
     
     .qs-question { font-size: 1.05rem; font-weight: 400; line-height: 1.5; margin: 0; color: var(--theme-text); }
     .qs-snippet-box { background: var(--theme-surface); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--theme-border); font-size: 0.75rem; color: var(--theme-text-secondary); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
@@ -313,13 +316,14 @@ const TIPO_MAP: Record<string, { label: string }> = {
     .qs-res-close { background: var(--theme-brand-neon); color: #000; border: none; border-radius: 10px; padding: 0.8rem 2.5rem; font-weight: 800; cursor: pointer; box-shadow: 0 5px 15px rgba(159, 255, 34, 0.2); }
 
     /* HINT REVEAL */
-    .qs-hint-container { position: relative; }
-    .qs-hint-trigger { background: rgba(134, 219, 0, 0.05); border: 1px solid rgba(134, 219, 0, 0.2); border-radius: 6px; padding: 4px 10px; color: var(--theme-brand-neon); font-size: 0.7rem; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
-    .qs-hint-trigger:hover { background: rgba(134, 219, 0, 0.12); transform: scale(1.05); }
+    .qs-hint-wrap { position: relative; }
+    .qs-hint-trigger { background: rgba(255, 193, 7, 0.05); border: 1px solid rgba(255, 193, 7, 0.2); border-radius: 6px; padding: 4px 10px; color: #ffc107; font-size: 0.65rem; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
+    .qs-hint-trigger:hover, .qs-hint-trigger.active { background: rgba(255, 193, 7, 0.15); border-color: #ffc107; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(255, 193, 7, 0.1); }
     .qs-hint-trigger svg { width: 14px; height: 14px; fill: currentColor; }
 
-    .qs-hint-glass { position: absolute; top: calc(100% + 10px); left: 0; width: 280px; background: rgba(255,255,255,0.02); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--theme-border); border-radius: 12px; padding: 1rem; font-size: 0.75rem; color: var(--theme-text-secondary); box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 100; opacity: 0; pointer-events: none; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .qs-hint-glass { position: absolute; top: calc(100% + 10px); left: 0; width: 320px; background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 12px; padding: 1.25rem; font-size: 0.8rem; line-height: 1.5; color: #fff; box-shadow: 0 15px 40px rgba(0,0,0,0.4); z-index: 1000; opacity: 0; pointer-events: none; transform: translateY(-10px); transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .qs-hint-glass.is-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .qs-hint-glass p { margin: 0; }
 
     /* LOG HISTORY */
     .qs-history-log { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; animation: qs-fade-in 0.3s ease; }

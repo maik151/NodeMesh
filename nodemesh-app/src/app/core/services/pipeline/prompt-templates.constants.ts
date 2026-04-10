@@ -106,21 +106,23 @@ El único resultado aceptable (OUTPUT) que me debes devolver es UN SOLO OBJETO J
       "pregunta": "...",
       "opciones": ["Opción A", "Opción B", "Opción C", "Opción D"],
       "retroalimentaciones_opciones": {
-         "Opción A": "Explica la lógica técnica de por qué esta opción es CORRECTA.",
-         "Opción B": "Explica el error conceptual o técnico de por qué esta opción es INCORRECTA.",
+         "Opción A": "Explica la lógica técnica de por qué esta opción es CORRECTA. USA AFIRMACIONES DIRECTAS, NO PREGUNTAS.",
+         "Opción B": "Explica el error conceptual o técnico de por qué esta opción es INCORRECTA. USA AFIRMACIONES DIRECTAS, NO PREGUNTAS.",
          "Opción C": "...",
          "Opción D": "..."
       },
       "respuesta_esperada": "...",
-      "pista_opcional": "...",
-      "justificacion_correcta": "...",
-      "justificacion_incorrecta": "..."
+      "pista": "Proporciona una pista técnica y útil que guíe al usuario sin dar la respuesta.",
+      "justificacion_correcta": "Afirmación directa y técnica de éxito.",
+      "justificacion_incorrecta": "Afirmación directa y técnica del error global."
     }
   ]
 }
 \`\`\`
 
 NOTAS ESTRATÉGICAS DE DATO:
+- Tono de Retroalimentación: Queda ESTRICTAMENTE PROHIBIDO usar preguntas retóricas (ej: "¿No crees que...?", "¿Por qué...?", "¿Y si...?"). Las retroalimentaciones DEBEN ser afirmaciones directas, pedagógicas y técnicas (ej: "Esto falla porque la memoria se desborda...", "El tipo de dato Boolean es el espejo más fiel de la lógica binaria ya que...").
+- campo "pista": Es OBLIGATORIO. Siempre debe viajar con información útil.
 - Campos Condicionales (null): Si el tipo de reto no tiene opciones múltiples (ej: output_prediction, feynman_synthesis, anomaly_detection), el campo "opciones" DEBE viajar como null estrictamente.
 - respuesta_esperada: 
   * En retos deterministas simples (single_choice, multi_choice, cloze_deletion, ordering, output_prediction), guarda la Respuesta Exacta.

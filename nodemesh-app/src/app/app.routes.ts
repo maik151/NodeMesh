@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { authGuard } from './core/guards/auth.guard';
+import { quizGuard } from './core/guards/quiz.guard';
 // byokGuard removed as it was unused
 
 export const routes: Routes = [
@@ -21,6 +22,7 @@ export const routes: Routes = [
     {
         path: 'vault',
         canActivate: [authGuard],
+        canDeactivate: [quizGuard],
         loadComponent: () => import('./features/vault/pages/vault/vault.component').then(m => m.VaultComponent)
     },
     {

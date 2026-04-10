@@ -252,6 +252,9 @@ export class VaultComponent implements OnInit {
       this.studyingQuiz = quiz;
       this.isStudying = true;
       
+      // Notify layout for navigation protection
+      this.layoutService.setQuizActive(true);
+      
       // Auto-collapse sidebars
       this.layoutService.collapseSidebar();
       this.sidebarCollapsed = true;
@@ -266,6 +269,9 @@ export class VaultComponent implements OnInit {
     this.isStudying = false;
     this.studyingQuiz = null;
     this.studyingNodes = [];
+
+    // Unlock navigation
+    this.layoutService.setQuizActive(false);
 
     // Restore sidebars
     this.layoutService.expandSidebar();

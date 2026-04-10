@@ -70,6 +70,17 @@ const TIPO_MAP: Record<string, { label: string }> = {
               </div>
             </div>
 
+            <!-- Precisión Widget -->
+            <div class="qs-widget">
+              <div class="qs-widget-main">
+                <span class="qs-val">{{ scorePercent }}%</span>
+                <span class="qs-lbl">Precisión</span>
+              </div>
+              <div class="qs-widget-prog-track">
+                <div class="qs-widget-prog-fill" [style.width.%]="scorePercent" style="background: var(--theme-brand-neon); box-shadow: 0 0 15px var(--theme-brand-neon);"></div>
+              </div>
+            </div>
+
             <!-- Tiempo Widget -->
             <div class="qs-widget">
               <div class="qs-widget-main">
@@ -148,6 +159,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
                           <span class="log-txt">{{ h.feedback }}</span>
                        </div>
                     </div>
+                  </div>
                 </div>
               </div>
               <div class="qs-divider" *ngIf="i < visibleNodes.length - 1"></div>

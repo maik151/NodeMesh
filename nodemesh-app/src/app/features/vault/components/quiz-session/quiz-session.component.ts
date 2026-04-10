@@ -10,7 +10,9 @@ interface NodeState {
   userAnswer: string | string[];
   isCorrect: boolean | null;
   showFeedback: boolean;
+  failedOptions: string[]; // NEW: Track which options were tried and failed
   history: { selection: string; feedback: string; isCorrect: boolean }[];
+  wrongAttempts: number; // NEW: Track count for scoring
 }
 
 const TIPO_MAP: Record<string, { label: string }> = {
@@ -101,13 +103,19 @@ const TIPO_MAP: Record<string, { label: string }> = {
                       </svg>
                       <span class="qs-type-tag">{{ getTypeName(node.tipo_reto) }}</span>
                     </div>
-                    <button class="qs-hint-link" *ngIf="node.pista" (click)="toggleHint(node.id!)">
-                      Pista
-                    </button>
-                  </div>
-
-                  <div class="qs-pista-inline" *ngIf="hintsVisible[node.id!]">
-                    {{ node.pista }}
+                    
+                    <!-- MODERN PISTA BUTTON -->
+                    <div class="qs-hint-container" *ngIf="node.pista">
+                      <button class="qs-hint-trigger" (click)="toggleHint(node.id!)">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                          <path d="M112,184H96a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm48-16H144a8,8,0,0,0,0,16h16a8,8,0,0,0,0-16Zm40-16H56a16,16,0,0,0-16,16v32a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V168A16,16,0,0,0,200,152Zm0,48H56V168H200v32ZM128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Z"/>
+                        </svg>
+                        <span>Pista</span>
+                      </button>
+                      <div class="qs-hint-glass" [class.is-visible]="hintsVisible[node.id!]">
+                         <p>{{ node.pista }}</p>
+                      </div>
+                    </div>
                   </div>
 
                   <h3 class="qs-question">{{ node.pregunta }}</h3>
@@ -122,33 +130,24 @@ const TIPO_MAP: Record<string, { label: string }> = {
                         *ngFor="let opt of node.opciones"
                         class="qs-opt-row"
                         [class.is-selected]="isSelected(node, opt)"
+                        [class.is-failed]="nodeStates[node.id!].failedOptions.includes(opt)"
                         [class.reveal-correct]="isVerified && isOptionCorrect(node, opt)"
-                        [class.reveal-wrong]="isVerified && isSelected(node, opt) && !isOptionCorrect(node, opt)"
                         (click)="selectOption(node, opt)"
-                        [disabled]="isVerified">
+                        [disabled]="isVerified || nodeStates[node.id!].isCorrect !== null || nodeStates[node.id!].failedOptions.includes(opt)">
                         <div class="qs-mark"></div>
                         {{ opt }}
                       </button>
                     </div>
 
-                    <div class="qs-input-v" *ngIf="isInputType(node)">
-                      <input 
-                        type="text" 
-                        class="qs-field" 
-                        [(ngModel)]="nodeStates[node.id!].userAnswer"
-                        (ngModelChange)="onAnswerChange()"
-                        [disabled]="isVerified"
-                        [class.is-correct]="isVerified && nodeStates[node.id!].isCorrect"
-                        [class.is-wrong]="isVerified && nodeStates[node.id!].isCorrect === false"
-                        placeholder="Contesta aquí...">
+                    <!-- ITERATIVE FEEDBACK HISTORY -->
+                    <div class="qs-history-log" *ngIf="nodeStates[node.id!].history.length > 0">
+                       <div *ngFor="let h of nodeStates[node.id!].history" 
+                            class="qs-log-entry" 
+                            [class.is-correct]="h.isCorrect">
+                          <span class="log-mark">{{ h.isCorrect ? '✓' : '✗' }}</span>
+                          <span class="log-txt">{{ h.feedback }}</span>
+                       </div>
                     </div>
-                  </div>
-
-                  <div class="qs-node-feedback" *ngIf="isVerified && nodeStates[node.id!].isCorrect !== null">
-                    <div class="qs-fb-card" [class.fb-ok]="nodeStates[node.id!].isCorrect">
-                      <p>{{ nodeStates[node.id!].isCorrect ? node.justificacion_correcta : node.justificacion_incorrecta }}</p>
-                    </div>
-                  </div>
                 </div>
               </div>
               <div class="qs-divider" *ngIf="i < visibleNodes.length - 1"></div>
@@ -263,7 +262,12 @@ const TIPO_MAP: Record<string, { label: string }> = {
     .qs-node-block { display: flex; gap: 1.5rem; animation: qs-slide-up 0.4s ease; }
     @keyframes qs-slide-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .qs-node-num { font-size: 1rem; font-weight: 800; opacity: 0.15; color: var(--theme-text); margin-top: 0.2rem; }
+    .qs-node-num { font-size: 1.1rem; font-weight: 800; color: var(--theme-text); opacity: 0.15; margin-top: 0.2rem; transition: 0.3s; }
+    .qs-node-block:hover .qs-node-num { opacity: 0.8; color: var(--theme-brand-neon); text-shadow: 0 0 10px rgba(159, 255, 34, 0.4); }
+    
+    :host-context([data-theme="light"]) .qs-node-num { opacity: 0.1; color: #000; }
+    :host-context([data-theme="light"]) .qs-node-block:hover .qs-node-num { opacity: 0.6; color: #1a1a2e; }
+
     .qs-node-body { flex: 1; display: flex; flex-direction: column; gap: 0.8rem; }
 
     .qs-type-badge { display: flex; align-items: center; gap: 0.4rem; padding: 2px 8px; background: rgba(192, 132, 252, 0.05); border-radius: 4px; border: 1px solid rgba(192, 132, 252, 0.1); }
@@ -291,6 +295,21 @@ const TIPO_MAP: Record<string, { label: string }> = {
     .qs-verify-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(159, 255, 34, 0.4); }
 
     .qs-res-close { background: var(--theme-brand-neon); color: #000; border: none; border-radius: 10px; padding: 0.8rem 2.5rem; font-weight: 800; cursor: pointer; box-shadow: 0 5px 15px rgba(159, 255, 34, 0.2); }
+
+    /* HINT REVEAL */
+    .qs-hint-container { position: relative; }
+    .qs-hint-trigger { background: rgba(134, 219, 0, 0.05); border: 1px solid rgba(134, 219, 0, 0.2); border-radius: 6px; padding: 4px 10px; color: var(--theme-brand-neon); font-size: 0.7rem; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
+    .qs-hint-trigger:hover { background: rgba(134, 219, 0, 0.12); transform: scale(1.05); }
+    .qs-hint-trigger svg { width: 14px; height: 14px; fill: currentColor; }
+
+    .qs-hint-glass { position: absolute; top: calc(100% + 10px); left: 0; width: 280px; background: rgba(255,255,255,0.02); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--theme-border); border-radius: 12px; padding: 1rem; font-size: 0.75rem; color: var(--theme-text-secondary); box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 100; opacity: 0; pointer-events: none; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .qs-hint-glass.is-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+    /* LOG HISTORY */
+    .qs-history-log { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; animation: qs-fade-in 0.3s ease; }
+    .qs-log-entry { display: flex; gap: 0.75rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 3px solid #f87171; font-size: 0.8rem; line-height: 1.4; color: var(--theme-text-muted); }
+    .qs-log-entry.is-correct { border-left-color: var(--theme-brand-neon); color: var(--theme-text); background: rgba(134, 219, 0, 0.03); }
+    .log-mark { font-weight: 900; }
 
     @keyframes qs-fade-in { from { opacity: 0; } to { opacity: 1; } }
   `]
@@ -334,7 +353,9 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
             userAnswer: type.includes('multi') ? [] : '',
             isCorrect: null,
             showFeedback: false,
-            history: []
+            failedOptions: [],
+            history: [],
+            wrongAttempts: 0
         };
         this.hintsVisible[node.id!] = false;
     });
@@ -383,9 +404,25 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     return `${mm}:${ss}`;
   }
 
+  get totalPossibleClicks(): number {
+     return this.nodes.reduce((acc, node) => acc + (node.opciones?.length || 1), 0);
+  }
+
+  get totalWrongClicks(): number {
+     return this.nodes.reduce((acc, node) => acc + this.nodeStates[node.id!].wrongAttempts, 0);
+  }
+
   get scorePercent() {
     if (this.nodes.length === 0) return 0;
-    return Math.round((this.totalCorrect / this.nodes.length) * 100);
+    // PRECISION LOGIC: Penalize every wrong click
+    const totalPossible = this.totalPossibleClicks;
+    const totalWrong = this.totalWrongClicks;
+    const accuracy = Math.max(0, (totalPossible - totalWrong) / totalPossible);
+    
+    // Also consider how many are actually finished correctly
+    const completionWeight = this.totalCorrect / this.nodes.length;
+    
+    return Math.round((accuracy * completionWeight) * 100);
   }
 
   onAnswerChange() {
@@ -416,12 +453,36 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
   }
 
   selectOption(node: NodeChallenge, opt: string) {
-    if (this.isVerified) return;
+    if (this.isVerified || this.isFinished) return;
     const state = this.nodeStates[node.id!];
     const type = this.normalizeType(node.tipo_reto);
+
     if (type.includes('single')) {
-      state.userAnswer = opt;
+      const isCorrect = this.isOptionCorrect(node, opt);
+      
+      if (isCorrect) {
+        state.userAnswer = opt;
+        state.isCorrect = true;
+        this.totalCorrect++;
+        state.history.push({
+          selection: opt,
+          feedback: node.justificacion_correcta,
+          isCorrect: true
+        });
+        this.toast.success('¡Correcto! Nodo sincronizado.');
+      } else {
+        state.failedOptions.push(opt);
+        state.wrongAttempts++;
+        const feedback = node.retroalimentaciones_opciones?.[opt] || node.justificacion_incorrecta || 'Opción incorrecta en este contexto.';
+        state.history.push({
+          selection: opt,
+          feedback: feedback,
+          isCorrect: false
+        });
+        this.toast.warning('Esa no es la respuesta. Analiza la retroalimentación.');
+      }
     } else {
+      // Logic for multi_choice or others
       const current = state.userAnswer as string[];
       const idx = current.indexOf(opt);
       if (idx > -1) current.splice(idx, 1);

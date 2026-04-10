@@ -104,7 +104,13 @@ El único resultado aceptable (OUTPUT) que me debes devolver es UN SOLO OBJETO J
       "requiere_ia": false,
       "contexto": "...",
       "pregunta": "...",
-      "opciones": [...],
+      "opciones": ["Opción A", "Opción B", "Opción C", "Opción D"],
+      "retroalimentaciones_opciones": {
+         "Opción A": "Breve explicación de por qué A es incorrecta o correcta",
+         "Opción B": "...",
+         "Opción C": "...",
+         "Opción D": "..."
+      },
       "respuesta_esperada": "...",
       "pista_opcional": "...",
       "justificacion_correcta": "...",

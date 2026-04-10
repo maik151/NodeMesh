@@ -19,6 +19,7 @@ export interface NodeChallenge {
     contexto: string;
     pregunta: string;
     opciones: string[] | null;
+    retroalimentaciones_opciones?: Record<string, string>; // NEW: Per-option feedback
     respuesta_esperada: string | string[];
     justificacion_correcta: string;
     justificacion_incorrecta: string;

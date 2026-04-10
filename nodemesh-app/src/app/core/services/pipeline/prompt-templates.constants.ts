@@ -57,7 +57,7 @@ export const buildPromptV2 = (config: PromptConfigV2): string => {
   }
 
   const pistaKey = config.incluirPistas 
-    ? `\n    "pista_opcional": "Una pista sutil acorde a tu personalidad que destrabe al humano sin revelar la respuesta.",`
+    ? `\n    "pista": "Una pista técnica directa que guíe al usuario.",`
     : '';
 
   const jsonWrapperStart = config.forzarJsonRaw ? '' : '```json\n';
@@ -106,22 +106,20 @@ El único resultado aceptable (OUTPUT) que me debes devolver es UN SOLO OBJETO J
       "pregunta": "...",
       "opciones": ["Opción A", "Opción B", "Opción C", "Opción D"],
       "retroalimentaciones_opciones": {
-         "Opción A": "Explica la lógica técnica de por qué esta opción es CORRECTA. USA AFIRMACIONES DIRECTAS, NO PREGUNTAS.",
-         "Opción B": "Explica el error conceptual o técnico de por qué esta opción es INCORRECTA. USA AFIRMACIONES DIRECTAS, NO PREGUNTAS.",
+         "Opción A": "Explica la lógica técnica de por qué esta opción es CORRECTA. PROHIBIDO USAR SIGNOS DE INTERROGACIÓN.",
+         "Opción B": "Explica el error conceptual o técnico de por qué esta opción es INCORRECTA. PROHIBIDO USAR SIGNOS DE INTERROGACIÓN.",
          "Opción C": "...",
          "Opción D": "..."
       },
       "respuesta_esperada": "...",
-      "pista": "Proporciona una pista técnica y útil que guíe al usuario sin dar la respuesta.",
-      "justificacion_correcta": "Afirmación directa y técnica de éxito.",
-      "justificacion_incorrecta": "Afirmación directa y técnica del error global."
+      "pista": "Pista técnica directa (Sin signos de interrogación)."
     }
   ]
 }
 \`\`\`
 
 NOTAS ESTRATÉGICAS DE DATO:
-- Tono de Retroalimentación: Queda ESTRICTAMENTE PROHIBIDO usar preguntas retóricas (ej: "¿No crees que...?", "¿Por qué...?", "¿Y si...?"). Las retroalimentaciones DEBEN ser afirmaciones directas, pedagógicas y técnicas (ej: "Esto falla porque la memoria se desborda...", "El tipo de dato Boolean es el espejo más fiel de la lógica binaria ya que...").
+- Tono de Retroalimentación: Queda ESTRICTAMENTE PROHIBIDO usar preguntas retóricas (ej: "¿No crees que...?", "¿Por qué...?", "¿Y si...?"). Las retroalimentaciones DEBEN ser afirmaciones directas, pedagógicas y técnicas. PROHIBIDO EL USO DE SIGNOS DE INTERROGACIÓN (?) en cualquier justificación.
 - campo "pista": Es OBLIGATORIO. Siempre debe viajar con información útil.
 - Campos Condicionales (null): Si el tipo de reto no tiene opciones múltiples (ej: output_prediction, feynman_synthesis, anomaly_detection), el campo "opciones" DEBE viajar como null estrictamente.
 - respuesta_esperada: 

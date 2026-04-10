@@ -128,6 +128,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
                            <p>{{ node.pista }}</p>
                         </div>
                       </div>
+                      <div *ngIf="!node.pista" style="font-size: 0.6rem; color: rgba(255,0,0,0.5);">DEBUG: No Pista data</div>
                     </div>
                   </div>
 
@@ -486,13 +487,13 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
         this.totalCorrect++;
         state.history.push({
           selection: opt,
-          feedback: node.justificacion_correcta,
+          feedback: node.retroalimentaciones_opciones?.[opt] || '¡Correcto! Respuesta sincronizada.',
           isCorrect: true
         });
       } else {
         state.failedOptions.push(opt);
         state.wrongAttempts++;
-        const feedback = node.retroalimentaciones_opciones?.[opt] || node.justificacion_incorrecta || 'Esta opción no es la correcta para este reto.';
+        const feedback = node.retroalimentaciones_opciones?.[opt] || 'Esta opción no es la correcta para este reto. Analiza los requerimientos de nuevo.';
         state.history.push({
           selection: opt,
           feedback: feedback,

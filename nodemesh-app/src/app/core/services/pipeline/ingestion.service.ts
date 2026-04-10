@@ -32,15 +32,23 @@ Reresponde SOLO con un array JSON válido. Cada objeto DEBE seguir este esquema:
   "requiere_ia": boolean,
   "contexto": "Contexto técnico breve",
   "pregunta": "¿Qué...?",
-  "opciones": ["A", "B", "C", "D"] o null si no aplica,
-  "respuesta_esperada": "string" o ["array", "de", "strings"],
-  "justificacion_correcta": "Retroalimentación positiva detallada",
-  "justificacion_incorrecta": "Análisis del error y por qué falló"  
+  "opciones": ["A", "B", "C", "D"] o null,
+  "retroalimentaciones_opciones": {
+     "A": "Justificación técnica directa por qué es A",
+     "B": "Justificación técnica directa por qué no es B",
+     "C": "...",
+     "D": "..."
+  },
+  "respuesta_esperada": "string",
+  "pista": "Pista técnica directa"
 }
 
 - "requiere_ia" es true solo para los tipos 6, 7, 8 y 9.
 - "opciones" es null para tipos que no sean choice o ordering.
-- Mantén un tono técnico, preciso y desafiante (Nivel Senior).`;
+- "retroalimentaciones_opciones": DEBE incluir una justificación técnica para CADA opción.
+- PROHIBIDO usar preguntas retóricas en las justificaciones.
+- El campo "pista" es OBLIGATORIO.
+- Tono técnico, preciso y desafiante (Nivel Senior).`;
 
     constructor(
         private readonly cryptoService: CryptoService,
@@ -152,9 +160,9 @@ Reresponde SOLO con un array JSON válido. Cada objeto DEBE seguir este esquema:
             contexto: item.contexto || '',
             pregunta: item.pregunta || item.question || '',
             opciones: Array.isArray(item.opciones) ? item.opciones : (Array.isArray(item.options) ? item.options : null),
+            retroalimentaciones_opciones: item.retroalimentaciones_opciones || {},
             respuesta_esperada: item.respuesta_esperada || item.expectedAnswer || '',
-            justificacion_correcta: item.justificacion_correcta || '',
-            justificacion_incorrecta: item.justificacion_incorrecta || '',
+            pista: item.pista || 'Analiza el contexto detalladamente.',
             createdAt: now,
             nextReviewDate: now
         }));

@@ -21,9 +21,7 @@ export interface NodeChallenge {
     opciones: string[] | null;
     retroalimentaciones_opciones?: Record<string, string>; // NEW: Per-option feedback
     respuesta_esperada: string | string[];
-    justificacion_correcta: string;
-    justificacion_incorrecta: string;
-    pista?: string;
+    pista: string; // Mandatorio en el prompt
     folder_id?: string;
     quiz_id?: string;
     nextReviewDate?: Date;

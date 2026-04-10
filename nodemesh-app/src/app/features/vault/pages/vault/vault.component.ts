@@ -6,11 +6,13 @@ import { FolderTheme, NodeChallenge, QuizSession } from '../../../../core/models
 import { Router } from '@angular/router';
 import { VaultSidebarComponent } from '../../components/vault-sidebar/vault-sidebar.component';
 import { QuizPreviewComponent } from '../../components/quiz-preview/quiz-preview.component';
+import { QuizSessionComponent } from '../../components/quiz-session/quiz-session.component';
+import { LayoutService } from '../../../../core/services/ui/layout.service';
 
 @Component({
   selector: 'app-vault',
   standalone: true,
-  imports: [CommonModule, FormsModule, VaultSidebarComponent, QuizPreviewComponent],
+  imports: [CommonModule, FormsModule, VaultSidebarComponent, QuizPreviewComponent, QuizSessionComponent],
   template: `
     <div class="vault-shell">
       <!-- SIDEBAR EXPLORER -->
@@ -54,9 +56,9 @@ import { QuizPreviewComponent } from '../../components/quiz-preview/quiz-preview
            </div>
         </div>
 
-        <!-- Quiz Preview -->
+        <!-- Quiz Preview or Study Session -->
         <app-quiz-preview
-          *ngIf="selectedQuiz"
+          *ngIf="selectedQuiz && !isStudying"
           [quiz]="selectedQuiz"
           [folder]="selectedFolder"
           [isSidebarCollapsed]="sidebarCollapsed"
@@ -65,6 +67,13 @@ import { QuizPreviewComponent } from '../../components/quiz-preview/quiz-preview
           (onQuizUpdated)="onQuizUpdated($event)"
           (onDeleteNode)="deleteNode($event)">
         </app-quiz-preview>
+
+        <app-quiz-session
+          *ngIf="isStudying && studyingQuiz"
+          [quiz]="studyingQuiz"
+          [nodes]="studyingNodes"
+          (onClose)="stopStudy()">
+        </app-quiz-session>
       </main>
     </div>
   `,
@@ -157,6 +166,7 @@ export class VaultComponent implements OnInit {
   private readonly db = inject(DatabaseService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly layoutService = inject(LayoutService);
 
   allFolders: FolderTheme[] = [];
   folderQuizzes: { [key: string]: QuizSession[] } = {};
@@ -164,6 +174,10 @@ export class VaultComponent implements OnInit {
   selectedTheme: FolderTheme | null = null;
   selectedQuiz: QuizSession | null = null;
   selectedFolder: FolderTheme | null = null;
+  
+  isStudying = false;
+  studyingQuiz: QuizSession | null = null;
+  studyingNodes: NodeChallenge[] = [];
 
   isLoadingData = true;
   sidebarCollapsed = false;
@@ -228,8 +242,32 @@ export class VaultComponent implements OnInit {
     }
   }
 
-  playQuiz(quiz: QuizSession) {
-    this.router.navigate(['/simulator'], { queryParams: { quiz: quiz.quiz_id, folder: quiz.folder_id } });
+  async playQuiz(quiz: QuizSession) {
+    try {
+      this.studyingNodes = await this.db.getNodesInQuiz(quiz.quiz_id);
+      this.studyingQuiz = quiz;
+      this.isStudying = true;
+      
+      // Auto-collapse sidebars
+      this.layoutService.collapseSidebar();
+      this.sidebarCollapsed = true;
+
+      this.cdr.detectChanges();
+    } catch (e) {
+      console.error('[Vault] Error starting study session:', e);
+    }
+  }
+
+  stopStudy() {
+    this.isStudying = false;
+    this.studyingQuiz = null;
+    this.studyingNodes = [];
+
+    // Restore sidebars
+    this.layoutService.expandSidebar();
+    this.sidebarCollapsed = false;
+
+    this.cdr.detectChanges();
   }
 
   onQuizUpdated(updatedQuiz: QuizSession) {

@@ -23,11 +23,11 @@ import { FolderTheme } from '../../../../core/models/node.model';
         </header>
 
         <div class="modal-body" style="padding-top: 0.5rem;">
-          <div class="row-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div class="row-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0.5rem;">
             <div class="input-group" style="position: relative;">
-              <label class="cc-label">Tema:</label>
+              <label class="cc-label">Tema / Carpeta:</label>
               <div style="position: relative; display: flex; align-items: center;">
-                 <input type="text" [(ngModel)]="uploadConfig.themeName" (input)="filterThemes()" (focus)="onFocusTheme()" (blur)="hideThemeDropdownDelay()" placeholder="Nombre del Tema / Carpeta..." class="cc-input" style="width: 100%; border-radius: 8px; padding-right: 3.5rem;">
+                 <input type="text" [(ngModel)]="uploadConfig.themeName" (input)="onThemeNameInput()" (focus)="onFocusTheme()" (blur)="hideThemeDropdownDelay()" placeholder="Ej: Fundamentos de Programación..." class="cc-input" style="width: 100%; border-radius: 8px; padding-right: 3.5rem;">
                  <svg style="position: absolute; right: 16px; opacity: 0.6; color: var(--theme-brand-neon);" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
               </div>
               
@@ -49,9 +49,21 @@ import { FolderTheme } from '../../../../core/models/node.model';
             </div>
 
             <div class="input-group">
-              <label class="cc-label">Título del Quiz:</label>
-              <input type="text" [(ngModel)]="uploadConfig.quizTitle" placeholder="Nombre descriptivo de esta sesión..." class="cc-input" style="width: 100%; border-radius: 8px;">
+              <label class="cc-label">Identificador del Test:</label>
+              <input type="text" [(ngModel)]="uploadConfig.quizTitle" placeholder="Título que llevará en el Vault..." class="cc-input" style="width: 100%; border-radius: 8px;">
             </div>
+          </div>
+
+          <!-- THEME DISCLAIMER / STATUS -->
+          <div class="theme-status-alert" *ngIf="uploadConfig.themeName.trim()">
+             <div class="status-content" *ngIf="themeStatus === 'new'">
+                <svg class="status-icon warn" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M236.8,188.09,149.35,36.22a16,16,0,0,0-26.7,0L35.2,188.09a16,16,0,0,0,13.35,23.91H223.45a16,16,0,0,0,13.35-23.91ZM128,176a12,12,0,1,1,12-12A12,12,0,0,1,128,176Zm8-40a8,8,0,0,1-16,0V96a8,8,0,0,1,16,0Z"></path></svg>
+                <span>Nuevo Tema Detectado: Se creará la carpeta <strong>"{{ uploadConfig.themeName }}"</strong></span>
+             </div>
+             <div class="status-content" *ngIf="themeStatus === 'existing'">
+                <svg class="status-icon check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128ZM173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34Z"></path></svg>
+                <span>Asignando a Carpeta Existente: <strong>"{{ uploadConfig.themeName }}"</strong></span>
+             </div>
           </div>
 
           <div class="metrics-track" style="display: flex; gap: 1rem; margin-bottom: 1.25rem; padding: 0.85rem 1.25rem; background: rgba(159, 255, 34, 0.04); border-radius: 16px; border: 1px solid rgba(159, 255, 34, 0.1); backdrop-filter: blur(5px);">
@@ -311,6 +323,25 @@ import { FolderTheme } from '../../../../core/models/node.model';
     :host-context([data-theme="light"]) .btn-micro:hover { background: #f0fce8; color: #3a7d0a; }
     :host-context([data-theme="light"]) .btn-close { color: #5a6272; background: #ffffff; border-color: #d1d5db; }
     :host-context([data-theme="light"]) .btn-close:hover { background: rgba(220,53,69,0.1); border-color: rgba(220,53,69,0.3); color: #dc3545; }
+
+    .theme-status-alert {
+      margin-bottom: 1rem;
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      animation: fadeIn 0.3s ease;
+    }
+    .status-content { display: flex; align-items: center; gap: 0.6rem; }
+    .status-icon { flex-shrink: 0; }
+    .status-icon.warn { color: #e5ff00; }
+    .status-icon.check { color: var(--theme-brand-neon); }
+    .theme-status-alert strong { color: #fff; font-weight: 700; }
+    
+    :host-context([data-theme="light"]) .theme-status-alert { background: #fff; border-color: #d1d5db; }
+    :host-context([data-theme="light"]) .theme-status-alert strong { color: #000; }
   `]
 })
 export class TestUploadComponent implements OnInit {
@@ -324,6 +355,7 @@ export class TestUploadComponent implements OnInit {
 
   uploadConfig = { themeName: '', themeId: '', quizTitle: '' };
   uploadStats = { nodeCount: 0, isValid: false, errorMessage: '', charCount: 0, uniqueTypes: 0, schemaErrors: 0 };
+  themeStatus: 'new' | 'existing' | 'none' = 'none';
 
   availableThemes: FolderTheme[] = [];
   filteredThemes: FolderTheme[] = [];
@@ -363,13 +395,23 @@ export class TestUploadComponent implements OnInit {
       const folder = parsed.folder || {};
       const isSigned = meta.signature === 'nodemesh-v1';
 
-      if (meta.titulo_quiz && !this.uploadConfig.quizTitle) {
-        this.uploadConfig.quizTitle = meta.titulo_quiz;
+      // El usuario prefiere tema_objetivo como título y tema primordial.
+      if (meta.tema_objetivo) {
+        if (!this.uploadConfig.themeName) {
+           this.uploadConfig.themeName = meta.tema_objetivo;
+        }
+        if (!this.uploadConfig.quizTitle) {
+           this.uploadConfig.quizTitle = meta.tema_objetivo;
+        }
       }
-      if (folder.nombre_tema && !this.uploadConfig.themeName) {
+
+      // Si no hay tema_objetivo pero hay folder, usamos folder como fallback
+      if (!this.uploadConfig.themeName && folder.nombre_tema) {
         this.uploadConfig.themeName = folder.nombre_tema;
         this.uploadConfig.themeId = folder.folder_id || '';
       }
+      
+      this.checkThemeStatus();
 
       // 2. VALIDACIÓN XSS (Permitir snippets técnicos en payloads firmados)
       if (!isSigned) {
@@ -448,6 +490,29 @@ export class TestUploadComponent implements OnInit {
     if (back) back.scrollTop = front.scrollTop;
   }
 
+  onThemeNameInput() { 
+    this.filterThemes(); 
+    this.checkThemeStatus();
+  }
+
+  checkThemeStatus() {
+    const name = this.uploadConfig.themeName.trim().toLowerCase();
+    if (!name) {
+      this.themeStatus = 'none';
+      this.uploadConfig.themeId = '';
+      return;
+    }
+
+    const match = this.availableThemes.find(t => t.nombre_tema.toLowerCase() === name);
+    if (match) {
+      this.themeStatus = 'existing';
+      this.uploadConfig.themeId = match.folder_id;
+    } else {
+      this.themeStatus = 'new';
+      this.uploadConfig.themeId = '';
+    }
+  }
+
   filterThemes() {
     this.showThemeDropdown = true;
     const q = this.uploadConfig.themeName.toLowerCase();
@@ -463,11 +528,9 @@ export class TestUploadComponent implements OnInit {
       this.availableThemes = await this.db.getRecentFolders(100);
       this.filteredThemes = [...this.availableThemes];
       
-      // Artificial delay for UX perception
-      await new Promise(resolve => setTimeout(resolve, 600));
-      
       this.isLoadingThemes = false;
       this.themesLoadedOnce = true;
+      this.checkThemeStatus(); // Reconfirmar estatus tras carga
       this.cdr.detectChanges();
     }
   }
@@ -477,6 +540,7 @@ export class TestUploadComponent implements OnInit {
   selectTheme(theme: any) {
     this.uploadConfig.themeName = theme.nombre_tema;
     this.uploadConfig.themeId = theme.folder_id;
+    this.themeStatus = 'existing';
     this.showThemeDropdown = false;
   }
 

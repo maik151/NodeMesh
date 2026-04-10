@@ -88,7 +88,6 @@ El único resultado aceptable (OUTPUT) que me debes devolver es UN SOLO OBJETO J
   "metadata": {
     "version": "1.1",
     "signature": "nodemesh-v1",
-    "titulo_quiz": "Título creativo y técnico para este Quiz",
     "tema_objetivo": "${config.tema}",
     "nivel_exigido": "${config.nivel}",
     "auditor_persona": "${config.auditor}"

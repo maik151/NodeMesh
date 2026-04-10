@@ -1,9 +1,11 @@
-import { Component, inject, HostBinding } from '@angular/core';
+import { Component, inject, HostBinding, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ThemeService } from '../../../core/services/ui/theme.service';
+import { LayoutService } from '../../../core/services/ui/layout.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { NAV_ICONS } from '../../constants/icons.constants';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-sidebar',
@@ -889,10 +891,11 @@ import { NAV_ICONS } from '../../constants/icons.constants';
     }
   `]
 })
-export class SidebarComponent {
-  private readonly themeService = inject(ThemeService);
-  private readonly authService  = inject(AuthService);
-  private readonly router       = inject(Router);
+export class SidebarComponent implements OnInit, OnDestroy {
+  private readonly themeService   = inject(ThemeService);
+  private readonly layoutService  = inject(LayoutService);
+  private readonly authService    = inject(AuthService);
+  private readonly router         = inject(Router);
 
   @HostBinding('class.collapsed') get isCollapsed() { return !this.isExpanded; }
   @HostBinding('class.expanded') get isExpandedInternal() { return this.isExpanded; }
@@ -902,6 +905,18 @@ export class SidebarComponent {
   isDark$ = this.themeService.isDark$;
   icons = NAV_ICONS;
 
+  private sub = new Subscription();
+
+  ngOnInit() {
+    this.sub.add(this.layoutService.isExpanded$.subscribe(val => {
+      this.isExpanded = val;
+    }));
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
+  }
+
   @HostBinding('class.mobile-active') get isMobileActive() { return this.isMobileOpen; }
 
   get currentUser() { return this.authService.getCurrentUser(); }
@@ -910,7 +925,7 @@ export class SidebarComponent {
   get userInitial() { return (this.currentUser?.displayName ?? 'A')[0].toUpperCase(); }
 
   toggle() { 
-    this.isExpanded = !this.isExpanded; 
+    this.layoutService.toggleSidebar();
   }
 
   toggleMobile() {

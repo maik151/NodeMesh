@@ -22,6 +22,7 @@ export interface NodeChallenge {
     respuesta_esperada: string | string[];
     justificacion_correcta: string;
     justificacion_incorrecta: string;
+    pista?: string;
     folder_id?: string;
     quiz_id?: string;
     nextReviewDate?: Date;

@@ -282,7 +282,8 @@ const TIPO_MAP: Record<string, { label: string }> = {
 
     .qs-node-body { flex: 1; display: flex; flex-direction: column; gap: 0.8rem; }
 
-    .qs-type-badge { display: flex; align-items: center; gap: 0.4rem; padding: 2px 8px; background: rgba(192, 132, 252, 0.05); border-radius: 4px; border: 1px solid rgba(192, 132, 252, 0.1); }
+    .qs-node-meta { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .qs-type-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 2px 8px; background: rgba(192, 132, 252, 0.05); border-radius: 4px; border: 1px solid rgba(192, 132, 252, 0.1); width: fit-content; }
     .qs-type-icon { width: 12px; height: 12px; fill: #c084fc; }
     .qs-type-tag { font-size: 0.5rem; text-transform: uppercase; font-weight: 800; color: #c084fc; }
     
@@ -299,8 +300,11 @@ const TIPO_MAP: Record<string, { label: string }> = {
     }
     .qs-opt-row:hover:not(:disabled) { border-color: var(--theme-brand-neon); background: rgba(159, 255, 34, 0.03); transform: translateX(4px); }
     .qs-opt-row.is-selected { border-color: var(--theme-brand-neon); background: rgba(159, 255, 34, 0.08); box-shadow: 0 4px 12px rgba(159, 255, 34, 0.1); }
-    .qs-mark { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--theme-text-muted); transition: 0.2s; }
+    .qs-mark { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--theme-text-muted); transition: 0.2s; flex-shrink: 0; }
     .is-selected .qs-mark { background: var(--theme-brand-neon); border-color: var(--theme-brand-neon); box-shadow: 0 0 8px var(--theme-brand-neon); }
+    
+    .qs-opt-row.is-failed { border-color: #ef4444; background: rgba(239, 68, 68, 0.03); }
+    .qs-opt-row.is-failed .qs-mark { border-color: #ef4444; background: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.5); }
 
     .qs-exam-footer { border-top: 1px solid var(--theme-border); padding-top: 2rem; margin-top: 1rem; display: flex; flex-direction: column; gap: 1.5rem; align-items: flex-start; }
     .qs-verify-btn { background: var(--theme-brand-neon); color: #000; border: none; border-radius: 12px; padding: 1rem 3rem; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 15px rgba(159, 255, 34, 0.3); transition: 0.2s; }
@@ -481,17 +485,15 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
           feedback: node.justificacion_correcta,
           isCorrect: true
         });
-        this.toast.success('¡Correcto! Nodo sincronizado.');
       } else {
         state.failedOptions.push(opt);
         state.wrongAttempts++;
-        const feedback = node.retroalimentaciones_opciones?.[opt] || node.justificacion_incorrecta || 'Opción incorrecta en este contexto.';
+        const feedback = node.retroalimentaciones_opciones?.[opt] || node.justificacion_incorrecta || 'Esta opción no es la correcta para este reto.';
         state.history.push({
           selection: opt,
           feedback: feedback,
           isCorrect: false
         });
-        this.toast.warning('Esa no es la respuesta. Analiza la retroalimentación.');
       }
     } else {
       // Logic for multi_choice or others

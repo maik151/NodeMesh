@@ -106,8 +106,8 @@ El único resultado aceptable (OUTPUT) que me debes devolver es UN SOLO OBJETO J
       "pregunta": "...",
       "opciones": ["Opción A", "Opción B", "Opción C", "Opción D"],
       "retroalimentaciones_opciones": {
-         "Opción A": "Breve explicación de por qué A es incorrecta o correcta",
-         "Opción B": "...",
+         "Opción A": "Explica la lógica técnica de por qué esta opción es CORRECTA.",
+         "Opción B": "Explica el error conceptual o técnico de por qué esta opción es INCORRECTA.",
          "Opción C": "...",
          "Opción D": "..."
       },

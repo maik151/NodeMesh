@@ -15,7 +15,7 @@ import { MOTOR_ICONS } from '../../../../shared/constants/icons.constants';
         <!-- HEADER -->
         <div class="ne-header">
           <div class="ne-header-left">
-            <span class="ne-type-badge">{{ node.tipo_reto.replace('_', ' ') }}</span>
+            <span class="ne-type-badge">{{ getTipoLabel(node.tipo_reto) }}</span>
             <div class="ne-title-wrap">
               <h2>Editar Nodo de Conocimiento</h2>
               <p class="ne-subtitle">ID: {{ node.id_temp }}</p>
@@ -387,5 +387,20 @@ export class NodeEditModalComponent implements OnInit {
 
   handleSave() {
     this.onSave.emit(this.tempNode);
+  }
+
+  getTipoLabel(tipo: string): string {
+    if (!tipo) return 'Desconocido';
+    const key = tipo.toLowerCase().trim().replace(/ /g, '_');
+    if (key.includes('single')) return 'Selección Única';
+    if (key.includes('multi')) return 'Selección Múltiple';
+    if (key.includes('cloze')) return 'Completar Espacios';
+    if (key.includes('output')) return 'Predicción de Salida';
+    if (key.includes('order')) return 'Ordenamiento Lógico';
+    if (key.includes('anomaly')) return 'Detección de Anomalías';
+    if (key.includes('optimiz')) return 'Optimización de Código';
+    if (key.includes('case')) return 'Análisis de Casos';
+    if (key.includes('feynman')) return 'Síntesis de Feynman';
+    return tipo;
   }
 }

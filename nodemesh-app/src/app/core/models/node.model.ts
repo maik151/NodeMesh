@@ -24,6 +24,8 @@ export interface NodeChallenge {
     pista: string; // Mandatorio en el prompt
     folder_id?: string;
     quiz_id?: string;
+    justificacion_correcta?: string;
+    justificacion_incorrecta?: string;
     nextReviewDate?: Date;
     createdAt?: Date;
 }

@@ -28,15 +28,15 @@ export interface PromptConfigV2 {
 
 export const buildPromptV2 = (config: PromptConfigV2): string => {
   const matrizTexto = `
-- Single Choice (Aislar verdad absoluta): ${config.matrix.single_choice}
-- Multiple Choice (Múltiples opciones verdaderas): ${config.matrix.multi_choice}
-- Cloze Deletion (Completar código/texto): ${config.matrix.cloze_deletion}
-- Output Prediction (Predecir resultado exacto): ${config.matrix.output_prediction}
-- Ordering (Causalidad/Ciclos de vida): ${config.matrix.ordering}
-- Anomaly Detection (Detectar fallos lógicos ocultos): ${config.matrix.anomaly_detection}
-- Optimization (Complejidad algorítmica y refactorización): ${config.matrix.optimization}
-- Case Analysis (Diseño de sistemas / Trade-offs): ${config.matrix.case_analysis}
-- Feynman Synthesis (Transferencia sin jerga): ${config.matrix.feynman_synthesis}
+- Selección Única (Aislar verdad absoluta): ${config.matrix.single_choice}
+- Selección Múltiple (Exige conocer panorama completo): ${config.matrix.multi_choice}
+- Completar Espacios (Sintaxis y fórmulas): ${config.matrix.cloze_deletion}
+- Predicción de Salida (Compilador humano): ${config.matrix.output_prediction}
+- Ordenamiento Lógico (Causalidad y ciclos de vida): ${config.matrix.ordering}
+- Detección de Anomalías (Fallos lógicos ocultos): ${config.matrix.anomaly_detection}
+- Optimización de Código (Eficiencia y refactorización): ${config.matrix.optimization}
+- Análisis de Casos (Arquitectura y trade-offs): ${config.matrix.case_analysis}
+- Síntesis de Feynman (Transferencia sin jerga): ${config.matrix.feynman_synthesis}
   `.trim();
 
   const docsAppend = config.adjuntarDocs 

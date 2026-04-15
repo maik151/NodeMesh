@@ -14,15 +14,15 @@ export class IngestionService {
     private readonly SYSTEM_PROMPT = `Eres la Matriz Maestra de NodeMesh. Tu propósito es transformar texto técnico en una taxonomía de 9 retos cognitivos.
 Genera EXACTAMENTE 9 objetos JSON en un array, uno por cada tipo de reto:
 
-1. "single_choice" - Una verdad absoluta entre distractores.
-2. "multi_choice" - Selección múltiple de múltiples respuestas correctas.
-3. "cloze_deletion" - Completar espacios en blanco (cloze).
-4. "output_prediction" - Predecir el resultado exacto de un código.
-5. "ordering" - Ordenar pasos lógicos o secuencias.
-6. "anomaly_detection" - Identificar fallos lógicos o vulnerabilidades.
-7. "optimization" - Refactorizar hacia la eficiencia.
-8. "case_analysis" - Evaluación de trade-offs en arquitectura.
-9. "feynman_synthesis" - Explicar conceptos complejos sin jerga.
+1. "single_choice" - Selección Única (Recordar): Aislar una verdad absoluta entre distractores. Ejemplo: "¿Estructura por defecto en PostgreSQL para un índice? B-Tree".
+2. "multi_choice" - Selección Múltiple (Comprender): Exige conocer el panorama completo; cero suerte. Ejemplo: "Métodos HTTP idempotentes (GET, PUT, DELETE, HEAD)".
+3. "cloze_deletion" - Completar Espacios (Aplicar): Memoria muscular para sintaxis o fórmulas. Ejemplo: "Comando para deshacer commit manteniendo cambios en stage: git reset --soft HEAD~1".
+4. "output_prediction" - Predicción de Salida (Aplicar): Forzar ejecución mental (compilador humano). Ejemplo: "Output de setTimeout vs Promise microtask queue".
+5. "ordering" - Ordenamiento Lógico (Analizar): Entender causalidad y ciclos de vida. Ejemplo: "Ordena el Three-way handshake de TCP (SYN, SYN-ACK, ACK)".
+6. "anomaly_detection" - Detección de Anomalías (Analizar): Detectar fallos lógicos ocultos que sí compilan (Requiere IA). Ejemplo: "Captura de variable en closure dentro de un loop".
+7. "optimization" - Optimización de Código (Evaluar): Refactorizar hacia la eficiencia matemática (Requiere IA). Ejemplo: "Refactorizar búsqueda O(n2) a O(n) usando Hash Maps".
+8. "case_analysis" - Análisis de Casos (Crear): Diseño de sistemas y evaluación de trade-offs (Requiere IA). Ejemplo: "Mitigar colapso de DB por lecturas masivas en Black Friday".
+9. "feynman_synthesis" - Síntesis de Feynman (Maestría): Transferencia de conocimiento sin jerga (Requiere IA). Ejemplo: "Explica Hashing vs Encriptación sin usar jerga abstracta".
 
 REGLAS ESTRUCTURALES:
 Reresponde SOLO con un array JSON válido. Cada objeto DEBE seguir este esquema:
@@ -40,13 +40,15 @@ Reresponde SOLO con un array JSON válido. Cada objeto DEBE seguir este esquema:
      "D": "..."
   },
   "respuesta_esperada": "string",
+  "justificacion_correcta": "Explicación detallada de por qué la respuesta es correcta",
+  "justificacion_incorrecta": "Explicación de por qué otras aproximaciones fallarían o qué error común evitar",
   "pista": "Pista técnica directa"
 }
 
-- "requiere_ia" es true solo para los tipos 6, 7, 8 y 9.
+- "requiere_ia" es true obligatoriamente para los tipos 6, 7, 8 y 9.
 - "opciones" es null para tipos que no sean choice o ordering.
 - "retroalimentaciones_opciones": DEBE incluir una justificación técnica para CADA opción.
-- PROHIBIDO usar preguntas retóricas en las justificaciones.
+- PROHIBIDO usar preguntas retóricas. Tono técnico, preciso y desafiante (Nivel Senior).
 - El campo "pista" es OBLIGATORIO.
 - Tono técnico, preciso y desafiante (Nivel Senior).`;
 
@@ -162,6 +164,8 @@ Reresponde SOLO con un array JSON válido. Cada objeto DEBE seguir este esquema:
             opciones: Array.isArray(item.opciones) ? item.opciones : (Array.isArray(item.options) ? item.options : null),
             retroalimentaciones_opciones: item.retroalimentaciones_opciones || {},
             respuesta_esperada: item.respuesta_esperada || item.expectedAnswer || '',
+            justificacion_correcta: item.justificacion_correcta || '',
+            justificacion_incorrecta: item.justificacion_incorrecta || '',
             pista: item.pista || 'Analiza el contexto detalladamente.',
             createdAt: now,
             nextReviewDate: now

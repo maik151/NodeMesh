@@ -9,7 +9,7 @@ import { QuizEditModalComponent } from '../quiz-edit-modal/quiz-edit-modal.compo
 import { NodeEditModalComponent } from '../node-edit-modal/node-edit-modal.component';
 
 const TIPO_MAP: Record<string, { label: string }> = {
-  single_choice:    { label: 'Desafío Único' },
+  single_choice:    { label: 'Selección Única' },
   multi_choice:     { label: 'Selección Múltiple' },
   cloze_deletion:   { label: 'Completar Espacios' },
   output_prediction:{ label: 'Predicción de Salida' },
@@ -683,14 +683,8 @@ export class QuizPreviewComponent implements OnChanges {
   async ngOnChanges(changes: SimpleChanges) {
     const qChange = changes['quiz'];
     if (qChange && this.quiz) {
-      const prevId = qChange.previousValue?.quiz_id;
-      const currId = qChange.currentValue?.quiz_id;
-
-      // Solo recargar nodos si el test físicamente es otro o es la primera carga.
-      // Si solo cambió el título o la dificultad, no hace falta re-consultar la DB de nodos.
-      if (prevId !== currId || qChange.isFirstChange()) {
-        await this.loadNodes();
-      }
+      // Recargar siempre que el objeto cambie para asegurar que los KPIs (basados en los nodos) se actualicen
+      await this.loadNodes();
     }
   }
 
@@ -753,7 +747,7 @@ export class QuizPreviewComponent implements OnChanges {
   getTipoLabel(tipo: string): string {
     if (!tipo) return 'Desconocido';
     const key = tipo.toLowerCase().trim().replace(/ /g, '_');
-    if (key.includes('single')) return 'Desafío Único';
+    if (key.includes('single')) return 'Selección Única';
     if (key.includes('multi')) return 'Selección Múltiple';
     if (key.includes('cloze')) return 'Completar Espacios';
     if (key.includes('output')) return 'Predicción de Salida';

@@ -265,7 +265,7 @@ export class VaultComponent implements OnInit {
     }
   }
 
-  stopStudy() {
+  async stopStudy() {
     this.isStudying = false;
     this.studyingQuiz = null;
     this.studyingNodes = [];
@@ -276,6 +276,14 @@ export class VaultComponent implements OnInit {
     // Restore sidebars
     this.layoutService.expandSidebar();
     this.sidebarCollapsed = false;
+
+    // RE-FETCH DATA to update KPIs
+    if (this.selectedQuiz) {
+      const updated = await this.db.table('quizzes').get(this.selectedQuiz.quiz_id);
+      if (updated) {
+        this.selectedQuiz = updated;
+      }
+    }
 
     this.cdr.detectChanges();
   }

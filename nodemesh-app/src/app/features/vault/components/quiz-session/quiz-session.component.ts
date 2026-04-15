@@ -16,7 +16,7 @@ interface NodeState {
 }
 
 const TIPO_MAP: Record<string, { label: string }> = {
-  single_choice:    { label: 'Desafío Único' },
+  single_choice:    { label: 'Selección Única' },
   multi_choice:     { label: 'Selección Múltiple' },
   cloze_deletion:   { label: 'Completar Espacios' },
   output_prediction:{ label: 'Predicción de Salida' },
@@ -342,6 +342,7 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
 
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly toast = inject(ToastService);
+  private readonly db = inject(DatabaseService);
   readonly ICONS = TYPE_ICONS;
 
   currentPage = 0;
@@ -551,9 +552,57 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  finishQuiz() {
+  async finishQuiz() {
     this.stopTimer();
     this.isFinished = true;
+
+    if (!this.quiz) return;
+
+    // 1. Actualizar estadísticas del Quiz
+    const updatedQuiz: QuizSession = {
+      ...this.quiz,
+      estadisticas_globales: {
+        intentos: (this.quiz.estadisticas_globales?.intentos || 0) + 1,
+        ultimo_score_porcentaje: this.scorePercent
+      }
+    };
+
+    try {
+      await this.db.saveQuiz(updatedQuiz);
+
+      // 2. Actualizar fechas de repaso de los nodos (Spaced Repetition básico)
+      const now = new Date();
+      for (const node of this.nodes) {
+        const state = this.nodeStates[node.id!];
+        if (!state) continue;
+
+        let intervalDays = 1; // Default
+        const prevDate = node.nextReviewDate ? new Date(node.nextReviewDate) : now;
+        
+        if (state.isCorrect) {
+          // Algoritmo simple: duplicar el intervalo si acertó
+          const currentInterval = Math.max(1, Math.floor((prevDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+          intervalDays = currentInterval * 2;
+          if (intervalDays > 30) intervalDays = 30; // Cap at 30 days for now
+        } else {
+          // Si falló, resetear a mañana
+          intervalDays = 1;
+        }
+
+        const nextDate = new Date();
+        nextDate.setDate(now.getDate() + intervalDays);
+        
+        await this.db.saveNode({
+          ...node,
+          nextReviewDate: nextDate
+        });
+      }
+
+      this.toast.success('Resultados sincronizados con la Bóveda.');
+    } catch (e) {
+      console.error('[QuizSession] Error al guardar resultados:', e);
+      this.toast.error('Error al sincronizar resultados.');
+    }
   }
 
   handleExit() {
@@ -574,7 +623,7 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
   getTypeName(tipo: string): string {
     if (!tipo) return 'Desconocido';
     const key = this.normalizeType(tipo);
-    if (key.includes('single')) return 'Desafío Único';
+    if (key.includes('single')) return 'Selección Única';
     if (key.includes('multi')) return 'Selección Múltiple';
     if (key.includes('cloze')) return 'Completar Espacios';
     if (key.includes('output')) return 'Predicción de Salida';

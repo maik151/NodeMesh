@@ -767,18 +767,12 @@ export class QuizPreviewComponent implements OnChanges {
     let totalRetention = 0;
     
     for (const n of this.nodes) {
-      if (!n.nextReviewDate || !n.createdAt) continue; // Nodo sin fechas
+      if (!n.intentos || n.intentos === 0) continue; // Si intentos es cero, nunca se ha repasado (aporta 0% al global).
       
-      const reviewTime = new Date(n.nextReviewDate).getTime();
-      const createdTime = new Date(n.createdAt).getTime();
+      const reviewDate = n.nextReviewDate ? new Date(n.nextReviewDate) : now;
+      const created = n.createdAt ? new Date(n.createdAt) : now;
       
-      // Si nextReviewDate es igual a createdAt, significa que nunca se ha repasado.
-      if (reviewTime <= createdTime) continue; 
-      
-      const reviewDate = new Date(n.nextReviewDate);
-      const created = new Date(n.createdAt);
-      
-      const stability = Math.max(1, (reviewDate.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+      const stability = n.intervalDays || Math.max(1, (reviewDate.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
       const daysSinceSchedule = Math.max(0, (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
       
       const retention = Math.exp(-daysSinceSchedule / stability) * 100;
@@ -789,10 +783,7 @@ export class QuizPreviewComponent implements OnChanges {
   }
 
   get reviewedNodesCount(): number {
-    return this.nodes.filter(n => {
-      if (!n.nextReviewDate || !n.createdAt) return false;
-      return new Date(n.nextReviewDate).getTime() > new Date(n.createdAt).getTime();
-    }).length;
+    return this.nodes.filter(n => (n.intentos || 0) > 0).length;
   }
 
   get lastReviewLabel(): string {

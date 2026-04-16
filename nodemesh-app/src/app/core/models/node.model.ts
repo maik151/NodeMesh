@@ -28,6 +28,8 @@ export interface NodeChallenge {
     justificacion_incorrecta?: string;
     nextReviewDate?: Date;
     createdAt?: Date;
+    intervalDays?: number;
+    intentos?: number;
 }
 
 export interface FolderTheme {

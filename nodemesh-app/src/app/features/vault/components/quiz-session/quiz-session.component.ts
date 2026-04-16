@@ -1228,7 +1228,9 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
         
         await this.db.saveNode({
           ...node,
-          nextReviewDate: nextDate
+          nextReviewDate: nextDate,
+          intervalDays: intervalDays,
+          intentos: (node.intentos || 0) + 1
         });
       }
 

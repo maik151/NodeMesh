@@ -691,16 +691,27 @@ export class QuizPreviewComponent implements OnChanges {
     return this.currentPage >= this.totalPages - 1;
   }
 
+  private _lastQuizId: string | null = null;
+
   async ngOnChanges(changes: SimpleChanges) {
     const qChange = changes['quiz'];
     if (qChange && this.quiz) {
-      // Recargar siempre que el objeto cambie para asegurar que los KPIs (basados en los nodos) se actualicen
-      await this.loadNodes();
+      // Solo recargar nodos si cambió el quiz_id (no al editar metadata como dificultad)
+      if (this.quiz.quiz_id !== this._lastQuizId) {
+        this._lastQuizId = this.quiz.quiz_id;
+        await this.loadNodes();
+      } else {
+        // Metadata cambió (dificultad, título) — solo actualizar auditor sin recargar
+        this.auditorPersona = this.quiz.auditor_persona || null;
+        this.cdr.detectChanges();
+      }
     }
   }
 
   async loadNodes() {
     if (!this.quiz) return;
+    // Deferir cambio de estado fuera del ciclo de detección para evitar NG0100
+    await Promise.resolve();
     this.isLoadingNodes = true;
     this.cdr.detectChanges();
     try {

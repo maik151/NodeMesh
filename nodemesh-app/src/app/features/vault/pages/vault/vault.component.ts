@@ -290,7 +290,7 @@ export class VaultComponent implements OnInit {
   }
 
   onQuizFinished() {
-    // Expand sidebars when the quiz results screen is shown
+    // Automatically expand sidebars when results appear, as requested.
     this.layoutService.expandSidebar();
     this.sidebarCollapsed = false;
     this.layoutService.setQuizActive(false);

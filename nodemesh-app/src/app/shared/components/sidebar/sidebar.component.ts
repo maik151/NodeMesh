@@ -1,4 +1,4 @@
-import { Component, inject, HostBinding, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef, Renderer2, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ThemeService } from '../../../core/services/ui/theme.service';
@@ -896,11 +896,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private readonly layoutService  = inject(LayoutService);
   private readonly authService    = inject(AuthService);
   private readonly router         = inject(Router);
-
-  @HostBinding('class.collapsed') get isCollapsed() { return !this.isExpanded; }
-  @HostBinding('class.expanded') get isExpandedInternal() { return this.isExpanded; }
+  private readonly cdr            = inject(ChangeDetectorRef);
+  private readonly renderer       = inject(Renderer2);
+  private readonly el             = inject(ElementRef);
 
   isExpanded = true;
+  isQuizActive = false;
   isMobileOpen = false;
   isDark$ = this.themeService.isDark$;
   icons = NAV_ICONS;
@@ -910,6 +911,18 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.sub.add(this.layoutService.isExpanded$.subscribe(val => {
       this.isExpanded = val;
+      if (val) {
+        this.renderer.removeClass(this.el.nativeElement, 'collapsed');
+        this.renderer.addClass(this.el.nativeElement, 'expanded');
+      } else {
+        this.renderer.removeClass(this.el.nativeElement, 'expanded');
+        this.renderer.addClass(this.el.nativeElement, 'collapsed');
+      }
+      this.cdr.detectChanges();
+    }));
+    this.sub.add(this.layoutService.isQuizActive$.subscribe(val => {
+      this.isQuizActive = val;
+      this.cdr.detectChanges();
     }));
   }
 
@@ -917,7 +930,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.sub.unsubscribe();
   }
 
-  @HostBinding('class.mobile-active') get isMobileActive() { return this.isMobileOpen; }
+  get isMobileActive() { return this.isMobileOpen; }
 
   get currentUser() { return this.authService.getCurrentUser(); }
   get userName()    { return this.currentUser?.displayName ?? 'Admin Profile'; }
@@ -930,6 +943,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   toggleMobile() {
     this.isMobileOpen = !this.isMobileOpen;
+    if (this.isMobileOpen) {
+      this.renderer.addClass(this.el.nativeElement, 'mobile-active');
+    } else {
+      this.renderer.removeClass(this.el.nativeElement, 'mobile-active');
+    }
   }
 
   setTheme(theme: 'light' | 'dark') {

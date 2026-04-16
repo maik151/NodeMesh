@@ -25,6 +25,9 @@ export class LayoutService {
 
   setQuizActive(active: boolean) {
     this.quizActiveSubject.next(active);
+    if (active) {
+      this.collapseSidebar();
+    }
   }
 
   toggleSidebar() {

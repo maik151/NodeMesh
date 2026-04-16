@@ -596,6 +596,9 @@ const TIPO_MAP: Record<string, { label: string }> = {
     .qs-log-entry { display: flex; gap: 0.75rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 3px solid #f87171; font-size: 0.8rem; }
     .qs-log-entry.is-correct { border-left-color: var(--theme-brand-neon); background: rgba(134, 219, 0, 0.03); }
 
+    .qs-cloze-blank { display: inline-block; width: 6ch; border-bottom: 2px solid rgba(255,255,255,0.3); vertical-align: middle; margin: 0 0.3rem; }
+    .qs-cloze-filled { color: var(--theme-brand-neon); border-bottom: 2px dashed var(--theme-brand-neon); padding: 0 0.5rem; display: inline-block; margin: 0 0.3rem; font-weight: 700; }
+
     /* ================= BENTO GRID RESULTS ================= */
     .qs-final-results {
       background: #09090b;
@@ -1074,9 +1077,9 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     const isSolved = this.isNodeSolved(node.id!);
     
     if (isSolved && state.userAnswer) {
-      return p.replace(/_{2,}/g, `<span style="color: var(--theme-brand-neon); border-bottom: 2px dashed var(--theme-brand-neon); padding: 0 0.5rem;">${state.userAnswer}</span>`);
+      return p.replace(/_{2,}/g, `<span class="qs-cloze-filled">${state.userAnswer}</span>`);
     } else {
-      return p.replace(/_{2,}/g, `<span style="display: inline-block; width: 6ch; border-bottom: 2px solid rgba(255,255,255,0.3); vertical-align: middle; margin: 0 0.3rem;"></span>`);
+      return p.replace(/_{2,}/g, `<span class="qs-cloze-blank"></span>`);
     }
   }
 

@@ -147,6 +147,16 @@ import { DifficultyLevel } from '../../../../core/models/node.model';
                  </div>
                  <span class="toggle-card-desc">¿Generar pistas socráticas para guiar al estudiante sin revelar la respuesta?</span>
                </div>
+               <div class="toggle-card" [class.toggle-active]="compiler.incluirContexto" (click)="compiler.incluirContexto = !compiler.incluirContexto">
+                 <div class="toggle-card-top">
+                   <span class="toggle-card-title">Incluir Contexto</span>
+                   <label class="toggle-switch" (click)="$event.stopPropagation()">
+                     <input type="checkbox" [(ngModel)]="compiler.incluirContexto">
+                     <span class="slider"></span>
+                   </label>
+                 </div>
+                 <span class="toggle-card-desc">¿Añadir un párrafo de contexto teórico de introducción antes de cada pregunta?</span>
+               </div>
                <div class="toggle-card" [class.toggle-active]="compiler.forzarJsonRaw" (click)="compiler.forzarJsonRaw = !compiler.forzarJsonRaw">
                  <div class="toggle-card-top">
                    <span class="toggle-card-title">JSON RAW</span>
@@ -395,6 +405,7 @@ export class PromptCompilerComponent {
     tagsExtra: '',
     adjuntarDocs: false,
     incluirPistas: false,
+    incluirContexto: true,
     forzarJsonRaw: false,
     matrix: { single_choice: 10, cloze_deletion: 10, ordering: 10, optimization: 5, feynman_synthesis: 5, multi_choice: 2, output_prediction: 4, anomaly_detection: 2, case_analysis: 2 }
   };

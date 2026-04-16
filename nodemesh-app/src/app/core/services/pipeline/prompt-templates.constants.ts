@@ -12,6 +12,7 @@ export interface PromptConfigV2 {
   tagsExtra: string;
   adjuntarDocs: boolean;
   incluirPistas: boolean;
+  incluirContexto: boolean;
   forzarJsonRaw: boolean;
   matrix: {
     single_choice: number;
@@ -92,28 +93,27 @@ El único resultado aceptable (OUTPUT) que me debes devolver es UN SOLO OBJETO J
     "nivel_exigido": "${config.nivel}",
     "auditor_persona": "${config.auditor}"
   },
-  "folder": {
-    "folder_id": "uuid_aleatorio",
-    "nombre_tema": "${config.tema}",
-    "color_tag": "#9FFF22"
-  },
-  "nodos": [
-    {
-      "id_temp": "nodo_1",
-      "tipo_reto": "DEBE ser uno de: single_choice, multi_choice, cloze_deletion, output_prediction, ordering, anomaly_detection, optimization, case_analysis, feynman_synthesis",
-      "requiere_ia": false,
-      "contexto": "...",
-      "pregunta": "...",
-      "opciones": ["Opción A", "Opción B", "Opción C", "Opción D"],
-      "retroalimentaciones_opciones": {
-         "Opción A": "Explica la lógica técnica de por qué esta opción es CORRECTA. PROHIBIDO USAR SIGNOS DE INTERROGACIÓN.",
-         "Opción B": "Explica el error conceptual o técnico de por qué esta opción es INCORRECTA. PROHIBIDO USAR SIGNOS DE INTERROGACIÓN.",
-         "Opción C": "...",
-         "Opción D": "..."
-      },
-      "respuesta_esperada": "...",
-      "pista": "Pista técnica directa (Sin signos de interrogación)."
-    }
+    "folder": {
+      "folder_id": "uuid_aleatorio",
+      "nombre_tema": "${config.tema}",
+      "color_tag": "#9FFF22"
+    },
+    "nodos": [
+      {
+        "id_temp": "nodo_1",
+        "tipo_reto": "DEBE ser uno de: single_choice, multi_choice, cloze_deletion, output_prediction, ordering, anomaly_detection, optimization, case_analysis, feynman_synthesis",
+        "requiere_ia": false,${config.incluirContexto ? '\n        "contexto": "...",' : ''}
+        "pregunta": "...",
+        "opciones": ["Opción A", "Opción B", "Opción C", "Opción D"],
+        "retroalimentaciones_opciones": {
+           "Opción A": "Explica la lógica técnica de por qué esta opción es CORRECTA. PROHIBIDO USAR SIGNOS DE INTERROGACIÓN.",
+           "Opción B": "Explica el error conceptual o técnico de por qué esta opción es INCORRECTA. PROHIBIDO USAR SIGNOS DE INTERROGACIÓN.",
+           "Opción C": "...",
+           "Opción D": "..."
+        },
+        "respuesta_esperada": "...",
+        "pista": "Pista técnica directa (Sin signos de interrogación)."
+      }
   ]
 }
 \`\`\`

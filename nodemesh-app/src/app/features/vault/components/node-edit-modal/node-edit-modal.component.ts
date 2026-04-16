@@ -31,100 +31,103 @@ import { MOTOR_ICONS } from '../../../../shared/constants/icons.constants';
         <!-- SCROLLABLE BODY -->
         <div class="ne-body scroll-custom">
           
-          <!-- PREGUNTA (PRINCIPAL) -->
-          <div class="ne-section">
-            <label>La Pregunta</label>
-            <textarea 
-              [(ngModel)]="tempNode.pregunta" 
-              class="ne-textarea ne-pregunta-input" 
-              rows="2"
-              placeholder="¿Qué quieres preguntar?">
-            </textarea>
-          </div>
+          <div class="ne-main-grid">
+            
+            <!-- LEFT COLUMN (Question & Context & Pista) -->
+            <div class="ne-col-left">
+              <div class="ne-section">
+                <label>La Pregunta</label>
+                <textarea 
+                  [(ngModel)]="tempNode.pregunta" 
+                  class="ne-textarea ne-pregunta-input" 
+                  rows="3"
+                  placeholder="¿Qué quieres preguntar?">
+                </textarea>
+              </div>
 
-          <div class="ne-grid-2">
-            <!-- CONTEXTO -->
-            <div class="ne-section">
-              <label>Contexto / Snippet de Código</label>
-              <textarea 
-                [(ngModel)]="tempNode.contexto" 
-                class="ne-textarea ne-contexto-input" 
-                rows="6"
-                placeholder="Agrega el código o contexto necesario...">
-              </textarea>
+              <div class="ne-section">
+                <label>Contexto / Snippet de Código</label>
+                <textarea 
+                  [(ngModel)]="tempNode.contexto" 
+                  class="ne-textarea ne-contexto-input" 
+                  rows="5"
+                  placeholder="Agrega el código o contexto necesario...">
+                </textarea>
+              </div>
+
+              <div class="ne-grid-2">
+                <div class="ne-section">
+                  <label>Pista / Hint estratégico</label>
+                  <textarea 
+                    [(ngModel)]="tempNode.pista" 
+                    class="ne-textarea" 
+                    rows="3"
+                    placeholder="Pista sutil para ayudar al jugador...">
+                  </textarea>
+                </div>
+                <div class="ne-section">
+                  <label>Nivel de Dificultad</label>
+                  <select [(ngModel)]="tempNode.dificultad" class="ne-input ne-select">
+                    <option value="Aprendiz">Aprendiz</option>
+                    <option value="Intermedio">Intermedio</option>
+                    <option value="Avanzado">Avanzado</option>
+                    <option value="Senior">Senior</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
-            <!-- MOTOR & OPTIONS -->
-            <div class="ne-side-cols">
-               <div class="ne-section">
-                 <label>Motor de Evaluación</label>
-                 <div class="ne-motor-toggle" [class.ia-active]="tempNode.requiere_ia" (click)="tempNode.requiere_ia = !tempNode.requiere_ia">
-                   <div class="ne-motor-icon">
-                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-                       <path [attr.d]="tempNode.requiere_ia ? MOTOR_ICONS.ia : MOTOR_ICONS.local"/>
-                     </svg>
+            <!-- RIGHT COLUMN (Evaluation & Responses) -->
+            <div class="ne-col-right">
+              <div class="ne-grid-2">
+                 <div class="ne-section">
+                   <label>Motor de Evaluación</label>
+                   <div class="ne-motor-toggle" [class.ia-active]="tempNode.requiere_ia" (click)="tempNode.requiere_ia = !tempNode.requiere_ia">
+                     <div class="ne-motor-icon">
+                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                         <path [attr.d]="tempNode.requiere_ia ? MOTOR_ICONS.ia : MOTOR_ICONS.local"/>
+                       </svg>
+                     </div>
+                     <div class="ne-motor-info">
+                       <span class="ne-motor-name">{{ tempNode.requiere_ia ? 'Motor IA (Cloud)' : 'Motor Local' }}</span>
+                       <span class="ne-motor-desc">{{ tempNode.requiere_ia ? 'Respuestas abiertas' : 'Por Reglas' }}</span>
+                     </div>
+                     <div class="ne-toggle-circle"></div>
                    </div>
-                   <div class="ne-motor-info">
-                     <span class="ne-motor-name">{{ tempNode.requiere_ia ? 'Motor IA (Cloud)' : 'Motor Local' }}</span>
-                     <span class="ne-motor-desc">{{ tempNode.requiere_ia ? 'Ideal para respuestas abiertas' : 'Rápido, basado en reglas' }}</span>
-                   </div>
-                   <div class="ne-toggle-circle"></div>
                  </div>
-               </div>
 
-               <div class="ne-section">
-                 <label>Respuesta Esperada</label>
-                 <input 
-                  type="text" 
-                  [(ngModel)]="tempNode.respuesta_esperada" 
-                  class="ne-input"
-                  placeholder="Respuesta correcta...">
-               </div>
-            </div>
-          </div>
+                 <div class="ne-section">
+                   <label>Respuesta Esperada</label>
+                   <textarea 
+                    [(ngModel)]="tempNode.respuesta_esperada" 
+                    class="ne-textarea"
+                    rows="3"
+                    placeholder="Respuesta correcta...">
+                   </textarea>
+                 </div>
+              </div>
 
-          <!-- PISTA Y DIFICULTAD -->
-          <div class="ne-grid-2">
-            <div class="ne-section">
-              <label>Pista / Hint estratégico</label>
-              <textarea 
-                [(ngModel)]="tempNode.pista" 
-                class="ne-textarea" 
-                rows="2"
-                placeholder="Pista sutil para ayudar al jugador...">
-              </textarea>
-            </div>
-            <div class="ne-section">
-              <label>Nivel de Dificultad</label>
-              <select [(ngModel)]="tempNode.dificultad" class="ne-input ne-select">
-                <option value="Aprendiz">Aprendiz</option>
-                <option value="Intermedio">Intermedio</option>
-                <option value="Avanzado">Avanzado</option>
-                <option value="Senior">Senior</option>
-              </select>
-            </div>
-          </div>
+              <div class="ne-section">
+                <label class="label-success">Justificación (Acierto)</label>
+                <textarea 
+                  [(ngModel)]="tempNode.justificacion_correcta" 
+                  class="ne-textarea" 
+                  rows="3"
+                  placeholder="¿Por qué es correcto?">
+                </textarea>
+              </div>
 
-          <!-- JUSTIFICACIONES -->
-          <div class="ne-grid-2">
-            <div class="ne-section">
-              <label class="label-success">Justificación (Acierto)</label>
-              <textarea 
-                [(ngModel)]="tempNode.justificacion_correcta" 
-                class="ne-textarea" 
-                rows="3"
-                placeholder="¿Por qué es correcto?">
-              </textarea>
+              <div class="ne-section">
+                <label class="label-error">Justificación (Fallo)</label>
+                <textarea 
+                  [(ngModel)]="tempNode.justificacion_incorrecta" 
+                  class="ne-textarea" 
+                  rows="3"
+                  placeholder="¿Por qué es incorrecto?">
+                </textarea>
+              </div>
             </div>
-            <div class="ne-section">
-              <label class="label-error">Justificación (Fallo)</label>
-              <textarea 
-                [(ngModel)]="tempNode.justificacion_incorrecta" 
-                class="ne-textarea" 
-                rows="3"
-                placeholder="¿Por qué es incorrecto?">
-              </textarea>
-            </div>
+            
           </div>
 
         </div>
@@ -147,17 +150,21 @@ import { MOTOR_ICONS } from '../../../../shared/constants/icons.constants';
     .ne-overlay {
       position: fixed;
       inset: 0;
-      background: var(--theme-shadow-soft); /* Usa la sombra del tema para el overlay */
-      backdrop-filter: blur(28px);
+      background: rgba(0, 0, 0, 0.7); /* Hard dimming para evitar cortes con el backgrop */
+      backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 100001;
       animation: ne-fade-in 0.3s ease;
     }
+    :host-context([data-theme="light"]) .ne-overlay {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+    }
 
     .ne-container {
-      width: 720px;
+      width: 1080px;
       max-width: 95vw;
       background: var(--theme-surface-solid);
       border: 1px solid var(--theme-border);
@@ -259,9 +266,21 @@ import { MOTOR_ICONS } from '../../../../shared/constants/icons.constants';
       font-family: 'JetBrains Mono', monospace;
     }
 
+    .ne-main-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 2.5rem;
+    }
+
+    .ne-col-left, .ne-col-right {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
     .ne-grid-2 {
       display: grid;
-      grid-template-columns: 1.4fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 1.5rem;
     }
 

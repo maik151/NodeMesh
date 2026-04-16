@@ -773,10 +773,19 @@ export class QuizPreviewComponent implements OnChanges {
       const reviewDate = n.nextReviewDate ? new Date(n.nextReviewDate) : now;
       const created = n.createdAt ? new Date(n.createdAt) : now;
       
-      const stability = n.intervalDays || Math.max(1, (reviewDate.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
-      const daysSinceSchedule = Math.max(0, (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+      let lastReviewTime = now.getTime();
+      if (n.nextReviewDate && n.intervalDays) {
+        lastReviewTime = new Date(n.nextReviewDate).getTime() - (n.intervalDays * 1000 * 60 * 60 * 24);
+      } else if (this.quiz?.ultimo_repaso) {
+        lastReviewTime = new Date(this.quiz.ultimo_repaso).getTime();
+      } else {
+        lastReviewTime = n.createdAt ? new Date(n.createdAt).getTime() : now.getTime();
+      }
+
+      const stability = n.intervalDays || 1;
+      const daysPassed = Math.max(0, (now.getTime() - lastReviewTime) / (1000 * 60 * 60 * 24));
       
-      const retention = Math.exp(-daysSinceSchedule / stability) * 100;
+      const retention = Math.exp(-daysPassed / stability) * 100;
       totalRetention += Math.min(100, Math.max(0, retention));
       countable++;
     }

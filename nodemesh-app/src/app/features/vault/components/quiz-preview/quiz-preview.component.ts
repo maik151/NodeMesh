@@ -381,31 +381,50 @@ const TIPO_MAP: Record<string, { label: string }> = {
     
     .kpi-tooltip {
       position: absolute;
-      top: -45px;
+      bottom: calc(100% + 15px);
       left: 50%;
       transform: translateX(-50%) translateY(10px);
-      background: var(--theme-surface);
-      border: 1px solid var(--theme-border);
-      padding: 0.5rem 0.8rem;
+      background: #1e1e1e;
+      border: 1px solid #4a4a4a;
+      padding: 0.6rem 0.9rem;
       border-radius: 6px;
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       font-family: inherit;
-      color: var(--theme-text-muted);
+      color: #ffffff;
       opacity: 0;
       pointer-events: none;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       z-index: 100;
-      width: 200px;
+      width: 210px;
       text-align: center;
-      line-height: 1.3;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      line-height: 1.4;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+      font-weight: 500;
+      letter-spacing: 0.02em;
     }
     :host-context([data-theme="light"]) .kpi-tooltip {
-      background: #fff;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      background: #f5f5f5;
+      color: #111;
+      border-color: #ddd;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
     
-    .kpi-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-3px); }
+    /* Pequeño triangulito decorativo para el tooltip */
+    .kpi-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #1e1e1e transparent transparent transparent;
+    }
+    :host-context([data-theme="light"]) .kpi-tooltip::after {
+      border-color: #f5f5f5 transparent transparent transparent;
+    }
+    
+    .kpi-card:hover { border-color: rgba(255,255,255,0.3); transform: translateY(-3px); }
     .kpi-card:hover .kpi-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     .kpi-icon-wrap {

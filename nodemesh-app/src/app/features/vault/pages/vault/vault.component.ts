@@ -73,7 +73,8 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
           *ngIf="isStudying && studyingQuiz"
           [quiz]="studyingQuiz"
           [nodes]="studyingNodes"
-          (onClose)="stopStudy()">
+          (onClose)="stopStudy()"
+          (onFinished)="onQuizFinished()">
         </app-quiz-session>
       </main>
     </div>
@@ -285,6 +286,14 @@ export class VaultComponent implements OnInit {
       }
     }
 
+    this.cdr.detectChanges();
+  }
+
+  onQuizFinished() {
+    // Expand sidebars when the quiz results screen is shown
+    this.layoutService.expandSidebar();
+    this.sidebarCollapsed = false;
+    this.layoutService.setQuizActive(false);
     this.cdr.detectChanges();
   }
 

@@ -49,7 +49,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
               (click)="handleExit()" 
               [title]="isConfirmingExit ? 'Clic de nuevo para confirmar' : 'Salir'">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-                <path d="M112,216a8,8,0,0,1-8,8H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32h56a8,8,0,0,1,0,16H48V208h56A8,8,0,0,1,112,216Zm117.66-93.66L192,84.69a8,8,0,0,0-13.66,5.65V120H104a8,8,0,0,0,0,16h74.34v29.66a8,8,0,0,0,13.66,5.65l37.66-37.65A8,8,0,0,0,229.66,122.34Z"/>
+                <path d="M120,216a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H56V208h56A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z"/>
               </svg>
               <span>{{ isConfirmingExit ? '¡Confirmar Salida!' : 'Salir' }}</span>
             </button>
@@ -559,6 +559,7 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
   @Input() quiz!: QuizSession;
   @Input() nodes: NodeChallenge[] = [];
   @Output() onClose = new EventEmitter<void>();
+  @Output() onFinished = new EventEmitter<void>();
 
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly toast = inject(ToastService);
@@ -892,6 +893,7 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
       this.impactSummary.streakDays = streak;
 
       this.toast.success('Sesión analizada. Impacto cognitivo sincronizado.');
+      this.onFinished.emit();
     } catch (e) {
       console.error('[QuizSession] Error al guardar resultados:', e);
       this.toast.error('Error al sincronizar resultados.');

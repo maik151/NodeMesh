@@ -22,6 +22,7 @@ export interface NodeChallenge {
     retroalimentaciones_opciones?: Record<string, string>; // NEW: Per-option feedback
     respuesta_esperada: string | string[];
     pista: string; // Mandatorio en el prompt
+    dificultad?: DifficultyLevel; // Nivel de dificultad por nodo
     folder_id?: string;
     quiz_id?: string;
     justificacion_correcta?: string;

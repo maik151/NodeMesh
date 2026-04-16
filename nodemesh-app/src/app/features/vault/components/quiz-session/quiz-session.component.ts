@@ -1077,9 +1077,9 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     const isSolved = this.isNodeSolved(node.id!);
     
     if (isSolved && state.userAnswer) {
-      return p.replace(/_{2,}/g, `<span class="qs-cloze-filled">${state.userAnswer}</span>`);
+      return p.replace(/_{2,}|\{\{.*?\}\}/g, `<span class="qs-cloze-filled">${state.userAnswer}</span>`);
     } else {
-      return p.replace(/_{2,}/g, `<span class="qs-cloze-blank"></span>`);
+      return p.replace(/_{2,}|\{\{.*?\}\}/g, `<span class="qs-cloze-blank"></span>`);
     }
   }
 

@@ -111,8 +111,7 @@ El único resultado aceptable (OUTPUT) que me debes devolver es UN SOLO OBJETO J
            "Opción C": "...",
            "Opción D": "..."
         },
-        "respuesta_esperada": "...",
-        "pista": "Pista técnica directa (Sin signos de interrogación)."
+        "respuesta_esperada": "..."${config.incluirPistas ? ',\n        "pista": "Pista técnica directa (Sin signos de interrogación)."' : ''}
       }
   ]
 }
@@ -120,8 +119,8 @@ El único resultado aceptable (OUTPUT) que me debes devolver es UN SOLO OBJETO J
 
 NOTAS ESTRATÉGICAS DE DATO:
 - Tono de Retroalimentación: Queda ESTRICTAMENTE PROHIBIDO usar preguntas retóricas (ej: "¿No crees que...?", "¿Por qué...?", "¿Y si...?"). Las retroalimentaciones DEBEN ser afirmaciones directas, pedagógicas y técnicas. PROHIBIDO EL USO DE SIGNOS DE INTERROGACIÓN (?) en cualquier justificación.
-- campo "pista": Es OBLIGATORIO. Siempre debe viajar con información útil.
-- Campos Condicionales (null): Si el tipo de reto no tiene opciones múltiples (ej: output_prediction, feynman_synthesis, anomaly_detection), el campo "opciones" DEBE viajar como null estrictamente.
+- Reglas para "cloze_deletion": El campo "pregunta" debe usar exactamente seis guiones bajos (______) en el lugar de la palabra a completar. Jamás utilices llaves {{}}. Además, DEBES proporcionar siempre 4 "opciones" válidas (1 correcta, 3 distractores), el array de opciones JAMÁS debe ser null.
+${config.incluirPistas ? '- campo "pista": Es OBLIGATORIO. Siempre debe viajar con información útil.\n' : ''}- Campos Condicionales (null): Si el tipo de reto no tiene opciones múltiples (ej: output_prediction, feynman_synthesis, anomaly_detection), el campo "opciones" DEBE viajar como null. Para cloze_deletion, single_choice, multi_choice y ordering, el campo "opciones" DEBE tener un array de strings.
 - respuesta_esperada: 
   * En retos deterministas simples (single_choice, multi_choice, cloze_deletion, ordering, output_prediction), guarda la Respuesta Exacta.
   * En retos evaluados por IA (anomaly_detection, optimization, case_analysis, feynman_synthesis), guarda el "Criterio Oculto" detallado de evaluación.

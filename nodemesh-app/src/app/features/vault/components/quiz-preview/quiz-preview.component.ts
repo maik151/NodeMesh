@@ -710,18 +710,50 @@ export class QuizPreviewComponent implements OnChanges {
   get retentionPercent(): number {
     if (!this.nodes.length) return 0;
     const now = new Date();
-    const weekAhead = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    const mastered = this.nodes.filter(n => n.nextReviewDate && new Date(n.nextReviewDate) > weekAhead).length;
-    return Math.round((mastered / this.nodes.length) * 100);
+    
+    // Fórmula Ebbinghaus: R = e^(-t/S) donde t = días desde último repaso, S = estabilidad
+    // S se infiere del intervalo SM-2 asignado a cada nodo
+    let totalRetention = 0;
+    let countable = 0;
+    
+    for (const n of this.nodes) {
+      if (!n.nextReviewDate) continue; // Nodo nunca repasado = 0% retención
+      
+      const reviewDate = new Date(n.nextReviewDate);
+      const created = n.createdAt ? new Date(n.createdAt) : now;
+      
+      // Estabilidad (S): El intervalo SM-2 asignado al nodo
+      const stability = Math.max(1, (reviewDate.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+      
+      // Tiempo transcurrido (t): Días desde que se calculó el review (hoy vs cuándo debería repasarse)
+      const daysSinceSchedule = Math.max(0, (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+      
+      // R = e^(-t/S) * 100
+      const retention = Math.exp(-daysSinceSchedule / stability) * 100;
+      totalRetention += Math.min(100, Math.max(0, retention));
+      countable++;
+    }
+    
+    if (countable === 0) return 0;
+    return Math.round(totalRetention / countable);
   }
 
   get lastReviewLabel(): string {
+    // Usar ultimo_repaso real del quiz (guardado al finalizar sesión)
+    const lastReview = this.quiz?.ultimo_repaso;
     const intentos = this.quiz?.estadisticas_globales?.intentos || 0;
-    if (intentos === 0) return 'Nunca';
-    const created = this.quiz?.creado_en ? new Date(this.quiz.creado_en) : null;
-    if (!created) return 'Ayer';
-    const diff = Date.now() - created.getTime();
+    
+    if (intentos === 0 || !lastReview) return 'Nunca';
+    
+    const reviewDate = new Date(lastReview);
+    const diff = Date.now() - reviewDate.getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor(diff / (1000 * 60));
+    
+    if (minutes < 1) return 'Ahora';
+    if (minutes < 60) return `Hace ${minutes}m`;
+    if (hours < 24) return `Hace ${hours}h`;
     if (days === 0) return 'Hoy';
     if (days === 1) return 'Ayer';
     return `Hace ${days}d`;

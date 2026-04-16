@@ -50,5 +50,6 @@ export interface QuizSession {
         intentos: number;
         ultimo_score_porcentaje: number | null;
     };
+    ultimo_repaso?: Date;
     creado_en?: Date;
 }

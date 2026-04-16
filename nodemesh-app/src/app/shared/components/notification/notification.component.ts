@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService, Toast } from '../../../core/services/ui/toast.service';
+import { UI_ICONS } from '../../constants/icons.constants';
 
 @Component({
   selector: 'app-notification',
@@ -17,17 +18,8 @@ import { ToastService, Toast } from '../../../core/services/ui/toast.service';
         <div class="toast-indicator"></div>
         
         <div class="toast-icon">
-          <svg *ngIf="toast.type === 'success'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-            <path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path>
-          </svg>
-          <svg *ngIf="toast.type === 'error'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-            <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,16,0v32A8,8,0,0,1,144,176Zm-16-72a12,12,0,1,1,12-12A12,12,0,0,1,128,104Z"></path>
-          </svg>
-          <svg *ngIf="toast.type === 'warning'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-            <path d="M236.8,188.09,149.35,36.22a16,16,0,0,0-26.7,0L35.2,188.09a16,16,0,0,0,13.35,23.91H223.45a16,16,0,0,0,13.35-23.91ZM128,176a12,12,0,1,1,12-12A12,12,0,0,1,128,176Zm8-40a8,8,0,0,1-16,0V96a8,8,0,0,1,16,0Z"></path>
-          </svg>
-          <svg *ngIf="toast.type === 'info'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-            <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-16,0V128a8,8,0,0,1,16,0ZM128,96a12,12,0,1,1,12-12A12,12,0,0,1,128,96Z"></path>
+          <svg viewBox="0 0 256 256">
+            <path [attr.d]="UI_ICONS[toast.type]"></path>
           </svg>
         </div>
 
@@ -36,8 +28,8 @@ import { ToastService, Toast } from '../../../core/services/ui/toast.service';
         </div>
 
         <button class="toast-close">
-           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-             <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
+           <svg viewBox="0 0 256 256">
+             <path [attr.d]="UI_ICONS.close"></path>
            </svg>
         </button>
       </div>
@@ -168,5 +160,6 @@ import { ToastService, Toast } from '../../../core/services/ui/toast.service';
   `]
 })
 export class NotificationComponent {
+  protected readonly UI_ICONS = UI_ICONS;
   protected readonly toastService = inject(ToastService);
 }

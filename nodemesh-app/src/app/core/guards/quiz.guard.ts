@@ -11,7 +11,7 @@ export const quizGuard: CanDeactivateFn<any> = () => {
   const toast = inject(ToastService);
 
   if (layout.isQuizActive) {
-    toast.warning('⚠️ Bloqueo de Seguridad: Debes confirmar la salida dentro del Quiz para abandonar la sesión.', 6000);
+    toast.warning('Bloqueo de Seguridad: Debes confirmar la salida dentro del Quiz para abandonar la sesión.', 6000);
     return false;
   }
 

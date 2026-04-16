@@ -70,6 +70,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
       <!-- KPI CARDS -->
       <div class="kpi-grid">
         <div class="kpi-card">
+          <div class="kpi-tooltip">Estado actual de tu memoria tras la curva del olvido</div>
           <div class="kpi-icon-wrap">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
               <path [attr.d]="MOTOR_ICONS.ia"/>
@@ -80,6 +81,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
         </div>
 
         <div class="kpi-card">
+          <div class="kpi-tooltip">Cantidad de preguntas autogeneradas por la Inteligencia Artificial</div>
           <div class="kpi-icon-wrap">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M200,152a31.84,31.84,0,0,0-19.53,6.68l-23.11-18A31.65,31.65,0,0,0,160,128c0-.74,0-1.48-.08-2.21l13.23-4.41A32,32,0,1,0,168,104c0,.74,0,1.48.08,2.21l-13.23,4.41A32,32,0,0,0,128,96a32.59,32.59,0,0,0-5.27.44L115.89,81A32,32,0,1,0,96,88a32.59,32.59,0,0,0,5.27-.44l6.84,15.4a31.92,31.92,0,0,0-8.57,39.64L73.83,165.44a32.06,32.06,0,1,0,10.63,12l25.71-22.84a31.91,31.91,0,0,0,37.36-1.24l23.11,18A31.65,31.65,0,0,0,168,184a32,32,0,1,0,32-32Zm0-64a16,16,0,1,1-16,16A16,16,0,0,1,200,88ZM80,56A16,16,0,1,1,96,72,16,16,0,0,1,80,56ZM56,208a16,16,0,1,1,16-16A16,16,0,0,1,56,208Zm56-80a16,16,0,1,1,16,16A16,16,0,0,1,112,128Zm88,72a16,16,0,1,1,16-16A16,16,0,0,1,200,200Z"/></svg>
           </div>
@@ -88,15 +90,18 @@ const TIPO_MAP: Record<string, { label: string }> = {
         </div>
 
         <div class="kpi-card">
+          <div class="kpi-tooltip">Tiempo transcurrido desde tu última sesión repasando esta baraja</div>
           <div class="kpi-icon-wrap">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-96-88v64a8,8,0,0,1-16,0V132.94l-4.42,2.22a8,8,0,0,1-7.16-14.32l16-8A8,8,0,0,1,112,120Zm59.16,30.45L152,176h16a8,8,0,0,1,0,16H136a8,8,0,0,1-6.4-12.8l28.78-38.37A8,8,0,1,0,145.07,132a8,8,0,1,1-13.85-8A24,24,0,0,1,176,136,23.76,23.76,0,0,1,171.16,150.45Z"/></svg>
           </div>
           <div class="kpi-value">{{ lastReviewLabel }}</div>
           <div class="kpi-label">Último Repaso</div>
         </div>
+
         <div class="kpi-card">
+          <div class="kpi-tooltip">Progreso de nodos que ya has intentado resolver al menos una vez</div>
           <div class="kpi-icon-wrap">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M216,48V208a16,16,0,0,1-16,16H56a16,16,0,0,1-16-16V48A16,16,0,0,1,56,32H200A16,16,0,0,1,216,48ZM88,144v24a8,8,0,0,0,16,0V144a8,8,0,0,0-16,0Zm40,0v24a8,8,0,0,0,16,0V144a8,8,0,0,0-16,0Zm40,0v24a8,8,0,0,0,16,0V144a8,8,0,0,0-16,0ZM200,48H56v40H200Z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M200,152a31.84,31.84,0,0,0-19.53,6.68l-23.11-18A31.65,31.65,0,0,0,160,128c0-.74,0-1.48-.08-2.21l13.23-4.41A32,32,0,1,0,168,104c0,.74,0,1.48.08,2.21l-13.23,4.41A32,32,0,0,0,128,96a32.59,32.59,0,0,0-5.27.44L115.89,81A32,32,0,1,0,96,88a32.59,32.59,0,0,0,5.27-.44l6.84,15.4a31.92,31.92,0,0,0-8.57,39.64L73.83,165.44a32.06,32.06,0,1,0,10.63,12l25.71-22.84a31.91,31.91,0,0,0,37.36-1.24l23.11,18A31.65,31.65,0,0,0,168,184a32,32,0,1,0,32-32Zm0-64a16,16,0,1,1-16,16A16,16,0,0,1,200,88ZM80,56A16,16,0,1,1,96,72,16,16,0,0,1,80,56ZM56,208a16,16,0,1,1,16-16A16,16,0,0,1,56,208Zm56-80a16,16,0,1,1,16,16A16,16,0,0,1,112,128Zm88,72a16,16,0,1,1,16-16A16,16,0,0,1,200,200Z"/></svg>
           </div>
           <div class="kpi-value">{{ reviewedNodesCount }}<span style="font-size:1rem;opacity:0.5;">/{{ nodes.length }}</span></div>
           <div class="kpi-label">Nodos Cubiertos</div>
@@ -368,13 +373,41 @@ const TIPO_MAP: Record<string, { label: string }> = {
       padding: 1.5rem 1.25rem;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      gap: 0.25rem;
+      gap: 0.5rem;
       position: relative;
-      overflow: hidden;
-      transition: border-color 0.2s;
+      overflow: visible;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .kpi-card:hover { border-color: rgba(255,255,255,0.15); }
+    
+    .kpi-tooltip {
+      position: absolute;
+      top: -45px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--theme-surface);
+      border: 1px solid var(--theme-border);
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-family: inherit;
+      color: var(--theme-text-muted);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 100;
+      width: 200px;
+      text-align: center;
+      line-height: 1.3;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    :host-context([data-theme="light"]) .kpi-tooltip {
+      background: #fff;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .kpi-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-3px); }
+    .kpi-card:hover .kpi-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); }
+
     .kpi-icon-wrap {
       width: 26px; height: 26px;
       opacity: 0.6;

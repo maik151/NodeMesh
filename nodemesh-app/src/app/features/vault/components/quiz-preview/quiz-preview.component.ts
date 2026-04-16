@@ -188,13 +188,15 @@ const TIPO_MAP: Record<string, { label: string }> = {
           <!-- PAGINATION -->
           <div class="table-pagination" *ngIf="nodes.length > pageSize">
             <button class="pag-btn" [disabled]="currentPage === 0" (click)="currentPage = currentPage - 1">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"></path></svg>
               Anterior
             </button>
-            <span class="pag-info">Página {{ currentPage + 1 }} de {{ totalPages }}</span>
+            <div class="pag-info">
+              <span>Página {{ currentPage + 1 }} de {{ totalPages }}</span>
+            </div>
             <button class="pag-btn" [disabled]="isLastPage" (click)="currentPage = currentPage + 1">
               Siguiente
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path></svg>
             </button>
           </div>
         </div>
@@ -635,21 +637,39 @@ const TIPO_MAP: Record<string, { label: string }> = {
       justify-content: center;
       align-items: center;
       gap: 1.5rem;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: inherit;
       font-size: 0.85rem;
     }
     .pag-btn {
-      background: var(--theme-input-bg);
+      background: transparent;
       border: 1px solid var(--theme-border);
-      color: var(--theme-text);
-      padding: 0.4rem 1rem;
+      color: var(--theme-text-muted);
+      padding: 0.5rem 1rem;
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 0.8rem;
     }
-    .pag-btn:hover:not(:disabled) { background: rgba(128,128,128,0.1); border-color: var(--theme-text-muted); }
+    .pag-btn svg { width: 14px; height: 14px; fill: currentColor; }
+    .pag-btn:hover:not(:disabled) { 
+      background: rgba(159, 255, 34, 0.05); 
+      border-color: var(--theme-brand-neon); 
+      color: var(--theme-brand-neon); 
+      transform: translateY(-1px);
+    }
     .pag-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-    .pag-info { color: var(--theme-text-muted); }
+    .pag-info { 
+      font-size: 0.75rem; 
+      color: var(--theme-text-muted); 
+      font-family: 'JetBrains Mono', monospace; 
+      font-weight: 700; 
+      opacity: 0.8;
+      letter-spacing: 0.05em;
+    }
   `]
 })
 export class QuizPreviewComponent implements OnChanges {
@@ -731,6 +751,9 @@ export class QuizPreviewComponent implements OnChanges {
 
   get retentionPercent(): number {
     if (!this.nodes.length) return 0;
+    const intentos = this.quiz?.estadisticas_globales?.intentos || 0;
+    if (intentos === 0) return 0;
+
     const now = new Date();
     
     // Fórmula Ebbinghaus: R = e^(-t/S) donde t = días desde último repaso, S = estabilidad

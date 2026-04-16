@@ -166,9 +166,17 @@ const TIPO_MAP: Record<string, { label: string }> = {
                  <div class="qs-prog-fill" [style.width.%]="progress"></div>
               </div>
               <div class="qs-pag-controls">
-                <button class="qs-btn-nav" [disabled]="currentPage === 0" (click)="changePage(-1)">← Anterior</button>
-                <span class="qs-page-info">Pág {{ currentPage + 1 }} de {{ totalPages }}</span>
-                <button class="qs-btn-nav" *ngIf="!isLastPage" (click)="changePage(1)">Siguiente →</button>
+                <button class="qs-btn-nav" [disabled]="currentPage === 0" (click)="changePage(-1)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"></path></svg>
+                  Anterior
+                </button>
+                <div class="qs-page-info">
+                  <span>Pág {{ currentPage + 1 }} de {{ totalPages }}</span>
+                </div>
+                <button class="qs-btn-nav" [disabled]="isLastPage" (click)="changePage(1)">
+                  Siguiente
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path></svg>
+                </button>
               </div>
             </footer>
 
@@ -208,7 +216,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
               </div>
             </div>
             
-            <button class="qs-finish-btn-sidebar" *ngIf="isLastPage" (click)="finishQuiz()">
+            <button class="qs-finish-btn-sidebar" (click)="finishQuiz()">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm36.44-94.66-48-32A8,8,0,0,0,104,96v64a8,8,0,0,0,12.44,6.66l48-32a8,8,0,0,0,0-13.32ZM120,145.05V111l25.58,17Z"></path></svg>
               Finalizar
             </button>
@@ -410,6 +418,30 @@ const TIPO_MAP: Record<string, { label: string }> = {
       overflow-y: auto;
       overflow-x: hidden;
       padding-right: 4px;
+    }
+
+    .qs-map-grid.scroll-custom::-webkit-scrollbar {
+      width: 6px;
+    }
+    .qs-map-grid.scroll-custom::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+    }
+    .qs-map-grid.scroll-custom::-webkit-scrollbar-thumb {
+      background: rgba(159, 255, 34, 0.2);
+      border-radius: 10px;
+    }
+    .qs-map-grid.scroll-custom::-webkit-scrollbar-thumb:hover {
+      background: rgba(159, 255, 34, 0.4);
+    }
+    :host-context([data-theme="light"]) .qs-map-grid.scroll-custom::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.02);
+    }
+    :host-context([data-theme="light"]) .qs-map-grid.scroll-custom::-webkit-scrollbar-thumb {
+      background: rgba(134, 219, 0, 0.3);
+    }
+    :host-context([data-theme="light"]) .qs-map-grid.scroll-custom::-webkit-scrollbar-thumb:hover {
+      background: rgba(134, 219, 0, 0.5);
     }
 
     .qs-map-item {
@@ -784,28 +816,38 @@ const TIPO_MAP: Record<string, { label: string }> = {
     .qs-exam-footer { border-top: 1px solid var(--theme-border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
     .qs-pag-controls { display: flex; align-items: center; gap: 1rem; }
     
-    .qs-finish-btn {
-      background: var(--theme-brand-neon); 
-      color: #000; 
-      border: none; 
-      padding: 0.6rem 1.4rem; 
-      border-radius: 10px; 
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.95rem;
-      font-weight: 600; 
-      letter-spacing: 0;
+    .qs-btn-nav {
+      background: transparent;
+      border: 1px solid var(--theme-border);
+      color: var(--theme-text-muted);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
       cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       align-items: center;
-      gap: 0.6rem;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 20px rgba(159, 255, 34, 0);
+      gap: 0.5rem;
+      font-weight: 700;
+      font-family: inherit;
+      font-size: 0.8rem;
     }
-    .qs-finish-btn:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 8px 25px rgba(159, 255, 34, 0.2);
+    .qs-btn-nav svg { width: 14px; height: 14px; fill: currentColor; }
+    .qs-btn-nav:hover:not(:disabled) {
+      background: rgba(159, 255, 34, 0.05);
+      border-color: var(--theme-brand-neon);
+      color: var(--theme-brand-neon);
+      transform: translateY(-1px);
     }
-    .qs-finish-btn svg { width: 20px; height: 20px; fill: currentColor; }
+    .qs-btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .qs-page-info {
+      font-size: 0.75rem;
+      color: var(--theme-text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      opacity: 0.8;
+      letter-spacing: 0.05em;
+    }
 
     @keyframes qs-fade-in { from { opacity: 0; } to { opacity: 1; } }
     @keyframes qs-slide-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

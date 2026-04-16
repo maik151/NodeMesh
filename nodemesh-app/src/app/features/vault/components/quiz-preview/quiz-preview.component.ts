@@ -633,6 +633,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
 
     .table-pagination {
       margin-top: 1.5rem;
+      padding-bottom: 1.5rem;
       display: flex;
       justify-content: center;
       align-items: center;

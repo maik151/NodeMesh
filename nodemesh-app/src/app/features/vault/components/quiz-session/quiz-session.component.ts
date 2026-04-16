@@ -10,6 +10,7 @@ import { TYPE_ICONS, UI_ICONS } from '../../../../shared/constants/icons.constan
 interface NodeState {
   userAnswer: string | string[];
   isCorrect: boolean | null;
+  isCompleted: boolean;
   showFeedback: boolean;
   failedOptions: string[]; 
   history: { selection: string; feedback: string; isCorrect: boolean }[];
@@ -916,6 +917,7 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
       this.nodeStates[n.id!] = {
         userAnswer: this.isChoiceType(n) ? [] : '',
         isCorrect: null,
+        isCompleted: false,
         showFeedback: false,
         failedOptions: [],
         history: [],
@@ -1064,7 +1066,7 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
 
   isNodeSolved(nodeId: number): boolean {
     const state = this.nodeStates[nodeId];
-    return state.history.some(h => h.isCorrect);
+    return state.isCompleted;
   }
 
   selectOption(node: NodeChallenge, opt: string) {
@@ -1083,6 +1085,7 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
           state.isCorrect = true;
           this.totalCorrect++;
         }
+        state.isCompleted = true; // Solve it completely
         state.history.push({
           selection: opt,
           feedback: node.retroalimentaciones_opciones?.[opt] || '¡Correcto! Respuesta sincronizada.',
@@ -1122,6 +1125,13 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
           current.splice(idx, 1);
         } else {
           current.push(opt);
+          
+          state.history.push({
+             selection: opt,
+             feedback: node.retroalimentaciones_opciones?.[opt] || 'Identificado componente válido.',
+             isCorrect: true
+          });
+
           // Check if all correct ones are selected
           const expected = node.respuesta_esperada as string[];
           if (current.length === expected.length) {
@@ -1132,9 +1142,10 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
                 state.isCorrect = true;
                 this.totalCorrect++;
               }
+              state.isCompleted = true;
               state.history.push({
                 selection: current.join(', '),
-                feedback: '¡Excelente! Has identificado todos los elementos correctamente.',
+                feedback: '¡Excelente! Has identificado todos los componentes esperados correctamente.',
                 isCorrect: true
               });
             }

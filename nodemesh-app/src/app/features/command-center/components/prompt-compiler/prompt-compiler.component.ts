@@ -452,15 +452,15 @@ export class PromptCompilerComponent {
 
   getMatrixLabel(key: string): string {
     const labels: Record<string, string> = {
-      single_choice: 'Single Choice',
-      cloze_deletion: 'Cloze Deletion',
-      ordering: 'Ordering',
-      optimization: 'Optimization',
-      feynman_synthesis: 'Feynman Synthesis',
-      multi_choice: 'Multi Choice',
-      output_prediction: 'Output Prediction',
-      anomaly_detection: 'Anomaly Detection',
-      case_analysis: 'Case Analysis'
+      single_choice: 'Selección Única',
+      cloze_deletion: 'Completar Espacios',
+      ordering: 'Ordenamiento',
+      optimization: 'Optimización',
+      feynman_synthesis: 'Síntesis Feynman',
+      multi_choice: 'Selección Múltiple',
+      output_prediction: 'Predicción Salida',
+      anomaly_detection: 'Det. de Anomalías',
+      case_analysis: 'Análisis Casos'
     };
     return labels[key] ?? key.replace(/_/g, ' ');
   }

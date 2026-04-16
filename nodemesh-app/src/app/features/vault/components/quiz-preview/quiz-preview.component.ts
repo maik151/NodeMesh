@@ -145,7 +145,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
                 <th class="col-tipo">Tipo</th>
                 <th class="col-pregunta">Pregunta</th>
                 <th class="col-motor">Motor</th>
-                <th class="col-memoria">Memoria</th>
+                <th class="col-dificultad">Dificultad</th>
                 <th class="col-acciones">Acciones</th>
               </tr>
             </thead>
@@ -173,10 +173,10 @@ const TIPO_MAP: Record<string, { label: string }> = {
                     <span>{{ node.requiere_ia ? 'IA' : 'Local' }}</span>
                   </div>
                 </td>
-                <td class="col-memoria">
-                  <div class="memoria-chip" [class]="getMemoriaClass(node)">
-                    <span class="mem-dot"></span>
-                    <span>{{ getMemoriaLabel(node) }}</span>
+                <td class="col-dificultad">
+                  <div class="dificultad-chip" [class]="getDificultadClass(node)">
+                    <span class="dif-dot"></span>
+                    <span>{{ node.dificultad || 'Aprendiz' }}</span>
                   </div>
                 </td>
                 <td class="col-acciones">
@@ -628,30 +628,37 @@ const TIPO_MAP: Record<string, { label: string }> = {
       color: #c084fc;
     }
 
-    /* MEMORIA */
-    .col-memoria { white-space: nowrap; }
-    .memoria-chip {
+    /* DIFICULTAD */
+    .col-dificultad { white-space: nowrap; }
+    .dificultad-chip {
       display: inline-flex; align-items: center; gap: 0.4rem;
       padding: 0.25rem 0.65rem;
       border-radius: 6px;
       font-size: 0.72rem;
       font-weight: 800;
     }
-    .mem-dot {
+    .dif-dot {
       width: 8px; height: 8px; border-radius: 50%;
     }
-    .memoria-alta {
+    .dif-aprendiz {
       background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); color: #4ade80;
     }
-    .memoria-alta .mem-dot { background: #4ade80; }
-    .memoria-media {
+    .dif-aprendiz .dif-dot { background: #4ade80; }
+    
+    .dif-intermedio {
+      background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25); color: #38bdf8;
+    }
+    .dif-intermedio .dif-dot { background: #38bdf8; }
+    
+    .dif-avanzado {
       background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.25); color: #facc15;
     }
-    .memoria-media .mem-dot { background: #facc15; }
-    .memoria-baja {
+    .dif-avanzado .dif-dot { background: #facc15; }
+    
+    .dif-senior {
       background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #f87171;
     }
-    .memoria-baja .mem-dot { background: #f87171; }
+    .dif-senior .dif-dot { background: #f87171; }
 
     /* ACCIONES */
     .col-acciones { white-space: nowrap; }
@@ -930,23 +937,15 @@ export class QuizPreviewComponent implements OnChanges {
     return text.length > len ? text.slice(0, len) + '...' : text;
   }
 
-  getMemoriaClass(node: NodeChallenge): string {
-    if (!node.nextReviewDate) return 'memoria-chip memoria-baja';
-    const now = new Date();
-    const reviewDate = new Date(node.nextReviewDate);
-    const days = (reviewDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
-    if (days > 7) return 'memoria-chip memoria-alta';
-    if (days > 1) return 'memoria-chip memoria-media';
-    return 'memoria-chip memoria-baja';
-  }
-
-  getMemoriaLabel(node: NodeChallenge): string {
-    if (!node.nextReviewDate) return 'Baja';
-    const now = new Date();
-    const days = (new Date(node.nextReviewDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
-    if (days > 7) return 'Alta';
-    if (days > 1) return 'Med';
-    return 'Baja';
+  getDificultadClass(node: NodeChallenge): string {
+    const map: Record<string, string> = {
+      'Aprendiz': 'dif-aprendiz',
+      'Intermedio': 'dif-intermedio',
+      'Avanzado': 'dif-avanzado',
+      'Senior': 'dif-senior'
+    };
+    const key = node.dificultad || 'Aprendiz';
+    return map[key] || 'dif-aprendiz';
   }
 
   async handleUpdateQuiz(data: { title: string, difficulty: string }) {

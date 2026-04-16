@@ -12,9 +12,9 @@ interface NodeState {
   isCorrect: boolean | null;
   isCompleted: boolean;
   showFeedback: boolean;
-  failedOptions: string[]; 
+  failedOptions: string[];
   history: { selection: string; feedback: string; isCorrect: boolean }[];
-  wrongAttempts: number; 
+  wrongAttempts: number;
 }
 
 interface SM2Impact {
@@ -24,15 +24,15 @@ interface SM2Impact {
 }
 
 const TIPO_MAP: Record<string, { label: string }> = {
-  single_choice:    { label: 'Selección Única' },
-  multi_choice:     { label: 'Selección Múltiple' },
-  cloze_deletion:   { label: 'Completar Espacios' },
-  output_prediction:{ label: 'Predicción de Salida' },
-  ordering:         { label: 'Ordenamiento Lógico' },
-  anomaly_detection:{ label: 'Detección de Anomalías' },
-  optimization:     { label: 'Optimización de Código' },
-  case_analysis:    { label: 'Análisis de Casos' },
-  feynman_synthesis:{ label: 'Síntesis de Feynman' },
+  single_choice: { label: 'Selección Única' },
+  multi_choice: { label: 'Selección Múltiple' },
+  cloze_deletion: { label: 'Completar Espacios' },
+  output_prediction: { label: 'Predicción de Salida' },
+  ordering: { label: 'Ordenamiento Lógico' },
+  anomaly_detection: { label: 'Detección de Anomalías' },
+  optimization: { label: 'Optimización de Código' },
+  case_analysis: { label: 'Análisis de Casos' },
+  feynman_synthesis: { label: 'Síntesis de Feynman' },
 };
 
 @Component({
@@ -129,8 +129,14 @@ const TIPO_MAP: Record<string, { label: string }> = {
 
                   <h3 class="qs-question" [innerHTML]="getFormattedQuestion(node)"></h3>
                   
-                  <div class="qs-snippet-box" *ngIf="node.contexto">
-                    <code>{{ node.contexto }}</code>
+                  <div class="qs-context-card" *ngIf="node.contexto">
+                    <div class="qs-context-header">
+                      <svg class="qs-context-icon" viewBox="0 0 256 256">
+                        <path d="M56,136a8,8,0,0,1-8,8H24a8,8,0,0,1,0-16h8V64H24a8,8,0,0,1,0-16H40v0a8,8,0,0,1,6.78,3.74L80,104.91l33.22-53.15A8,8,0,0,1,120,48v0h16a8,8,0,0,1,0,16h-8v64h8a8,8,0,0,1,0,16H112a8,8,0,0,1,0-16V83.89L86.78,124.24a8,8,0,0,1-13.56,0L48,83.89V128A8,8,0,0,1,56,136Zm112-24h64a8,8,0,0,0,0-16H168a8,8,0,0,0,0,16Zm64,16H168a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16Zm0,32H80a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Zm0,32H80a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Z"></path>
+                      </svg>
+                      <span class="qs-context-title">CONTEXTO</span>
+                    </div>
+                    <div class="qs-context-body">{{ node.contexto }}</div>
                   </div>
 
                   <div class="qs-interaction-box">
@@ -359,6 +365,57 @@ const TIPO_MAP: Record<string, { label: string }> = {
       overflow-y: auto; 
       padding: 1.5rem 3rem; 
       scroll-behavior: smooth; 
+    }
+
+    .qs-cloze-filled { 
+      color: var(--theme-brand-neon); 
+      border: 1.5px solid var(--theme-brand-neon); 
+      background: rgba(159, 255, 34, 0.1);
+      padding: 0.8rem; 
+      border-radius: 4px;
+      display: inline-flex; 
+      align-items: center;
+      height: 1.6rem;
+      vertical-align: middle; 
+      margin: 0 0.4rem; 
+      font-weight: 700; 
+    }
+
+    .qs-context-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+    .qs-context-header {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.6rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .qs-context-icon {
+      width: 16px;
+      height: 16px;
+      fill: var(--theme-brand-neon);
+      opacity: 0.8;
+    }
+    .qs-context-title {
+      font-size: 0.65rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: var(--theme-text-muted);
+    }
+    .qs-context-body {
+      padding: 1rem;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--theme-text);
+      font-family: 'Inter', sans-serif;
+      font-style: italic;
+      opacity: 0.85;
     }
 
     /* MAP FLOATING CARD (PREMIUM) */
@@ -596,8 +653,29 @@ const TIPO_MAP: Record<string, { label: string }> = {
     .qs-log-entry { display: flex; gap: 0.75rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 3px solid #f87171; font-size: 0.8rem; }
     .qs-log-entry.is-correct { border-left-color: var(--theme-brand-neon); background: rgba(134, 219, 0, 0.03); }
 
-    .qs-cloze-blank { display: inline-block; width: 6ch; border-bottom: 2px solid rgba(255,255,255,0.3); vertical-align: middle; margin: 0 0.3rem; }
-    .qs-cloze-filled { color: var(--theme-brand-neon); border-bottom: 2px dashed var(--theme-brand-neon); padding: 0 0.5rem; display: inline-block; margin: 0 0.3rem; font-weight: 700; }
+    ::ng-deep .qs-cloze-blank { 
+      display: inline-flex; 
+      min-width: 100px; 
+      height: 1.6rem; 
+      border: 1.5px dashed rgba(255,255,255,0.3); 
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+      vertical-align: middle; 
+      margin: 0 0.4rem; 
+    }
+    ::ng-deep .qs-cloze-filled { 
+      color: var(--theme-brand-neon); 
+      border: 1.5px solid var(--theme-brand-neon); 
+      background: rgba(159, 255, 34, 0.1);
+      padding: 0 0.8rem; 
+      border-radius: 4px;
+      display: inline-flex; 
+      align-items: center;
+      height: 1.6rem;
+      vertical-align: middle; 
+      margin: 0 0.4rem; 
+      font-weight: 700; 
+    }
 
     /* ================= BENTO GRID RESULTS ================= */
     .qs-final-results {
@@ -893,10 +971,10 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // Ensuring it always collapses on start
     this.layoutService.setExpanded(false);
-    
+
     // Aleatorizar el orden de las preguntas cada vez que se inicia un quiz o repaso
     this.nodes = this.shuffleArray([...this.nodes]);
-    
+
     this.initNodeStates();
     this.startTimer();
   }
@@ -954,11 +1032,11 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     if (answered === 0) return 0;
     return Math.round(this.secondsElapsed / answered);
   }
-  
+
   get timerLabelCentered(): string {
-     const m = Math.floor(this.secondsElapsed / 60);
-     const s = this.secondsElapsed % 60;
-     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    const m = Math.floor(this.secondsElapsed / 60);
+    const s = this.secondsElapsed % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   }
 
   get displacementLabel(): string {
@@ -991,13 +1069,13 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     const iconDown = 'M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z';
 
     if (score === 100 && degraded === 0) return { label: 'Dominio<br>Total', cssClass: 'fr-cell-sm badge badge-elite', icon: iconTrophy };
-    if (score >= 90)                     return { label: 'Memoria<br>de Acero', cssClass: 'fr-cell-sm badge badge-elite', icon: iconFire };
-    if (score >= 80)                     return { label: 'Nivel<br>Maestro', cssClass: 'fr-cell-sm badge badge-good', icon: iconStar };
-    if (score >= 70)                     return { label: 'Buen<br>Progreso', cssClass: 'fr-cell-sm badge badge-good', icon: iconRocket };
-    if (score >= 50)                     return { label: 'En<br>Desarrollo', cssClass: 'fr-cell-sm badge badge-ok', icon: iconChart };
-    if (score >= 35)                     return { label: 'Fase de<br>Adaptación', cssClass: 'fr-cell-sm badge badge-warn', icon: iconWarn };
-    if (score >= 15)                     return { label: 'Requiere<br>Refuerzo', cssClass: 'fr-cell-sm badge badge-danger', icon: iconDown };
-    if (degraded >= total && total > 0)  return { label: 'Reseteo<br>Cognitivo', cssClass: 'fr-cell-sm badge badge-danger', icon: iconSkull };
+    if (score >= 90) return { label: 'Memoria<br>de Acero', cssClass: 'fr-cell-sm badge badge-elite', icon: iconFire };
+    if (score >= 80) return { label: 'Nivel<br>Maestro', cssClass: 'fr-cell-sm badge badge-good', icon: iconStar };
+    if (score >= 70) return { label: 'Buen<br>Progreso', cssClass: 'fr-cell-sm badge badge-good', icon: iconRocket };
+    if (score >= 50) return { label: 'En<br>Desarrollo', cssClass: 'fr-cell-sm badge badge-ok', icon: iconChart };
+    if (score >= 35) return { label: 'Fase de<br>Adaptación', cssClass: 'fr-cell-sm badge badge-warn', icon: iconWarn };
+    if (score >= 15) return { label: 'Requiere<br>Refuerzo', cssClass: 'fr-cell-sm badge badge-danger', icon: iconDown };
+    if (degraded >= total && total > 0) return { label: 'Reseteo<br>Cognitivo', cssClass: 'fr-cell-sm badge badge-danger', icon: iconSkull };
     return { label: 'Nivel<br>Principiante', cssClass: 'fr-cell-sm badge badge-danger', icon: iconDown };
   }
 
@@ -1071,11 +1149,11 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     const p = node.pregunta || '';
     const t = this.normalizeType(node.tipo_reto);
     if (!t.includes('cloze')) return p;
-    
+
     // Replace ____ with a styling span, or if answered, fill it.
     const state = this.nodeStates[node.id!];
     const isSolved = this.isNodeSolved(node.id!);
-    
+
     if (isSolved && state.userAnswer) {
       return p.replace(/_{2,}|\{\{.*?\}\}/g, `<span class="qs-cloze-filled">${state.userAnswer}</span>`);
     } else {
@@ -1092,13 +1170,13 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     if (this.isFinished) return;
     const state = this.nodeStates[node.id!];
     if (this.isNodeSolved(node.id!)) return;
-    
+
     const type = this.normalizeType(node.tipo_reto);
 
     // Treat Cloze as Single Choice UI
     if (type.includes('single') || type.includes('cloze')) {
       const isCorrect = this.isOptionCorrect(node, opt);
-      
+
       if (isCorrect) {
         state.userAnswer = opt;
         if (state.isCorrect === null) {
@@ -1145,11 +1223,11 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
           current.splice(idx, 1);
         } else {
           current.push(opt);
-          
+
           state.history.push({
-             selection: opt,
-             feedback: node.retroalimentaciones_opciones?.[opt] || 'Identificado componente válido.',
-             isCorrect: true
+            selection: opt,
+            feedback: node.retroalimentaciones_opciones?.[opt] || 'Identificado componente válido.',
+            isCorrect: true
           });
 
           // Check if all correct ones are selected
@@ -1242,7 +1320,7 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
         if (state.isCorrect) {
           // SM-2 Curva muy suave (Exámenes a corto plazo)
           if (state.wrongAttempts === 0) {
-            intervalDays = Math.ceil(previousInterval * 1.5); 
+            intervalDays = Math.ceil(previousInterval * 1.5);
             if (previousInterval === 1) intervalDays = 2; // Salto inicial lento 1 -> 2
           } else if (state.wrongAttempts === 1) {
             intervalDays = Math.ceil(previousInterval * 1.2);
@@ -1254,7 +1332,7 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
           // Limites para evitar "absurdos" como dijo el usuario
           if (intervalDays > 8) intervalDays = 8; // MÁXIMO 8 DÍAS (1 semana)
           if (intervalDays < 1) intervalDays = 1;
-          
+
           totalDisp += intervalDays;
           correctC++;
         } else if (state.isCorrect === false) {
@@ -1268,7 +1346,7 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
 
         const nextDate = new Date();
         nextDate.setDate(now.getDate() + intervalDays);
-        
+
         await this.db.saveNode({
           ...node,
           nextReviewDate: nextDate,
@@ -1279,12 +1357,12 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
 
       this.impactSummary.avgDisplacement = correctC > 0 ? parseFloat((totalDisp / correctC).toFixed(1)) : 0;
       this.impactSummary.degradedCount = degradC;
-      
+
       // Racha diaria con localStorage
       const today = now.toISOString().split('T')[0];
       const lastDay = localStorage.getItem('nm_streak_date');
       let streak = parseInt(localStorage.getItem('nm_streak') || '0', 10);
-      
+
       if (lastDay === today) {
         // Ya se registró hoy, no incrementar
       } else {
@@ -1344,14 +1422,14 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
 
   getSafeIcon(tipo: string): string {
     const key = this.normalizeType(tipo);
-    if (key.includes('single'))  return this.ICONS['single_choice'];
-    if (key.includes('multi'))   return this.ICONS['multiple_choice'];
-    if (key.includes('cloze'))   return this.ICONS['cloze_deletion'];
-    if (key.includes('output'))  return this.ICONS['output_prediction'];
-    if (key.includes('order'))   return this.ICONS['ordering'];
+    if (key.includes('single')) return this.ICONS['single_choice'];
+    if (key.includes('multi')) return this.ICONS['multiple_choice'];
+    if (key.includes('cloze')) return this.ICONS['cloze_deletion'];
+    if (key.includes('output')) return this.ICONS['output_prediction'];
+    if (key.includes('order')) return this.ICONS['ordering'];
     if (key.includes('anomaly')) return this.ICONS['anomaly_detection'];
     if (key.includes('optimiz')) return this.ICONS['optimization'];
-    if (key.includes('case'))    return this.ICONS['case_analysis'];
+    if (key.includes('case')) return this.ICONS['case_analysis'];
     if (key.includes('feynman')) return this.ICONS['feynman_synthesis'];
     return '';
   }

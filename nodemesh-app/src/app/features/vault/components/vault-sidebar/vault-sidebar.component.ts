@@ -186,6 +186,12 @@ import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
                 <span class="row-name child-name">{{ quiz.titulo_quiz }}</span>
                 <div class="recent-dot" *ngIf="isRecent(quiz)"></div>
               </div>
+              
+              <!-- VS CODE STYLE TOOLTIP -->
+              <div class="full-title-tooltip">
+                {{ quiz.titulo_quiz }}
+              </div>
+
               <div class="row-right">
                 <button class="dots-btn"
                         (click)="$event.stopPropagation(); toggleMenu(quiz.quiz_id)"
@@ -500,6 +506,32 @@ import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
       height: 17px;
       flex-shrink: 0;
       fill: currentColor;
+    }
+
+    /* ═══════════════════════════════════════ VS CODE STYLE TOOLTIP */
+    .full-title-tooltip {
+      position: absolute;
+      left: 3rem;
+      top: calc(100% - 2px);
+      background: #1e1e1e;
+      border: 1px solid #454545;
+      color: #cccccc;
+      padding: 3px 8px;
+      font-size: 11px;
+      white-space: normal;
+      width: max-content;
+      max-width: 260px;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.1s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      border-radius: 2px;
+    }
+
+    .tree-row.quiz-row:hover .full-title-tooltip {
+      opacity: 1;
+      transition-delay: 0.4s; /* Like a real tooltip */
     }
 
     .quiz-svg {

@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { NodeChallenge, QuizSession, ChallengeType } from '../../../../core/models/node.model';
 import { DatabaseService } from '../../../../core/services/storage/database.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
-import { TYPE_ICONS } from '../../../../shared/constants/icons.constants';
+import { LayoutService } from '../../../../core/services/ui/layout.service';
+import { TYPE_ICONS, UI_ICONS } from '../../../../shared/constants/icons.constants';
 
 interface NodeState {
   userAnswer: string | string[];
@@ -93,8 +94,9 @@ const TIPO_MAP: Record<string, { label: string }> = {
           </div>
         </header>
 
-        <main class="qs-main-scroll">
-          <div class="qs-exam-list">
+        <div class="qs-content-layout">
+          <main class="qs-main-scroll">
+            <div class="qs-exam-list">
             
             <ng-container *ngFor="let node of visibleNodes; let i = index">
               <div class="qs-node-block" [id]="'node-' + node.id">
@@ -111,13 +113,13 @@ const TIPO_MAP: Record<string, { label: string }> = {
                       </div>
                       
                       <div class="qs-hint-wrap" *ngIf="node.pista">
-                        <button class="qs-hint-trigger" (click)="toggleHint(node.id!)" [class.active]="hintsVisible[node.id!]">
+                        <button class="qs-hint-trigger">
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-                            <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm48-88a8,8,0,0,1-8,8H112a8,8,0,0,1,0-16h56A8,8,0,0,1,176,128Zm-24,40a8,8,0,0,1-8,8H112a8,8,0,0,1,0-16h32A8,8,0,0,1,152,168Z"/>
+                            <path d="M176,232a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h80A8,8,0,0,1,176,232Zm40-128a87.55,87.55,0,0,1-33.64,69.21A16.24,16.24,0,0,0,176,186v6a16,16,0,0,1-16,16H96a16,16,0,0,1-16-16v-6a16,16,0,0,0-6.23-12.66A87.59,87.59,0,0,1,40,104.5C39.74,56.83,78.26,17.15,125.88,16A88,88,0,0,1,216,104Zm-16,0a72,72,0,0,0-73.74-72c-39,.92-70.47,33.39-70.26,72.39a71.64,71.64,0,0,0,27.64,56.3h0A32,32,0,0,1,96,186v6h24V147.31L90.34,117.66a8,8,0,0,1,11.32-11.32L128,132.69l26.34-26.35a8,8,0,0,1,11.32,11.32L136,147.31V192h24v-6a32.12,32.12,0,0,1,12.47-25.35A71.65,71.65,0,0,0,200,104Z"/>
                           </svg>
                           <span>Pista</span>
                         </button>
-                        <div class="qs-hint-glass" [class.is-visible]="hintsVisible[node.id!]">
+                        <div class="qs-hint-glass">
                            <p>{{ node.pista }}</p>
                         </div>
                       </div>
@@ -137,9 +139,9 @@ const TIPO_MAP: Record<string, { label: string }> = {
                         class="qs-opt-row"
                         [class.is-selected]="isSelected(node, opt)"
                         [class.is-failed]="nodeStates[node.id!].failedOptions.includes(opt)"
-                        [class.reveal-correct]="nodeStates[node.id!].isCorrect && isOptionCorrect(node, opt)"
+                        [class.reveal-correct]="isNodeSolved(node.id!) && isOptionCorrect(node, opt)"
                         (click)="selectOption(node, opt)"
-                        [disabled]="isFinished || nodeStates[node.id!].isCorrect !== null || nodeStates[node.id!].failedOptions.includes(opt)">
+                        [disabled]="isFinished || isNodeSolved(node.id!) || nodeStates[node.id!].failedOptions.includes(opt)">
                         <div class="qs-mark"></div>
                         {{ opt }}
                       </button>
@@ -167,19 +169,54 @@ const TIPO_MAP: Record<string, { label: string }> = {
                 <button class="qs-btn-nav" [disabled]="currentPage === 0" (click)="changePage(-1)">← Anterior</button>
                 <span class="qs-page-info">Pág {{ currentPage + 1 }} de {{ totalPages }}</span>
                 <button class="qs-btn-nav" *ngIf="!isLastPage" (click)="changePage(1)">Siguiente →</button>
-                
-                <button class="qs-finish-btn" *ngIf="isLastPage" (click)="finishQuiz()">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm36.44-94.66-48-32A8,8,0,0,0,104,96v64a8,8,0,0,0,12.44,6.66l48-32a8,8,0,0,0,0-13.32ZM120,145.05V111l25.58,17Z"></path></svg>
-                  Finalizar Evaluacion
-                </button>
               </div>
             </footer>
 
-          </div>
-        </main>
+            </div>
+          </main>
+
+          <!-- SIDEBAR: ESQUEMA DE PREGUNTAS -->
+          <aside class="qs-map-sidebar">
+            <div class="qs-map-header">
+              <svg class="qs-map-icon" viewBox="0 0 256 256">
+                <path [attr.d]="UI_ICONS.quiz_map"/>
+              </svg>
+              <h3>Esquema de Preguntas</h3>
+            </div>
+
+            <div class="qs-map-grid scroll-custom">
+              <div 
+                *ngFor="let node of nodes; let i = index" 
+                class="qs-map-item"
+                [class.is-correct]="nodeStates[node.id!]?.isCorrect === true"
+                [class.is-wrong]="nodeStates[node.id!]?.isCorrect === false"
+                [class.is-current]="isCurrentNode(i)"
+                [title]="'Pregunta ' + (i + 1)">
+                
+                <div class="qs-map-status-icon">
+                  <svg *ngIf="nodeStates[node.id!]?.isCorrect === null" viewBox="0 0 256 256">
+                    <circle cx="128" cy="128" r="16" fill="currentColor" opacity="0.3"></circle>
+                  </svg>
+                  <svg *ngIf="nodeStates[node.id!]?.isCorrect === true" viewBox="0 0 256 256">
+                    <path [attr.d]="UI_ICONS.success"></path>
+                  </svg>
+                  <svg *ngIf="nodeStates[node.id!]?.isCorrect === false" viewBox="0 0 256 256">
+                    <path [attr.d]="UI_ICONS.error"></path>
+                  </svg>
+                </div>
+                <span class="qs-map-num">{{ i + 1 }}</span>
+              </div>
+            </div>
+            
+            <button class="qs-finish-btn-sidebar" *ngIf="isLastPage" (click)="finishQuiz()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm36.44-94.66-48-32A8,8,0,0,0,104,96v64a8,8,0,0,0,12.44,6.66l48-32a8,8,0,0,0,0-13.32ZM120,145.05V111l25.58,17Z"></path></svg>
+              Finalizar
+            </button>
+          </aside>
+        </div>
       </div>
 
-      <ng-template #finishedState>
+    <ng-template #finishedState>
         <div class="qs-final-results">
           
           <header class="fr-header">
@@ -264,9 +301,32 @@ const TIPO_MAP: Record<string, { label: string }> = {
   `,
   styles: [`
     .qs-shell { width: 100%; height: 100%; background: var(--theme-bg); color: var(--theme-text); display: flex; flex-direction: column; animation: qs-fade-in 0.3s ease; text-align: left; font-family: 'JetBrains Mono', monospace; }
-    .qs-container { display: flex; flex-direction: column; width: 100%; height: 100%; overflow: hidden; }
+    .qs-container { display: flex; flex-direction: column; width: 100%; height: 100%; overflow: hidden; background: var(--theme-bg-base); }
 
-    .qs-header { height: 80px; padding: 0 2rem; border-bottom: 1px solid var(--theme-border); background: var(--theme-header-bg, rgba(255,255,255,0.02)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: space-between; z-index: 100; position: sticky; top: 0; flex-shrink: 0; }
+    .qs-content-layout {
+      position: relative;
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 80px);
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .qs-header { 
+      height: 80px; 
+      padding: 0 2rem; 
+      border-bottom: 1px solid var(--theme-border); 
+      background: var(--theme-header-bg, rgba(255,255,255,0.02)); 
+      backdrop-filter: blur(12px); 
+      -webkit-backdrop-filter: blur(12px); 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      z-index: 100; 
+      position: sticky; 
+      top: 0; 
+      flex-shrink: 0; 
+    }
     .qs-header-left { display: flex; align-items: center; gap: 1.5rem; min-width: 0; flex: 1; }
     .qs-exit-btn-alt { background: transparent; border: none; color: var(--theme-text-muted); padding:0; display: flex; align-items: center; gap: 0.6rem; cursor: pointer; transition: 0.2s; font-family: 'JetBrains Mono'; font-size: 0.85rem; flex-shrink: 0; }
     .qs-exit-btn-alt:hover { color: #f87171; transform: translateX(-2px); }
@@ -285,14 +345,210 @@ const TIPO_MAP: Record<string, { label: string }> = {
     .qs-widget-prog-track { height:3px; background: rgba(0,0,0,0.05); width: 100%; position: absolute; bottom: 0; }
     .qs-widget-prog-fill { height: 100%; background: var(--theme-brand-neon); transition: width 0.4s ease; box-shadow: 0 0 10px var(--theme-brand-neon); }
 
-    .qs-main-scroll { flex: 1; overflow-y: auto; padding: 2.5rem 4rem; scroll-behavior: smooth; }
-    .qs-exam-list { max-width: 750px; display: flex; flex-direction: column; gap: 2.5rem; }
+    .qs-main-scroll { 
+      flex: 1; 
+      overflow-y: auto; 
+      padding: 1.5rem 3rem; 
+      scroll-behavior: smooth; 
+    }
+
+    /* MAP FLOATING CARD (PREMIUM) */
+    .qs-map-sidebar {
+      position: absolute;
+      top: 1.5rem;
+      right: 2rem;
+      width: 260px;
+      background: rgba(18, 18, 22, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      z-index: 1000;
+      transition: all 0.3s ease;
+      animation: qs-slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    :host-context([data-theme="light"]) .qs-map-sidebar {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    .qs-map-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      color: var(--theme-text);
+      opacity: 0.9;
+    }
+
+    .qs-map-header h3 {
+      font-size: 1rem;
+      margin: 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .qs-map-icon {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    .qs-map-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.5rem;
+      align-content: start;
+      max-height: 400px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 4px;
+    }
+
+    .qs-map-item {
+      aspect-ratio: 1/1.2;
+      background: rgba(150, 150, 150, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    :host-context([data-theme="light"]) .qs-map-item {
+      background: rgba(0, 0, 0, 0.05);
+      border-color: rgba(0, 0, 0, 0.05);
+      color: #777;
+    }
+
+    .qs-map-item.is-correct {
+      background: #86db00;
+      border-color: #9fff22;
+      color: #000;
+      box-shadow: 0 4px 15px rgba(134, 219, 0, 0.4);
+    }
+
+    .qs-map-item.is-wrong {
+      background: #ff4444;
+      border-color: #ff6b6b;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4);
+    }
+
+    .qs-finish-btn-sidebar {
+      margin-top: 1rem;
+      background: var(--theme-brand-neon);
+      color: var(--theme-surface-solid);
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      transition: all 0.2s ease;
+      animation: qs-slide-up 0.4s ease both;
+    }
+    .qs-finish-btn-sidebar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(134, 219, 0, 0.4);
+    }
+    .qs-finish-btn-sidebar svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .qs-map-item.is-current {
+      border-color: #86db00;
+      background: rgba(134, 219, 0, 0.05);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+
+    :host-context([data-theme="light"]) .qs-map-item.is-current {
+      background: rgba(134, 219, 0, 0.1);
+      border-color: #86db00;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .qs-map-status-icon {
+      width: 26px;
+      height: 26px;
+    }
+
+    .qs-map-status-icon svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+
+    .qs-map-num {
+      font-size: 0.72rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .qs-map-item.is-correct .qs-map-num,
+    .qs-map-item.is-wrong .qs-map-num {
+       opacity: 1;
+    }
+
+    .qs-exam-list { 
+      width: 100%;
+      max-width: 1100px;
+      display: flex; 
+      flex-direction: column; 
+      gap: 2.5rem; 
+      margin: 0; 
+      padding-left: 2rem;
+      padding-right: 320px; 
+      transition: all 0.3s ease;
+    }
+
+    @media (max-width: 1400px) {
+      .qs-exam-list { padding-right: 0; }
+      .qs-map-sidebar { 
+        position: relative; 
+        top: 0; 
+        right: 0; 
+        width: 100%; 
+        margin-bottom: 2rem; 
+        box-shadow: none;
+        backdrop-filter: none;
+        background: rgba(255,255,255,0.03);
+      }
+    }
     .qs-node-block { display: flex; gap: 1.5rem; animation: qs-slide-up 0.4s ease; }
     .qs-node-num { font-size: 1.1rem; font-weight: 800; color: var(--theme-text); opacity: 0.15; margin-top: 0.2rem; }
     .qs-node-body { flex: 1; display: flex; flex-direction: column; gap: 0.8rem; }
     .qs-type-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 4px 10px; background: rgba(192, 132, 252, 0.08); border-radius: 6px; border: 1px solid rgba(192, 132, 252, 0.2); }
     .qs-type-icon { width: 13px; height: 13px; fill: #c084fc; }
     .qs-type-tag { font-size: 0.65rem; text-transform: uppercase; font-weight: 800; color: #c084fc; }
+
+    .qs-hint-wrap { position: relative; display: inline-flex; }
+    .qs-hint-trigger { background: transparent; border: 1px solid var(--theme-border); color: var(--theme-text-muted); padding: 4px 10px; border-radius: 6px; display: flex; align-items: center; gap: 0.4rem; font-size: 0.65rem; text-transform: uppercase; font-weight: 800; cursor: default; transition: all 0.2s; font-family: inherit; }
+    .qs-hint-wrap:hover .qs-hint-trigger { color: #facc15; border-color: rgba(250, 204, 21, 0.4); background: rgba(250, 204, 21, 0.05); }
+    .qs-hint-trigger svg { width: 14px; height: 14px; fill: currentColor; }
+    .qs-hint-glass { position: absolute; top: calc(100% + 8px); left: 0; width: 280px; padding: 1rem; background: rgba(30, 30, 34, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; pointer-events: none; transform: translateY(10px); transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); z-index: 50; }
+    .qs-hint-wrap:hover .qs-hint-glass { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .qs-hint-glass p { font-size: 0.85rem; color: #e9ecef; margin: 0; line-height: 1.5; font-style: italic; }
+    :host-context([data-theme="light"]) .qs-hint-glass { background: rgba(255, 255, 255, 0.95); border-color: rgba(0, 0, 0, 0.1); }
+    :host-context([data-theme="light"]) .qs-hint-glass p { color: #333; }
     .qs-question { font-size: 1.05rem; font-weight: 400; line-height: 1.5; margin: 0; }
 
     .qs-opt-row { background: var(--theme-input-bg); border: 1px solid var(--theme-border); border-radius: 12px; padding: 0.7rem 1.2rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.8rem; width: 100%; text-align: left; cursor: pointer; transition: all 0.2s; color: var(--theme-text); margin-bottom: 0.5rem; }
@@ -564,7 +820,9 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly toast = inject(ToastService);
   private readonly db = inject(DatabaseService);
+  private readonly layoutService = inject(LayoutService);
   readonly ICONS = TYPE_ICONS;
+  protected readonly UI_ICONS = UI_ICONS;
 
   currentPage = 0;
   pageSize = 10;
@@ -580,7 +838,15 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
   isConfirmingExit = false;
   private exitTimeout: any;
 
+  isCurrentNode(index: number): boolean {
+    // Determine which node is currently "active" in the scroll view or focus.
+    // For now, we simple highlight the active page's items if relevant.
+    return false; // Gray out everything unless answered or finished.
+  }
+
   ngOnInit() {
+    // Ensuring it always collapses on start
+    this.layoutService.setExpanded(false);
     this.initNodeStates();
     this.startTimer();
   }
@@ -666,13 +932,14 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     const iconDown = 'M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z';
 
     if (score === 100 && degraded === 0) return { label: 'Dominio<br>Total', cssClass: 'fr-cell-sm badge badge-elite', icon: iconTrophy };
-    if (score >= 90 && degraded === 0)   return { label: 'Memoria<br>de Acero', cssClass: 'fr-cell-sm badge badge-elite', icon: iconFire };
+    if (score >= 90)                     return { label: 'Memoria<br>de Acero', cssClass: 'fr-cell-sm badge badge-elite', icon: iconFire };
     if (score >= 80)                     return { label: 'Nivel<br>Maestro', cssClass: 'fr-cell-sm badge badge-good', icon: iconStar };
     if (score >= 70)                     return { label: 'Buen<br>Progreso', cssClass: 'fr-cell-sm badge badge-good', icon: iconRocket };
     if (score >= 50)                     return { label: 'En<br>Desarrollo', cssClass: 'fr-cell-sm badge badge-ok', icon: iconChart };
-    if (score >= 30)                     return { label: 'Requiere<br>Refuerzo', cssClass: 'fr-cell-sm badge badge-warn', icon: iconWarn };
+    if (score >= 35)                     return { label: 'Fase de<br>Adaptación', cssClass: 'fr-cell-sm badge badge-warn', icon: iconWarn };
+    if (score >= 15)                     return { label: 'Requiere<br>Refuerzo', cssClass: 'fr-cell-sm badge badge-danger', icon: iconDown };
     if (degraded >= total && total > 0)  return { label: 'Reseteo<br>Cognitivo', cssClass: 'fr-cell-sm badge badge-danger', icon: iconSkull };
-    return { label: 'Vuelve a<br>Nivel Junior', cssClass: 'fr-cell-sm badge badge-danger', icon: iconDown };
+    return { label: 'Nivel<br>Principiante', cssClass: 'fr-cell-sm badge badge-danger', icon: iconDown };
   }
 
   get progress(): number {
@@ -741,10 +1008,15 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     return t.includes('output') || t.includes('cloze');
   }
 
+  isNodeSolved(nodeId: number): boolean {
+    const state = this.nodeStates[nodeId];
+    return state.history.some(h => h.isCorrect);
+  }
+
   selectOption(node: NodeChallenge, opt: string) {
     if (this.isFinished) return;
     const state = this.nodeStates[node.id!];
-    if (state.isCorrect !== null) return;
+    if (this.isNodeSolved(node.id!)) return;
     
     const type = this.normalizeType(node.tipo_reto);
 
@@ -753,14 +1025,18 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
       
       if (isCorrect) {
         state.userAnswer = opt;
-        state.isCorrect = true;
-        this.totalCorrect++;
+        if (state.isCorrect === null) {
+          state.isCorrect = true;
+          this.totalCorrect++;
+        }
         state.history.push({
           selection: opt,
           feedback: node.retroalimentaciones_opciones?.[opt] || '¡Correcto! Respuesta sincronizada.',
           isCorrect: true
         });
       } else {
+        state.userAnswer = opt;
+        if (state.isCorrect === null) state.isCorrect = false;
         state.failedOptions.push(opt);
         state.wrongAttempts++;
         const feedback = node.retroalimentaciones_opciones?.[opt] || 'Esta opción no es la correcta para este reto. Analiza los requerimientos de nuevo.';
@@ -771,10 +1047,46 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
         });
       }
     } else {
+      // MULTI CHOICE LOGIC: One wrong click = failure
+      const isCorrect = this.isOptionCorrect(node, opt);
       const current = state.userAnswer as string[];
-      const idx = current.indexOf(opt);
-      if (idx > -1) current.splice(idx, 1);
-      else current.push(opt);
+
+      if (!isCorrect) {
+        // Instant failure on first bad click
+        if (state.isCorrect === null) state.isCorrect = false;
+        state.wrongAttempts++;
+        state.failedOptions.push(opt);
+        state.history.push({
+          selection: opt,
+          feedback: node.retroalimentaciones_opciones?.[opt] || 'Error crítico: Opción incorrecta detectada en selección múltiple.',
+          isCorrect: false
+        });
+      } else {
+        // Check if selected
+        const idx = current.indexOf(opt);
+        if (idx > -1) {
+          current.splice(idx, 1);
+        } else {
+          current.push(opt);
+          // Check if all correct ones are selected
+          const expected = node.respuesta_esperada as string[];
+          if (current.length === expected.length) {
+            // Verify all selected are correct (double check)
+            const allMatch = current.every(o => expected.includes(o));
+            if (allMatch) {
+              if (state.isCorrect === null) {
+                state.isCorrect = true;
+                this.totalCorrect++;
+              }
+              state.history.push({
+                selection: current.join(', '),
+                feedback: '¡Excelente! Has identificado todos los elementos correctamente.',
+                isCorrect: true
+              });
+            }
+          }
+        }
+      }
     }
     this.onAnswerChange();
   }
@@ -825,9 +1137,16 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
         const state = this.nodeStates[node.id!];
         if (!state) continue;
 
-        // Calcular el intervalo previo real del nodo
+        // Calcular el intervalo previo extraído desde el quiz
         let previousInterval = 1;
-        if (node.nextReviewDate) {
+        if (node.nextReviewDate && this.quiz.ultimo_repaso) {
+          const prevDate = new Date(node.nextReviewDate);
+          const lastReview = new Date(this.quiz.ultimo_repaso);
+          if (prevDate > lastReview) {
+            previousInterval = Math.max(1, Math.round((prevDate.getTime() - lastReview.getTime()) / (1000 * 60 * 60 * 24)));
+          }
+        } else if (node.nextReviewDate) {
+          // Si no hay ultimo_repaso, calcula de su creacion (Fallback)
           const prevDate = new Date(node.nextReviewDate);
           const created = node.createdAt ? new Date(node.createdAt) : now;
           previousInterval = Math.max(1, Math.round((prevDate.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)));
@@ -836,20 +1155,19 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
         let intervalDays = 1;
 
         if (state.isCorrect) {
-          // SM-2 Factor de Calidad (Q)
+          // SM-2 Curva muy suave (Exámenes a corto plazo)
           if (state.wrongAttempts === 0) {
-            // Q=5 (Perfecto): Multiplicador x2.5
-            intervalDays = Math.ceil(previousInterval * 2.5);
+            intervalDays = Math.ceil(previousInterval * 1.5); 
+            if (previousInterval === 1) intervalDays = 2; // Salto inicial lento 1 -> 2
           } else if (state.wrongAttempts === 1) {
-            // Q=4 (Bueno): Multiplicador x1.5
-            intervalDays = Math.ceil(previousInterval * 1.5);
+            intervalDays = Math.ceil(previousInterval * 1.2);
+            if (previousInterval === 1) intervalDays = 1; // Mantiene en 1 día si dudó
           } else {
-            // Q=2 (Fallo Leve): Reseteo a 1 día
             intervalDays = 1;
             degradC++;
           }
-          // Caps de seguridad
-          if (intervalDays > 180) intervalDays = 180;
+          // Limites para evitar "absurdos" como dijo el usuario
+          if (intervalDays > 8) intervalDays = 8; // MÁXIMO 8 DÍAS (1 semana)
           if (intervalDays < 1) intervalDays = 1;
           
           totalDisp += intervalDays;
@@ -905,6 +1223,7 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     if (firstErrorIdx > -1) {
       this.currentPage = Math.floor(firstErrorIdx / this.pageSize);
       this.isFinished = false;
+      setTimeout(() => this.layoutService.collapseSidebar(), 0);
       this.cdr.detectChanges();
     }
   }

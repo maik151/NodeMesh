@@ -140,7 +140,7 @@ describe('IngestionService (TDD - F3)', () => {
                 json: vi.fn().mockResolvedValue({ candidates: [{ content: { parts: [{ text: '[]' }] } }] })
             } as any);
 
-            await expect(service.generateNodes('T', 'k', 'S')).rejects.toThrow('La IA retornó un array vacío');
+            await expect(service.generateNodes('T', 'k', 'S')).rejects.toThrow('La IA retornó un array de nodos vacío.');
         });
 
         it('debe lanzar error si candidates es nulo o vacío', async () => {
@@ -150,6 +150,83 @@ describe('IngestionService (TDD - F3)', () => {
             } as any);
 
             await expect(service.generateNodes('T', 'k', 'S')).rejects.toThrow('La IA no retornó contenido válido');
+        });
+    });
+
+    describe('TDD - Compatibilidad con Nuevo Formato JSON (Objeto con Metadata y Nodos)', () => {
+        it('debe parsear un objecto JSON completo con metadata.nivel_exigido y extraer un arreglo de nodos', async () => {
+            const fullJsonConfig = JSON.stringify({
+                metadata: {
+                    version: "1.1",
+                    tema_objetivo: "HISTORIA de Estados Unidos",
+                    nivel_exigido: "Intermedio"
+                },
+                folder: {
+                    folder_id: "8d3e2b1",
+                    nombre_tema: "HISTORIA"
+                },
+                nodos: [
+                    {
+                        id_temp: "nodo_1",
+                        tipo_reto: "single_choice",
+                        requiere_ia: false,
+                        contexto: "Test Context",
+                        pregunta: "Test Question",
+                        opciones: ["A", "B", "C", "D"],
+                        retroalimentaciones_opciones: {
+                            "A": "R",
+                            "B": "X",
+                            "C": "X",
+                            "D": "X"
+                        },
+                        respuesta_esperada: "A",
+                        pista: "Test Hint"
+                    }
+                ]
+            });
+
+            const mockFetchResponse = {
+                ok: true,
+                json: vi.fn().mockResolvedValue({
+                    candidates: [{
+                        content: {
+                            parts: [{ text: fullJsonConfig }]
+                        }
+                    }]
+                })
+            };
+
+            vi.spyOn(globalThis, 'fetch').mockResolvedValue(mockFetchResponse as any);
+
+            const nodes = await service.generateNodes('Texto de prueba', 'fake_key', 'Test Source');
+
+            expect(nodes.length).toBe(1);
+            expect(nodes[0].tipo_reto).toBe('single_choice');
+            expect(nodes[0].pregunta).toBe('Test Question');
+            expect(nodes[0].dificultad).toBe('Intermedio'); // Validates default mapping from metadata
+            expect(nodes[0].pista).toBe('Test Hint');
+            expect(Object.keys(nodes[0].retroalimentaciones_opciones || {}).length).toBe(4);
+        });
+
+        it('debe asignar dificultad "Aprendiz" si no hay metadata', async () => {
+            const partialJson = JSON.stringify({
+                nodos: [
+                    {
+                        tipo_reto: "single_choice",
+                        pregunta: "Sin metadata"
+                    }
+                ]
+            });
+
+            vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+                ok: true,
+                json: vi.fn().mockResolvedValue({
+                    candidates: [{ content: { parts: [{ text: partialJson }] } }]
+                })
+            } as any);
+
+            const nodes = await service.generateNodes('Texto', 'key', 'Source');
+            expect(nodes[0].dificultad).toBe('Aprendiz');
         });
     });
 

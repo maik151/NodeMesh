@@ -132,30 +132,48 @@ Reresponde SOLO con un array JSON válido. Cada objeto DEBE seguir este esquema:
         }
     }
 
-    private parseAiResponse(rawText: string, sourceName: string): NodeChallenge[] {
-        // Extraer el array JSON del texto (puede contener markdown backticks)
+    public parseAiResponse(rawText: string, sourceName: string): NodeChallenge[] {
         const firstBracket = rawText.indexOf('[');
+        const firstBrace = rawText.indexOf('{');
+        const startIdx = (firstBracket !== -1 && (firstBrace === -1 || firstBracket < firstBrace)) ? firstBracket : firstBrace;
+        
         const lastBracket = rawText.lastIndexOf(']');
+        const lastBrace = rawText.lastIndexOf('}');
+        const endIdx = (lastBracket !== -1 && (lastBrace === -1 || lastBracket > lastBrace)) ? lastBracket : lastBrace;
 
-        if (firstBracket === -1 || lastBracket === -1 || lastBracket < firstBracket) {
+        if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) {
             throw new Error('No se pudo extraer el JSON de la respuesta de la IA.');
         }
 
-        let parsed: any[];
+        let parsed: any;
         try {
-            const jsonText = rawText.substring(firstBracket, lastBracket + 1);
+            const jsonText = rawText.substring(startIdx, endIdx + 1);
             parsed = JSON.parse(jsonText);
         } catch {
             throw new Error('El JSON retornado por la IA no es válido.');
         }
 
-        if (!Array.isArray(parsed) || parsed.length === 0) {
-            throw new Error('La IA retornó un array vacío o un formato inesperado.');
+        let nodesArray = [];
+        let defaultDifficulty = 'Aprendiz';
+
+        if (parsed.nodos && Array.isArray(parsed.nodos)) {
+            nodesArray = parsed.nodos;
+            if (parsed.metadata?.nivel_exigido) {
+                defaultDifficulty = parsed.metadata.nivel_exigido;
+            }
+        } else if (Array.isArray(parsed)) {
+            nodesArray = parsed;
+        } else {
+            throw new Error('La IA retornó un formato inesperado (se esperaba un array o un objeto con prop "nodos").');
+        }
+
+        if (nodesArray.length === 0) {
+            throw new Error('La IA retornó un array de nodos vacío.');
         }
 
         const now = new Date();
 
-        return parsed.map((item: any) => ({
+        return nodesArray.map((item: any) => ({
             id_temp: item.id_temp || `node_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
             tipo_reto: (item.tipo_reto || item.type) as ChallengeType,
             requiere_ia: !!item.requiere_ia,
@@ -167,6 +185,7 @@ Reresponde SOLO con un array JSON válido. Cada objeto DEBE seguir este esquema:
             justificacion_correcta: item.justificacion_correcta || '',
             justificacion_incorrecta: item.justificacion_incorrecta || '',
             pista: item.pista || 'Analiza el contexto detalladamente.',
+            dificultad: item.dificultad || defaultDifficulty,
             createdAt: now,
             nextReviewDate: now
         }));

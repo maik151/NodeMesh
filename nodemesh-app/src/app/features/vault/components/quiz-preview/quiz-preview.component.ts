@@ -94,6 +94,14 @@ const TIPO_MAP: Record<string, { label: string }> = {
           <div class="kpi-value">{{ lastReviewLabel }}</div>
           <div class="kpi-label">Último Repaso</div>
         </div>
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M216,48V208a16,16,0,0,1-16,16H56a16,16,0,0,1-16-16V48A16,16,0,0,1,56,32H200A16,16,0,0,1,216,48ZM88,144v24a8,8,0,0,0,16,0V144a8,8,0,0,0-16,0Zm40,0v24a8,8,0,0,0,16,0V144a8,8,0,0,0-16,0Zm40,0v24a8,8,0,0,0,16,0V144a8,8,0,0,0-16,0ZM200,48H56v40H200Z"/></svg>
+          </div>
+          <div class="kpi-value">{{ reviewedNodesCount }}<span style="font-size:1rem;opacity:0.5;">/{{ nodes.length }}</span></div>
+          <div class="kpi-label">Nodos Cubiertos</div>
+        </div>
+
       </div>
 
       <!-- SEPARATOR -->
@@ -349,7 +357,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
     /* KPI */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
       margin-bottom: 2.5rem;
     }
@@ -757,31 +765,26 @@ export class QuizPreviewComponent implements OnChanges {
 
     const now = new Date();
     
-    // Fórmula Ebbinghaus: R = e^(-t/S) donde t = días desde último repaso, S = estabilidad
-    // S se infiere del intervalo SM-2 asignado a cada nodo
     let totalRetention = 0;
-    let countable = 0;
     
     for (const n of this.nodes) {
-      if (!n.nextReviewDate) continue; // Nodo nunca repasado = 0% retención
+      if (!n.nextReviewDate) continue; // Nodo nunca repasado
       
       const reviewDate = new Date(n.nextReviewDate);
       const created = n.createdAt ? new Date(n.createdAt) : now;
       
-      // Estabilidad (S): El intervalo SM-2 asignado al nodo
       const stability = Math.max(1, (reviewDate.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
-      
-      // Tiempo transcurrido (t): Días desde que se calculó el review (hoy vs cuándo debería repasarse)
       const daysSinceSchedule = Math.max(0, (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
       
-      // R = e^(-t/S) * 100
       const retention = Math.exp(-daysSinceSchedule / stability) * 100;
       totalRetention += Math.min(100, Math.max(0, retention));
-      countable++;
     }
     
-    if (countable === 0) return 0;
-    return Math.round(totalRetention / countable);
+    return Math.round(totalRetention / this.nodes.length);
+  }
+
+  get reviewedNodesCount(): number {
+    return this.nodes.filter(n => n.nextReviewDate).length;
   }
 
   get lastReviewLabel(): string {

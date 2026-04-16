@@ -765,9 +765,10 @@ export class QuizPreviewComponent implements OnChanges {
 
     const now = new Date();
     let totalRetention = 0;
+    let countable = 0;
     
     for (const n of this.nodes) {
-      if (!n.intentos || n.intentos === 0) continue; // Si intentos es cero, nunca se ha repasado (aporta 0% al global).
+      if (!n.intentos || n.intentos === 0) continue; // Ignoramos los nodos no estudiados (solo el KPI "Nodos Cubiertos" los penaliza)
       
       const reviewDate = n.nextReviewDate ? new Date(n.nextReviewDate) : now;
       const created = n.createdAt ? new Date(n.createdAt) : now;
@@ -777,9 +778,11 @@ export class QuizPreviewComponent implements OnChanges {
       
       const retention = Math.exp(-daysSinceSchedule / stability) * 100;
       totalRetention += Math.min(100, Math.max(0, retention));
+      countable++;
     }
     
-    return Math.round(totalRetention / this.nodes.length);
+    if (countable === 0) return 0;
+    return Math.round(totalRetention / countable);
   }
 
   get reviewedNodesCount(): number {

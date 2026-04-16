@@ -27,6 +27,8 @@ const TIPO_MAP: Record<string, { label: string }> = {
   template: `
     <div class="qp-shell" *ngIf="quiz && folder">
 
+      <!-- STICKY TOP SECTION -->
+      <div class="qp-sticky-top">
       <!-- BREADCRUMB -->
       <div class="breadcrumb">
         <!-- Sidebar Toggle (Only visible when collapsed) -->
@@ -81,7 +83,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
           <div class="kpi-icon-wrap">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path d="M200,152a31.84,31.84,0,0,0-19.53,6.68l-23.11-18A31.65,31.65,0,0,0,160,128c0-.74,0-1.48-.08-2.21l13.23-4.41A32,32,0,1,0,168,104c0,.74,0,1.48.08,2.21l-13.23,4.41A32,32,0,0,0,128,96a32.59,32.59,0,0,0-5.27.44L115.89,81A32,32,0,1,0,96,88a32.59,32.59,0,0,0,5.27-.44l6.84,15.4a31.92,31.92,0,0,0-8.57,39.64L73.83,165.44a32.06,32.06,0,1,0,10.63,12l25.71-22.84a31.91,31.91,0,0,0,37.36-1.24l23.11,18A31.65,31.65,0,0,0,168,184a32,32,0,1,0,32-32Zm0-64a16,16,0,1,1-16,16A16,16,0,0,1,200,88ZM80,56A16,16,0,1,1,96,72,16,16,0,0,1,80,56ZM56,208a16,16,0,1,1,16-16A16,16,0,0,1,56,208Zm56-80a16,16,0,1,1,16,16A16,16,0,0,1,112,128Zm88,72a16,16,0,1,1,16-16A16,16,0,0,1,200,200Z"/></svg>
           </div>
-          <div class="kpi-value">{{ iaNodesCount }}<span style="font-size:1rem;opacity:0.5;">/{{ nodes.length }}</span></div>
+          <div class="kpi-value">{{ iaNodesCount }}<span style="font-size:1rem;opacity:0.5;">/{{ iaNodesCount }}</span></div>
           <div class="kpi-label">Nodos IA</div>
         </div>
 
@@ -96,6 +98,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
 
       <!-- SEPARATOR -->
       <div class="qp-separator"></div>
+      </div>
 
       <!-- INVENTORY SECTION -->
       <div class="inventory-section">
@@ -219,14 +222,22 @@ const TIPO_MAP: Record<string, { label: string }> = {
 
     /* SHELL */
     .qp-shell {
-      padding: 2.5rem 3rem;
       height: 100%;
+      overflow-y: auto;
       animation: fadeSlideIn 0.4s cubic-bezier(0.2,0,0,1) both;
       color: var(--theme-text);
     }
     @keyframes fadeSlideIn {
       from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .qp-sticky-top {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--theme-bg);
+      padding: 2.5rem 3rem 0;
     }
 
     /* BREADCRUMB */
@@ -386,7 +397,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
     }
 
     /* INVENTORY */
-    .inventory-section { }
+    .inventory-section { padding: 0 3rem 2.5rem; }
     .inventory-header {
       display: flex;
       justify-content: space-between;

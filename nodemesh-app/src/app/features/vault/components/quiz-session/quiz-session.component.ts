@@ -267,14 +267,17 @@ const TIPO_MAP: Record<string, { label: string }> = {
     .qs-container { display: flex; flex-direction: column; width: 100%; height: 100%; overflow: hidden; }
 
     .qs-header { height: 80px; padding: 0 2rem; border-bottom: 1px solid var(--theme-border); background: var(--theme-header-bg, rgba(255,255,255,0.02)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: space-between; z-index: 100; position: sticky; top: 0; flex-shrink: 0; }
-    .qs-header-left { display: flex; align-items: center; gap: 3rem; }
-    .qs-exit-btn-alt { background: transparent; border: none; color: var(--theme-text-muted); padding:0; display: flex; align-items: center; gap: 0.6rem; cursor: pointer; transition: 0.2s; font-family: 'JetBrains Mono'; font-size: 0.85rem; }
+    .qs-header-left { display: flex; align-items: center; gap: 1.5rem; min-width: 0; flex: 1; }
+    .qs-exit-btn-alt { background: transparent; border: none; color: var(--theme-text-muted); padding:0; display: flex; align-items: center; gap: 0.6rem; cursor: pointer; transition: 0.2s; font-family: 'JetBrains Mono'; font-size: 0.85rem; flex-shrink: 0; }
     .qs-exit-btn-alt:hover { color: #f87171; transform: translateX(-2px); }
     .qs-exit-btn-alt.confirming { color: #ff6b6b; background: rgba(255, 107, 107, 0.1); padding: 4px 12px; border-radius: 8px; font-weight: 800; border: 1px solid rgba(255, 107, 107, 0.2); }
     .qs-exit-btn-alt svg { width: 22px; height: 22px; fill: currentColor; }
-    .qs-quiz-title-alt { font-size: 1.25rem; font-weight: 500; margin: 0; color: var(--theme-text); letter-spacing: -0.5px; }
+    .qs-quiz-info-set { display: flex; align-items: center; gap: 0.75rem; min-width: 0; flex: 1; }
+    .qs-quiz-icon-wrap { flex-shrink: 0; }
+    .qs-quiz-icon-wrap svg { width: 32px; height: 32px; fill: var(--theme-text); opacity: 0.6; }
+    .qs-quiz-title-alt { font-size: 1.1rem; font-weight: 500; margin: 0; color: var(--theme-text); letter-spacing: -0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .qs-header-right { display: flex; align-items: center; gap: 0.75rem; }
+    .qs-header-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
     .qs-widget { height: 52px; min-width: 90px; background: var(--theme-surface); border: 1px solid var(--theme-border); border-radius: 8px; display: flex; flex-direction: column; position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
     .qs-widget-main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 1rem; }
     .qs-widget .qs-val { font-size: 1rem; font-weight: 600; color: var(--theme-text); line-height: 1; }

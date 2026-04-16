@@ -184,7 +184,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
           
           <header class="fr-header">
             <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-               <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H216V152H184a8,8,0,0,0,0,16h32v32H40V200h32a8,8,0,0,0,0-16H40Zm88,40v48a8,8,0,0,1-16,0V96a8,8,0,0,1,16,0Zm48,0a8,8,0,0,1-8,8H136a8,8,0,0,1,0-16h32A8,8,0,0,1,176,96Zm0,32a8,8,0,0,1-8,8H136a8,8,0,0,1,0-16h32A8,8,0,0,1,176,128Z"/>
+               <path d="M243.28,68.24l-24-23.56a16,16,0,0,0-22.59,0L104,136.23l-36.69-35.6a16,16,0,0,0-22.58.05l-24,24a16,16,0,0,0,0,22.61l71.62,72a16,16,0,0,0,22.63,0L243.33,90.91A16,16,0,0,0,243.28,68.24ZM103.62,208,32,136l24-24a.6.6,0,0,1,.08.08l42.35,41.09a8,8,0,0,0,11.19,0L208.06,56,232,79.6Z"/>
             </svg>
             <h1>Resultados</h1>
           </header>
@@ -225,7 +225,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
             <!-- ROW 2: Sub KPIs -->
             <div class="fr-row-bottom">
               <div class="fr-cell-sm">
-                <span class="fr-med">+{{ impactSummary.avgDisplacement }} Días</span>
+                <span class="fr-med">{{ displacementLabel }}</span>
                 <div class="fr-label">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-96-88v64a8,8,0,0,1-16,0V132.94l-4.42,2.22a8,8,0,0,1-7.16-14.32l16-8A8,8,0,0,1,112,120Zm59.16,30.45L152,176h16a8,8,0,0,1,0,16H136a8,8,0,0,1-6.4-12.8l28.78-38.37A8,8,0,1,0,145.07,132a8,8,0,1,1-13.85-8A24,24,0,0,1,176,136,23.76,23.76,0,0,1,171.16,150.45Z"></path></svg>
                   <span>Próximo<br>Repaso</span>
@@ -238,10 +238,10 @@ const TIPO_MAP: Record<string, { label: string }> = {
                   <span>Tiempo Promedio<br>por Nodo</span>
                 </div>
               </div>
-              <div class="fr-cell-sm badge" [class.badge-warn]="impactSummary.degradedCount > 0">
+              <div class="fr-cell-sm badge" [class]="performanceBadge.cssClass">
                 <div class="fr-label badge-label">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M128,72a8,8,0,0,1,8,8v56a8,8,0,0,1-16,0V80A8,8,0,0,1,128,72ZM116,172a12,12,0,1,0,12-12A12,12,0,0,0,116,172Zm124-44a15.85,15.85,0,0,1-4.67,11.28l-96.05,96.06a16,16,0,0,1-22.56,0h0l-96-96.06a16,16,0,0,1,0-22.56l96.05-96.06a16,16,0,0,1,22.56,0l96.05,96.06A15.85,15.85,0,0,1,240,128Zm-16,0L128,32,32,128,128,224h0Z"></path></svg>
-                  <span>Vuelve al<br>Nivel Junior</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path [attr.d]="performanceBadge.icon"></path></svg>
+                  <span [innerHTML]="performanceBadge.label"></span>
                 </div>
               </div>
             </div>
@@ -450,17 +450,40 @@ const TIPO_MAP: Record<string, { label: string }> = {
       align-items: center;
       min-height: 56px;
     }
-    .fr-cell-sm.badge-warn {
-      background: rgba(212, 175, 55, 0.12);
-      border-color: rgba(212, 175, 55, 0.3);
-    }
+    .fr-cell-sm.badge-danger { background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.3); }
+    .fr-cell-sm.badge-danger .fr-label { color: rgba(239, 68, 68, 0.9); }
+    .fr-cell-sm.badge-danger .fr-label svg { fill: rgba(239, 68, 68, 0.7); }
+    .fr-cell-sm.badge-warn { background: rgba(212, 175, 55, 0.12); border-color: rgba(212, 175, 55, 0.3); }
     .fr-cell-sm.badge-warn .fr-label { color: rgba(212, 175, 55, 0.85); }
     .fr-cell-sm.badge-warn .fr-label svg { fill: rgba(212, 175, 55, 0.7); }
-    .badge-label {
-      justify-content: center;
-      text-align: center;
-    }
+    .fr-cell-sm.badge-ok { background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.25); }
+    .fr-cell-sm.badge-ok .fr-label { color: rgba(96, 165, 250, 0.9); }
+    .fr-cell-sm.badge-ok .fr-label svg { fill: rgba(96, 165, 250, 0.7); }
+    .fr-cell-sm.badge-good { background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.25); }
+    .fr-cell-sm.badge-good .fr-label { color: rgba(74, 222, 128, 0.9); }
+    .fr-cell-sm.badge-good .fr-label svg { fill: rgba(74, 222, 128, 0.7); }
+    .fr-cell-sm.badge-elite { background: rgba(168, 85, 247, 0.12); border-color: rgba(168, 85, 247, 0.3); }
+    .fr-cell-sm.badge-elite .fr-label { color: rgba(192, 132, 252, 0.9); }
+    .fr-cell-sm.badge-elite .fr-label svg { fill: rgba(192, 132, 252, 0.7); }
+    .badge-label { justify-content: center; text-align: center; }
     .badge-label span { text-align: center; }
+
+    /* ============ LIGHT MODE ============ */
+    :host-context([data-theme="light"]) .qs-final-results { background: #f8fafc; color: #1a1a2e; }
+    :host-context([data-theme="light"]) .fr-header svg { fill: #1a1a2e; }
+    :host-context([data-theme="light"]) .fr-header h1 { color: #1a1a2e; }
+    :host-context([data-theme="light"]) .fr-bento-card { background: #fff; border-color: #e2e8f0; }
+    :host-context([data-theme="light"]) .fr-big { color: #1a1a2e; }
+    :host-context([data-theme="light"]) .fr-med { color: #1a1a2e; }
+    :host-context([data-theme="light"]) .fr-label { color: #64748b; }
+    :host-context([data-theme="light"]) .fr-label svg { fill: #94a3b8; }
+    :host-context([data-theme="light"]) .fr-row-bottom { border-top-color: #e2e8f0; }
+    :host-context([data-theme="light"]) .fr-circle::before { background: #fff; }
+    :host-context([data-theme="light"]) .fr-time-bar { background: #e2e8f0; }
+    :host-context([data-theme="light"]) .fr-btn { background: #fff; border-color: #e2e8f0; color: #1a1a2e; }
+    :host-context([data-theme="light"]) .fr-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    :host-context([data-theme="light"]) .fr-btn.primary { background: var(--theme-brand-neon); color: #000; border-color: transparent; }
+    :host-context([data-theme="light"]) .fr-cell-sm.badge { background: #f1f5f9; border-color: #e2e8f0; }
 
     .fr-actions {
       display: flex;
@@ -610,6 +633,45 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
      const m = Math.floor(this.secondsElapsed / 60);
      const s = this.secondsElapsed % 60;
      return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
+
+  get displacementLabel(): string {
+    const d = this.impactSummary.avgDisplacement;
+    if (d <= 0) return 'Inmediato';
+    if (d < 1) return '< 1 Día';
+    if (d === 1) return '1 Día';
+    return `+${d} Días`;
+  }
+
+  get performanceBadge(): { label: string; cssClass: string; icon: string } {
+    const score = this.scorePercent;
+    const degraded = this.impactSummary.degradedCount;
+    const total = this.nodes.length;
+    // Trophy icon
+    const iconTrophy = 'M232,64H208V48a8,8,0,0,0-8-8H56a8,8,0,0,0-8,8V64H24A8,8,0,0,0,16,72V96a40,40,0,0,0,40,40h.5A95.89,95.89,0,0,0,120,163.94V200H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V163.94A95.89,95.89,0,0,0,199.5,136H200a40,40,0,0,0,40-40V72A8,8,0,0,0,232,64ZM56,120A24,24,0,0,1,32,96V80H48v32a96.15,96.15,0,0,0,.91,13.05A24,24,0,0,1,56,120Zm88,28a80,80,0,0,1-80-80V56H192v12A80,80,0,0,1,144,148Zm80-52a24,24,0,0,1-16.91,22.88A96.15,96.15,0,0,0,208,112V80h16Z';
+    // Fire icon
+    const iconFire = 'M143.38,17.85a8,8,0,0,0-12.63,3.41l-22,60.41L84.59,58.26a8,8,0,0,0-11.93,2.17C51.53,93.8,40,119.92,40,148a88,88,0,0,0,176,0C216,82.14,168.49,36.78,143.38,17.85ZM128,220a72.08,72.08,0,0,1-72-72c0-22,8.09-44.12,24.08-65.74l26.19,26.18a8,8,0,0,0,13.09-2.89l22.42-61.57C167.44,64.82,200,100.66,200,148A72.08,72.08,0,0,1,128,220Z';
+    // Star icon
+    const iconStar = 'M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59.46-5.15,23.21-55.36a16.4,16.4,0,0,1,28.5,0l23.21,55.36L224.92,86a16.46,16.46,0,0,1,9.37,28.86Z';
+    // Rocket icon
+    const iconRocket = 'M152,224a8,8,0,0,1-8,8H112a8,8,0,0,1,0-16h32A8,8,0,0,1,152,224Zm73.69-126.19a8,8,0,0,1-2.63,4.25l-28.42,24.47A155.59,155.59,0,0,1,200,148a8,8,0,0,1-16,0,139.22,139.22,0,0,0-5.06-19.55l-9.09,7.83A96.48,96.48,0,0,1,176,168a8,8,0,0,1-16,0,80.28,80.28,0,0,0-4.35-26.14L128,166l-27.65-24.14A80.28,80.28,0,0,0,96,168a8,8,0,0,1-16,0,96.48,96.48,0,0,1,5.15-31.72l-9.09-7.83A139.22,139.22,0,0,0,72,148a8,8,0,0,1-16,0,155.59,155.59,0,0,1,5.36-21.47L33,102.06a8,8,0,0,1,5.34-13.87l47,4.07L111.56,47.8A8,8,0,0,1,118.4,44h19.2a8,8,0,0,1,6.84,3.8l26.24,44.46,47,4.07a8,8,0,0,1,5.34,13.87Z';
+    // Chart up icon
+    const iconChart = 'M232,208a8,8,0,0,1-8,8H32a8,8,0,0,1-8-8V48a8,8,0,0,1,16,0V156.69l50.34-50.35a8,8,0,0,1,11.32,0L128,132.69,180.69,80H160a8,8,0,0,1,0-16h40a8,8,0,0,1,8,8v40a8,8,0,0,1-16,0V91.31l-58.34,58.35a8,8,0,0,1-11.32,0L96,123.31,40,179.31V200H224A8,8,0,0,1,232,208Z';
+    // Warning icon
+    const iconWarn = 'M128,72a8,8,0,0,1,8,8v56a8,8,0,0,1-16,0V80A8,8,0,0,1,128,72ZM116,172a12,12,0,1,0,12-12A12,12,0,0,0,116,172Zm124-44a15.85,15.85,0,0,1-4.67,11.28l-96.05,96.06a16,16,0,0,1-22.56,0h0l-96-96.06a16,16,0,0,1,0-22.56l96.05-96.06a16,16,0,0,1,22.56,0l96.05,96.06A15.85,15.85,0,0,1,240,128Zm-16,0L128,32,32,128,128,224h0Z';
+    // Skull icon
+    const iconSkull = 'M128,16a88.1,88.1,0,0,0-88,88c0,23.43,9.07,49,24.18,68.24C77.78,190.18,96,203.79,96,224a8,8,0,0,0,8,8h48a8,8,0,0,0,8-8c0-20.21,18.22-33.82,31.82-51.76C206.93,153,216,127.43,216,104A88.1,88.1,0,0,0,128,16ZM112,216a62.76,62.76,0,0,0-7.34-24h46.68A62.76,62.76,0,0,0,144,216ZM92,152a20,20,0,1,1,20-20A20,20,0,0,1,92,152Zm72,0a20,20,0,1,1,20-20A20,20,0,0,1,164,152Z';
+    // ArrowDown icon  
+    const iconDown = 'M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z';
+
+    if (score === 100 && degraded === 0) return { label: 'Dominio<br>Total', cssClass: 'fr-cell-sm badge badge-elite', icon: iconTrophy };
+    if (score >= 90 && degraded === 0)   return { label: 'Memoria<br>de Acero', cssClass: 'fr-cell-sm badge badge-elite', icon: iconFire };
+    if (score >= 80)                     return { label: 'Nivel<br>Maestro', cssClass: 'fr-cell-sm badge badge-good', icon: iconStar };
+    if (score >= 70)                     return { label: 'Buen<br>Progreso', cssClass: 'fr-cell-sm badge badge-good', icon: iconRocket };
+    if (score >= 50)                     return { label: 'En<br>Desarrollo', cssClass: 'fr-cell-sm badge badge-ok', icon: iconChart };
+    if (score >= 30)                     return { label: 'Requiere<br>Refuerzo', cssClass: 'fr-cell-sm badge badge-warn', icon: iconWarn };
+    if (degraded >= total && total > 0)  return { label: 'Reseteo<br>Cognitivo', cssClass: 'fr-cell-sm badge badge-danger', icon: iconSkull };
+    return { label: 'Vuelve a<br>Nivel Junior', cssClass: 'fr-cell-sm badge badge-danger', icon: iconDown };
   }
 
   get progress(): number {

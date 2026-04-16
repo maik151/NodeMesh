@@ -127,7 +127,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
                     </div>
                   </div>
 
-                  <h3 class="qs-question">{{ node.pregunta }}</h3>
+                  <h3 class="qs-question" [innerHTML]="getFormattedQuestion(node)"></h3>
                   
                   <div class="qs-snippet-box" *ngIf="node.contexto">
                     <code>{{ node.contexto }}</code>
@@ -1056,12 +1056,28 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
 
   isChoiceType(node: NodeChallenge): boolean {
     const t = this.normalizeType(node.tipo_reto);
-    return t.includes('single') || t.includes('multi') || t.includes('order');
+    return t.includes('single') || t.includes('multi') || t.includes('order') || t.includes('cloze');
   }
 
   isInputType(node: NodeChallenge): boolean {
     const t = this.normalizeType(node.tipo_reto);
-    return t.includes('output') || t.includes('cloze');
+    return t.includes('output'); // We removed cloze from here so it doesn't double-trigger
+  }
+
+  getFormattedQuestion(node: NodeChallenge): string {
+    const p = node.pregunta || '';
+    const t = this.normalizeType(node.tipo_reto);
+    if (!t.includes('cloze')) return p;
+    
+    // Replace ____ with a styling span, or if answered, fill it.
+    const state = this.nodeStates[node.id!];
+    const isSolved = this.isNodeSolved(node.id!);
+    
+    if (isSolved && state.userAnswer) {
+      return p.replace(/_{2,}/g, `<span style="color: var(--theme-brand-neon); border-bottom: 2px dashed var(--theme-brand-neon); padding: 0 0.5rem;">${state.userAnswer}</span>`);
+    } else {
+      return p.replace(/_{2,}/g, `<span style="display: inline-block; width: 6ch; border-bottom: 2px solid rgba(255,255,255,0.3); vertical-align: middle; margin: 0 0.3rem;"></span>`);
+    }
   }
 
   isNodeSolved(nodeId: number): boolean {
@@ -1076,7 +1092,8 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     
     const type = this.normalizeType(node.tipo_reto);
 
-    if (type.includes('single')) {
+    // Treat Cloze as Single Choice UI
+    if (type.includes('single') || type.includes('cloze')) {
       const isCorrect = this.isOptionCorrect(node, opt);
       
       if (isCorrect) {

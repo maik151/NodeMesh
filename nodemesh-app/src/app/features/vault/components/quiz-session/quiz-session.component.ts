@@ -889,8 +889,20 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // Ensuring it always collapses on start
     this.layoutService.setExpanded(false);
+    
+    // Aleatorizar el orden de las preguntas cada vez que se inicia un quiz o repaso
+    this.nodes = this.shuffleArray([...this.nodes]);
+    
     this.initNodeStates();
     this.startTimer();
+  }
+
+  private shuffleArray<T>(array: T[]): T[] {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   }
 
   ngOnDestroy() {

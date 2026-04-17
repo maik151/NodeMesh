@@ -140,18 +140,53 @@ const TIPO_MAP: Record<string, { label: string }> = {
                   </div>
 
                   <div class="qs-interaction-box">
-                    <div class="qs-options-v" *ngIf="isChoiceType(node)">
-                      <button 
-                        *ngFor="let opt of node.opciones"
-                        class="qs-opt-row"
-                        [class.is-selected]="isSelected(node, opt)"
-                        [class.is-failed]="nodeStates[node.id!].failedOptions.includes(opt)"
-                        [class.reveal-correct]="isNodeSolved(node.id!) && isOptionCorrect(node, opt)"
-                        (click)="selectOption(node, opt)"
-                        [disabled]="isFinished || isNodeSolved(node.id!) || nodeStates[node.id!].failedOptions.includes(opt)">
-                        <div class="qs-mark"></div>
-                        {{ opt }}
-                      </button>
+                    <div class="qs-flex-interaction">
+                      <div class="qs-options-v" *ngIf="isChoiceType(node)" [class.is-ordering]="normalizeType(node.tipo_reto).includes('order')">
+                        <button 
+                          *ngFor="let opt of node.opciones"
+                          class="qs-opt-row"
+                          [class.is-selected]="isSelected(node, opt)"
+                          [class.is-failed]="nodeStates[node.id!].failedOptions.includes(opt)"
+                          [class.reveal-correct]="isNodeSolved(node.id!) && isOptionCorrect(node, opt)"
+                          (click)="selectOption(node, opt)"
+                          [disabled]="isFinished || isNodeSolved(node.id!) || nodeStates[node.id!].failedOptions.includes(opt)">
+                          <div class="qs-mark">
+                            <span class="qs-mark-order" *ngIf="normalizeType(node.tipo_reto).includes('order')">{{ getOrderIndex(node, opt) }}</span>
+                          </div>
+                          {{ opt }}
+                        </button>
+                      </div>
+
+                      <!-- PREVIEW PANEL FOR ORDERING -->
+                      <div class="qs-order-preview-panel" *ngIf="normalizeType(node.tipo_reto).includes('order') && !isNodeSolved(node.id!)">
+                        <div class="qs-preview-header">
+                           <span class="qs-preview-title">SECUENCIA PROPUESTA</span>
+                        </div>
+                        <div class="qs-preview-list">
+                          <div class="qs-preview-empty" *ngIf="getUserAnswerLength(node) === 0">
+                            Construyendo orden...
+                          </div>
+                          <div class="qs-preview-item-expanded" *ngFor="let sel of castAnswerToArray(node); let i = index">
+                            <div class="preview-item-top">
+                              <span class="preview-num">{{ i + 1 }}</span>
+                              <span class="preview-txt">{{ sel }}</span>
+                            </div>
+                            <!-- Show justification if available (last result) -->
+                            <div class="preview-justification" *ngIf="getItemJustification(node, sel) as retro">
+                               {{ retro }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- VALIDATE BUTTON FOR ORDERING -->
+                    <div class="qs-actions" *ngIf="normalizeType(node.tipo_reto).includes('order') && !isNodeSolved(node.id!)">
+                       <button class="qs-validate-btn" 
+                               [disabled]="getUserAnswerLength(node) < (node.opciones?.length || 0)"
+                               (click)="validateOrder(node)">
+                         VALIDAR ORDENAMIENTO
+                       </button>
                     </div>
 
                     <div class="qs-history-log" *ngIf="nodeStates[node.id!].history.length > 0">
@@ -381,6 +416,69 @@ const TIPO_MAP: Record<string, { label: string }> = {
       font-weight: 700; 
     }
 
+    .qs-mark-order {
+      font-size: 0.7rem;
+      font-weight: 900;
+      color: #000;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .is-selected .qs-mark-order { color: #000 !important; }
+
+    .qs-actions { margin-top: 1.5rem; display: flex; justify-content: flex-end; }
+    .qs-validate-btn {
+      background: var(--theme-brand-neon);
+      color: #000;
+      border: none;
+      padding: 0.75rem 1.75rem;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(134, 219, 0, 0.3);
+      transition: all 0.2s;
+    }
+    .qs-validate-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(134, 219, 0, 0.5); }
+    .qs-validate-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
+
+    .qs-flex-interaction { display: flex; gap: 2rem; align-items: flex-start; width: 100%; }
+    .qs-order-preview-panel {
+      width: 450px;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 0.85rem;
+      animation: qs-fade-in 0.3s ease;
+    }
+    .qs-preview-title { font-size: 0.55rem; letter-spacing: 1px; color: var(--theme-brand-neon); font-weight: 800; }
+    .qs-preview-list { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.4rem; }
+    .qs-preview-empty { font-size: 0.65rem; color: var(--theme-text-muted); font-style: italic; }
+    .qs-preview-item-expanded { 
+      padding: 0.5rem; 
+      background: rgba(255, 255, 255, 0.03); border-radius: 6px; border-left: 2px solid var(--theme-brand-neon);
+      font-size: 0.65rem;
+      animation: qs-slide-up 0.2s ease-out;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .preview-item-top { display: flex; gap: 0.5rem; align-items: center; }
+    .preview-justification {
+      font-size: 0.6rem;
+      color: var(--theme-text-muted);
+      line-height: 1.3;
+      padding-left: 1.25rem;
+      font-style: italic;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding-top: 0.25rem;
+    }
+    .preview-num { color: var(--theme-brand-neon); font-weight: 900; min-width: 0.8rem; }
+    .preview-txt { color: var(--theme-text); white-space: normal; line-height: 1.3; opacity: 0.8; }
+
     .qs-context-card {
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(255, 255, 255, 0.05);
@@ -416,6 +514,19 @@ const TIPO_MAP: Record<string, { label: string }> = {
       font-family: 'Inter', sans-serif;
       font-style: italic;
       opacity: 0.85;
+    }
+
+    :host-context([data-theme="light"]) .qs-context-card {
+      background: rgba(0, 0, 0, 0.02);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    :host-context([data-theme="light"]) .qs-context-header {
+      background: rgba(0, 0, 0, 0.03);
+      border-bottom-color: rgba(0, 0, 0, 0.05);
+    }
+    :host-context([data-theme="light"]) .qs-context-body {
+      color: #444;
+      opacity: 1;
     }
 
     /* MAP FLOATING CARD (PREMIUM) */
@@ -600,12 +711,12 @@ const TIPO_MAP: Record<string, { label: string }> = {
 
     .qs-exam-list { 
       width: 100%;
-      max-width: 1100px;
+      max-width: 1450px;
       display: flex; 
       flex-direction: column; 
-      gap: 2.5rem; 
+      gap: 1.75rem; 
       margin: 0; 
-      padding-left: 2rem;
+      padding-left: 1.5rem;
       padding-right: 320px; 
       transition: all 0.3s ease;
     }
@@ -639,14 +750,29 @@ const TIPO_MAP: Record<string, { label: string }> = {
     .qs-hint-glass p { font-size: 0.85rem; color: #e9ecef; margin: 0; line-height: 1.5; font-style: italic; }
     :host-context([data-theme="light"]) .qs-hint-glass { background: rgba(255, 255, 255, 0.95); border-color: rgba(0, 0, 0, 0.1); }
     :host-context([data-theme="light"]) .qs-hint-glass p { color: #333; }
-    .qs-question { font-size: 1.05rem; font-weight: 400; line-height: 1.5; margin: 0; }
-
-    .qs-opt-row { background: var(--theme-input-bg); border: 1px solid var(--theme-border); border-radius: 12px; padding: 0.7rem 1.2rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.8rem; width: 100%; text-align: left; cursor: pointer; transition: all 0.2s; color: var(--theme-text); margin-bottom: 0.5rem; }
-    .qs-opt-row:hover:not(:disabled) { border-color: var(--theme-brand-neon); background: rgba(159, 255, 34, 0.03); }
+    .qs-question { font-size: 0.85rem; font-weight: 400; line-height: 1.4; margin: 0; }
+    .qs-options-v { flex: 1; }
+    .qs-options-v:not(.is-ordering) { max-width: 800px; }
+    
+    .qs-opt-row { 
+      background: transparent; border: 1px solid transparent; border-radius: 8px; padding: 0.5rem 0.8rem; 
+      font-size: 0.75rem; display: flex; align-items: center; gap: 0.7rem; width: 100%; text-align: left; cursor: pointer; 
+      transition: all 0.2s; color: var(--theme-text); margin-bottom: 0.2rem; 
+    }
+    .qs-opt-row:hover:not(:disabled) { background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.05); }
     .qs-opt-row.is-selected { border-color: var(--theme-brand-neon); background: rgba(159, 255, 34, 0.08); }
     .qs-opt-row.is-failed { border-color: #ef4444; background: rgba(239, 68, 68, 0.03); }
-    .qs-mark { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--theme-text-muted); flex-shrink: 0; }
-    .is-selected .qs-mark { background: var(--theme-brand-neon); border-color: var(--theme-brand-neon); }
+    .qs-mark { 
+      width: 16px; 
+      height: 16px; 
+      border-radius: 50%; 
+      border: 1.5px solid rgba(255,255,255,0.2); 
+      flex-shrink: 0; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+    }
+    .is-selected .qs-mark { background: var(--theme-brand-neon); border-color: var(--theme-brand-neon); box-shadow: 0 0 12px rgba(134,219,0,0.4); }
     .is-failed .qs-mark { background: #ef4444; border-color: #ef4444; }
 
     .qs-history-log { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
@@ -1130,7 +1256,7 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     if (container) container.scrollTop = 0;
   }
 
-  private normalizeType(tipo: string): string {
+  public normalizeType(tipo: string): string {
     if (!tipo) return '';
     return tipo.toLowerCase().trim().replace(/ /g, '_');
   }
@@ -1201,10 +1327,20 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
           isCorrect: false
         });
       }
+    } else if (type.includes('order')) {
+      // ORDERING: Toggle in sequence
+      const current = Array.isArray(state.userAnswer) ? state.userAnswer : [];
+      const idx = current.indexOf(opt);
+      if (idx > -1) {
+        current.splice(idx, 1);
+      } else {
+        current.push(opt);
+      }
+      state.userAnswer = [...current];
     } else {
       // MULTI CHOICE LOGIC: One wrong click = failure
       const isCorrect = this.isOptionCorrect(node, opt);
-      const current = state.userAnswer as string[];
+      const current = Array.isArray(state.userAnswer) ? state.userAnswer : [];
 
       if (!isCorrect) {
         // Instant failure on first bad click
@@ -1223,7 +1359,8 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
           current.splice(idx, 1);
         } else {
           current.push(opt);
-
+          state.userAnswer = [...current]; // Ensure detection
+          
           state.history.push({
             selection: opt,
             feedback: node.retroalimentaciones_opciones?.[opt] || 'Identificado componente válido.',
@@ -1252,6 +1389,83 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
       }
     }
     this.onAnswerChange();
+  }
+
+  getOrderIndex(node: NodeChallenge, opt: string): string {
+    const val = this.nodeStates[node.id!]?.userAnswer;
+    if (!Array.isArray(val)) return '';
+    const idx = val.indexOf(opt);
+    return idx >= 0 ? (idx + 1).toString() : '';
+  }
+
+  getUserAnswerLength(node: NodeChallenge): number {
+    const val = this.nodeStates[node.id!]?.userAnswer;
+    if (Array.isArray(val)) return val.length;
+    if (typeof val === 'string') return val.length;
+    return 0;
+  }
+
+  castAnswerToArray(node: NodeChallenge): string[] {
+    const val = this.nodeStates[node.id!]?.userAnswer;
+    return Array.isArray(val) ? val : [];
+  }
+
+  validateOrder(node: NodeChallenge) {
+    const state = this.nodeStates[node.id!];
+    const current = state.userAnswer as string[];
+    const expected = node.respuesta_esperada as string[];
+
+    // 1. Normalize comparison (Extract labels A, B, C...)
+    const currentLabels = current.map(item => item.match(/^([A-Z])\./)?.[1] || item);
+    const isCorrect = JSON.stringify(currentLabels) === JSON.stringify(expected);
+
+    const selectionStr = current.map((s, i) => `[${i + 1}] ${s}`).join(' → ');
+    
+    // Anti-spam
+    if (state.history.length > 0) {
+      const last = state.history[state.history.length - 1];
+      if (last.selection === selectionStr) return;
+    }
+
+    if (isCorrect) {
+      if (state.isCorrect === null) {
+        state.isCorrect = true;
+        this.totalCorrect++;
+      }
+      state.isCompleted = true;
+      state.history.push({
+        selection: selectionStr,
+        feedback: '¡Excelente! El orden propuesto es impecable. Revisa las justificaciones en el panel derecho.',
+        isCorrect: true
+      });
+    } else {
+      state.wrongAttempts++;
+      if (state.isCorrect === null) state.isCorrect = false;
+      
+      const newEntry = {
+        selection: selectionStr,
+        feedback: 'El orden propuesto es INCORRECTO. Analiza las pistas en el panel derecho y reintenta.',
+        isCorrect: false
+      };
+
+      const last = state.history[state.history.length - 1];
+      if (last && !last.isCorrect) {
+        state.history[state.history.length - 1] = newEntry;
+      } else {
+        state.history.push(newEntry);
+      }
+    }
+    this.onAnswerChange();
+  }
+
+  getItemJustification(node: NodeChallenge, item: string): string {
+    const state = this.nodeStates[node.id!];
+    // Only show if there was at least one validation attempt
+    if (state.history.length === 0) return '';
+    
+    const labelMatch = item.match(/^([A-Z])\./);
+    const key = labelMatch ? labelMatch[1] : item;
+    return node.retroalimentaciones_opciones?.[key] || '';
   }
 
   isSelected(node: NodeChallenge, opt: string): boolean {

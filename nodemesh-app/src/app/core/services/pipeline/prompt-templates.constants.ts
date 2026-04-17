@@ -124,7 +124,7 @@ ${config.incluirPistas ? '- campo "pista": Es OBLIGATORIO. Siempre debe viajar c
 - respuesta_esperada: 
   * En retos deterministas simples (single_choice, multi_choice, cloze_deletion, ordering, output_prediction), guarda la Respuesta Exacta.
   * En retos evaluados por IA (anomaly_detection, optimization, case_analysis, feynman_synthesis), guarda el "Criterio Oculto" detallado de evaluación.
-- En las preguntas del tipo "ordering", respuesta_esperada debe ser un array con el orden, ej: ["B", "A", "C"].
+- Para "ordering": El campo "respuesta_esperada" DEBE ser un array de strings que contenga las opciones en el orden cronológico o lógico exacto (ej: ["Evento A", "Evento B", "Evento C"]).
 - justificacion_correcta y justificacion_incorrecta: DEBEN venir ya generadas para ahorrar latencia e inferencia.
 
 ¡GENERA LA SALIDA AHORA!`.trim();

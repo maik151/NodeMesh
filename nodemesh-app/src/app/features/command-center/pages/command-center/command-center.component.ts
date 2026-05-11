@@ -325,10 +325,10 @@ export class CommandCenterComponent implements OnInit {
   pomo = { seconds: 1500, running: false, interval: null as any };
 
   async ngOnInit() {
-    await this.refreshAllData();
     this.generateMockHeatmap();
     this.generateRetentionPath();
     this.generateSparkline();
+    await this.refreshAllData();
   }
 
   async onUploadFinished(msg: string) {

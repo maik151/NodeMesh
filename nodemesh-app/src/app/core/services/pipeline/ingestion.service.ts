@@ -29,7 +29,7 @@ Reresponde SOLO con un array JSON válido. Cada objeto DEBE seguir este esquema:
 {
   "id_temp": "string_unico",
   "tipo_reto": "tipo_del_1_al_9",
-  "requiere_ia": boolean,
+  "requiere_ia": boolean, (DEBE ser true para tipos 6, 7, 8 y 9)
   "contexto": "Contexto técnico breve",
   "pregunta": "¿Qué...?",
   "opciones": ["A", "B", "C", "D"] o null,
@@ -48,7 +48,6 @@ Reresponde SOLO con un array JSON válido. Cada objeto DEBE seguir este esquema:
 - "requiere_ia" es true obligatoriamente para los tipos 6, 7, 8 y 9.
 - "opciones" es null para tipos que no sean choice o ordering.
 - "retroalimentaciones_opciones": DEBE incluir una justificación técnica para CADA opción.
-- PROHIBIDO usar preguntas retóricas. Tono técnico, preciso y desafiante (Nivel Senior).
 - El campo "pista" es OBLIGATORIO.
 - Tono técnico, preciso y desafiante (Nivel Senior).`;
 
@@ -78,9 +77,11 @@ Reresponde SOLO con un array JSON válido. Cada objeto DEBE seguir este esquema:
     async generateNodes(
         text: string,
         apiKey: string,
-        sourceName: string
+        sourceName: string,
+        model: string = 'gemini-2.5-flash'
     ): Promise<NodeChallenge[]> {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=${apiKey}`;
+        const modelId = model.includes('models/') ? model.split('models/')[1] : model;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
 
         const payload = {
             contents: [{
@@ -113,6 +114,19 @@ Reresponde SOLO con un array JSON válido. Cada objeto DEBE seguir este esquema:
         const sanitized = this.cryptoService.sanitizeHtml(rawText);
 
         return this.parseAiResponse(sanitized, sourceName);
+    }
+
+    async getAvailableModels(apiKey: string): Promise<any[]> {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) return [];
+            const data = await response.json();
+            return data.models || [];
+        } catch (error) {
+            console.error('[IngestionService] Error listing models:', error);
+            return [];
+        }
     }
 
     private async initPdfWorker() {
@@ -189,5 +203,75 @@ Reresponde SOLO con un array JSON válido. Cada objeto DEBE seguir este esquema:
             createdAt: now,
             nextReviewDate: now
         }));
+    }
+
+    async evaluateResponseWithIA(
+        node: NodeChallenge,
+        userAnswer: string,
+        apiKey: string,
+        auditor: string = 'Socrático',
+        model: string = 'gemini-2.5-flash'
+    ): Promise<{ isCorrect: boolean; feedback: string }> {
+        // Asegurar que el ID del modelo no tenga el prefijo models/ si ya estamos en un endpoint de /models/
+        const modelId = model.includes('models/') ? model.split('models/')[1] : model;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
+
+        const prompt = `
+Actúa como un Auditor Técnico ${auditor}.
+Tu tarea es evaluar la respuesta de un usuario a un reto de tipo "${node.tipo_reto}".
+
+DATOS DEL RETO:
+- Pregunta: ${node.pregunta}
+- Contexto: ${node.contexto}
+- Criterio de Evaluación / Respuesta Esperada: ${node.respuesta_esperada}
+
+RESPUESTA DEL USUARIO:
+"${userAnswer}"
+
+OBJETIVO:
+Determina si la lógica del usuario es correcta y alineada con el criterio de evaluación. No seas extremadamente rígido con la semántica si la lógica técnica es sólida.
+
+Debes responder ÚNICAMENTE con un objeto JSON siguiendo este esquema:
+{
+  "isCorrect": boolean,
+  "feedback": "Explicación pedagógica detallada del error y por qué ocurre. Si la respuesta del usuario incluye código o necesitas ejemplificar una solución, DEBES usar bloques de código Markdown (\`\`\`) para ilustrar la versión incorrecta vs la correcta. Usa formato enriquecido (negritas, listas, etc.) para que la lectura sea fácil."
+}
+`.trim();
+
+        const payload = {
+            contents: [{
+                parts: [{ text: prompt }]
+            }]
+        };
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            console.error('[IngestionService] IA Error:', response.status, errorBody);
+            throw new Error(`Error al conectar con la IA (${response.status}): ${errorBody}`);
+        }
+
+        const data = await response.json();
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        
+        try {
+            // Extraer JSON de la respuesta (por si la IA añade markdown)
+            const firstBrace = rawText.indexOf('{');
+            const lastBrace = rawText.lastIndexOf('}');
+            const jsonText = rawText.substring(firstBrace, lastBrace + 1);
+            return JSON.parse(jsonText);
+        } catch {
+            // Fallback manual si el JSON falla
+            const isCorrect = rawText.toLowerCase().includes('"iscorrect": true');
+            return {
+                isCorrect,
+                feedback: 'La IA tuvo problemas para estructurar la respuesta, pero el veredicto parece ser ' + (isCorrect ? 'Correcto.' : 'Incorrecto.')
+            };
+        }
     }
 }

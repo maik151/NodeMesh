@@ -1,10 +1,20 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, ChangeDetectorRef, HostListener } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import * as Prism from 'prismjs';
+import 'prismjs/components/prism-typescript';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-bash';
 import { NodeChallenge, QuizSession, ChallengeType } from '../../../../core/models/node.model';
 import { DatabaseService } from '../../../../core/services/storage/database.service';
 import { ToastService } from '../../../../core/services/ui/toast.service';
 import { LayoutService } from '../../../../core/services/ui/layout.service';
+import { IngestionService } from '../../../../core/services/pipeline/ingestion.service';
+import { CryptoService } from '../../../../core/services/storage/crypto.service';
+import { AuthService } from '../../../../core/services/auth/auth.service';
 import { TYPE_ICONS, UI_ICONS } from '../../../../shared/constants/icons.constants';
 
 interface NodeState {
@@ -66,10 +76,30 @@ const TIPO_MAP: Record<string, { label: string }> = {
           </div>
 
           <div class="qs-header-right">
+            <div class="qs-widget model-widget" *ngIf="availableModels.length > 0">
+              <div class="qs-widget-main is-horizontal model-picker" (click)="toggleModelDropdown()">
+                <span class="qs-lbl">MODELO</span>
+                <div class="qs-custom-select">
+                  <span class="qs-select-value">{{ getSelectedModelLabel() }}</span>
+                  <svg class="qs-chevron" viewBox="0 0 24 24" [class.is-open]="isModelDropdownOpen">
+                    <path d="M7 10l5 5 5-5z" fill="currentColor"/>
+                  </svg>
+                </div>
+                
+                <div class="qs-select-dropdown scroll-custom" *ngIf="isModelDropdownOpen">
+                  <div class="qs-select-option" *ngFor="let m of availableModels"
+                       [class.is-active]="m.id === selectedModel"
+                       (click)="selectModel(m.id, $event)">
+                    {{ m.label }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="qs-widget">
-              <div class="qs-widget-main">
-                <span class="qs-val">{{ answeredCount }}/{{ nodes.length }}</span>
+              <div class="qs-widget-main is-horizontal">
                 <span class="qs-lbl">Nodos</span>
+                <span class="qs-val">{{ answeredCount }}/{{ nodes.length }}</span>
               </div>
               <div class="qs-widget-prog-track">
                 <div class="qs-widget-prog-fill" [style.width.%]="progress"></div>
@@ -77,9 +107,9 @@ const TIPO_MAP: Record<string, { label: string }> = {
             </div>
 
             <div class="qs-widget">
-              <div class="qs-widget-main">
-                <span class="qs-val">{{ scorePercent }}%</span>
+              <div class="qs-widget-main is-horizontal">
                 <span class="qs-lbl">Precisión</span>
+                <span class="qs-val">{{ scorePercent }}%</span>
               </div>
               <div class="qs-widget-prog-track">
                 <div class="qs-widget-prog-fill" [style.width.%]="scorePercent" style="background: var(--theme-brand-neon); box-shadow: 0 0 15px var(--theme-brand-neon);"></div>
@@ -87,9 +117,9 @@ const TIPO_MAP: Record<string, { label: string }> = {
             </div>
 
             <div class="qs-widget">
-              <div class="qs-widget-main">
-                <span class="qs-val">{{ timerLabel }}</span>
+              <div class="qs-widget-main is-horizontal">
                 <span class="qs-lbl">Tiempo</span>
+                <span class="qs-val">{{ timerLabel }}</span>
               </div>
             </div>
           </div>
@@ -127,7 +157,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
                     </div>
                   </div>
 
-                  <h3 class="qs-question" [innerHTML]="getFormattedQuestion(node)"></h3>
+                  <div class="qs-question" [innerHTML]="getFormattedQuestion(node)"></div>
                   
                   <div class="qs-context-card" *ngIf="node.contexto">
                     <div class="qs-context-header">
@@ -136,12 +166,36 @@ const TIPO_MAP: Record<string, { label: string }> = {
                       </svg>
                       <span class="qs-context-title">CONTEXTO</span>
                     </div>
-                    <div class="qs-context-body">{{ node.contexto }}</div>
+                    <div class="qs-context-body" [innerHTML]="formatMarkdown(node.contexto)"></div>
                   </div>
 
                   <div class="qs-interaction-box">
-                    <div class="qs-flex-interaction">
-                      <div class="qs-options-v" *ngIf="isChoiceType(node)" [class.is-ordering]="normalizeType(node.tipo_reto).includes('order')">
+                      <div class="qs-flex-interaction">
+                        <!-- AI EVALUATION TYPE (Optimization, Case Analysis, etc) -->
+                        <div class="qs-options-v is-ia-type" *ngIf="isInputType(node)">
+                        <textarea 
+                          class="qs-textarea scroll-custom" 
+                          placeholder="Propón tu refactorización o solución lógica aquí..."
+                          [disabled]="isNodeSolved(node.id!) || isEvaluatingWithIA[node.id!]"
+                          [(ngModel)]="nodeStates[node.id!].userAnswer">
+                        </textarea>
+                        
+                        <div class="qs-ia-actions" *ngIf="!isNodeSolved(node.id!)">
+                             <button class="qs-validate-btn primary" 
+                                     [class.is-loading]="isEvaluatingWithIA[node.id!]"
+                                     [disabled]="!nodeStates[node.id!].userAnswer || isEvaluatingWithIA[node.id!]"
+                                     (click)="validateWithIA(node)">
+                               <svg *ngIf="!isEvaluatingWithIA[node.id!]" class="qs-btn-icon-ia" viewBox="0 0 256 256">
+                                  <path [attr.d]="UI_ICONS.ia_spark" fill="currentColor"></path>
+                               </svg>
+                               <span class="qs-ia-loader" *ngIf="isEvaluatingWithIA[node.id!]"></span>
+                               <span *ngIf="!isEvaluatingWithIA[node.id!]">VALIDAR CON IA</span>
+                               <span *ngIf="isEvaluatingWithIA[node.id!]">ANALIZANDO...</span>
+                             </button>
+                          </div>
+                        </div>
+
+                      <div class="qs-options-v" *ngIf="isChoiceType(node) && !isInputType(node)" [class.is-ordering]="normalizeType(node.tipo_reto).includes('order')">
                         <button 
                           *ngFor="let opt of node.opciones"
                           class="qs-opt-row"
@@ -194,7 +248,7 @@ const TIPO_MAP: Record<string, { label: string }> = {
                             class="qs-log-entry" 
                             [class.is-correct]="h.isCorrect">
                           <span class="log-mark">{{ h.isCorrect ? '✓' : '✗' }}</span>
-                          <span class="log-txt">{{ h.feedback }}</span>
+                          <div class="log-txt" [innerHTML]="formatMarkdown(h.feedback)"></div>
                        </div>
                     </div>
                   </div>
@@ -354,21 +408,21 @@ const TIPO_MAP: Record<string, { label: string }> = {
     .qs-container { display: flex; flex-direction: column; width: 100%; height: 100%; overflow: hidden; background: var(--theme-bg-base); }
 
     .qs-content-layout {
-      position: relative;
-      display: flex;
-      flex: 1;
-      height: calc(100vh - 80px);
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      height: calc(100vh - 60px);
       width: 100%;
       overflow: hidden;
+      position: relative;
     }
 
     .qs-header { 
-      height: 80px; 
+      height: 60px; 
       padding: 0 2rem; 
       border-bottom: 1px solid var(--theme-border); 
-      background: var(--theme-header-bg, rgba(255,255,255,0.02)); 
-      backdrop-filter: blur(12px); 
-      -webkit-backdrop-filter: blur(12px); 
+      background: var(--theme-header-bg, rgba(18,18,22,0.8)); 
+      backdrop-filter: blur(20px); 
+      -webkit-backdrop-filter: blur(20px); 
       display: flex; 
       align-items: center; 
       justify-content: space-between; 
@@ -382,25 +436,113 @@ const TIPO_MAP: Record<string, { label: string }> = {
     .qs-exit-btn-alt:hover { color: #f87171; transform: translateX(-2px); }
     .qs-exit-btn-alt.confirming { color: #ff6b6b; background: rgba(255, 107, 107, 0.1); padding: 4px 12px; border-radius: 8px; font-weight: 800; border: 1px solid rgba(255, 107, 107, 0.2); }
     .qs-exit-btn-alt svg { width: 22px; height: 22px; fill: currentColor; }
-    .qs-quiz-info-set { display: flex; align-items: center; gap: 0.75rem; min-width: 0; flex: 1; }
-    .qs-quiz-icon-wrap { flex-shrink: 0; }
-    .qs-quiz-icon-wrap svg { width: 32px; height: 32px; fill: var(--theme-text); opacity: 0.6; }
-    .qs-quiz-title-alt { font-size: 1.1rem; font-weight: 500; margin: 0; color: var(--theme-text); letter-spacing: -0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .qs-quiz-info-set { display: flex; align-items: center; gap: 1rem; min-width: 0; flex: 1; }
+    .qs-quiz-icon-wrap { flex-shrink: 0; display: flex; align-items: center; }
+    .qs-quiz-icon-wrap svg { width: 22px; height: 22px; fill: var(--theme-text); opacity: 0.5; }
+    .qs-quiz-title-alt { font-size: 0.95rem; font-weight: 500; margin: 0; color: var(--theme-text); letter-spacing: -0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.9; }
 
-    .qs-header-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
-    .qs-widget { height: 52px; min-width: 90px; background: var(--theme-surface); border: 1px solid var(--theme-border); border-radius: 8px; display: flex; flex-direction: column; position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-    .qs-widget-main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 1rem; }
-    .qs-widget .qs-val { font-size: 1rem; font-weight: 600; color: var(--theme-text); line-height: 1; }
-    .qs-widget .qs-lbl { font-size: 0.55rem; text-transform: uppercase; color: var(--theme-text-muted); margin-top: 3px; letter-spacing: 0.05em; }
-    .qs-widget-prog-track { height:3px; background: rgba(0,0,0,0.05); width: 100%; position: absolute; bottom: 0; }
-    .qs-widget-prog-fill { height: 100%; background: var(--theme-brand-neon); transition: width 0.4s ease; box-shadow: 0 0 10px var(--theme-brand-neon); }
+    .qs-header-right { display: flex; align-items: center; gap: 1.5rem; flex-shrink: 0; }
+    .qs-widget { height: 38px; min-width: 110px; background: rgba(0,0,0,0.2); border: 1px solid var(--theme-border); border-radius: 6px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+    .qs-widget.model-widget { overflow: visible; min-width: 200px; }
+    .qs-widget-main.is-horizontal { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 0.8rem; gap: 1rem; }
+    .qs-widget-main.model-picker { cursor: pointer; transition: background 0.2s; position: relative; }
+    .qs-widget-main.model-picker:hover { background: rgba(255,255,255,0.03); }
+    .qs-widget .qs-val { font-size: 0.85rem; font-weight: 700; color: var(--theme-brand-neon); font-family: 'JetBrains Mono'; }
+    .qs-widget .qs-lbl { font-size: 0.55rem; font-weight: 900; text-transform: uppercase; color: var(--theme-text-muted); letter-spacing: 0.1em; }
+    .qs-widget-prog-track { height:2px; background: rgba(255,255,255,0.05); width: 100%; position: absolute; bottom: 0; }
+    .qs-widget-prog-fill { height: 100%; background: var(--theme-brand-neon); transition: width 0.4s ease; box-shadow: 0 0 8px var(--theme-brand-neon); }
+    
+    .qs-custom-select {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--theme-brand-neon);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .qs-chevron {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s;
+    }
+    .qs-chevron.is-open {
+      transform: rotate(180deg);
+    }
+    .qs-select-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      width: 100%;
+      min-width: 200px;
+      background: #121216;
+      border: 1px solid var(--theme-border);
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      z-index: 1000;
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 0.5rem 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .qs-select-dropdown.scroll-custom::-webkit-scrollbar { width: 6px; }
+    .qs-select-dropdown.scroll-custom::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); border-radius: 10px; }
+    .qs-select-dropdown.scroll-custom::-webkit-scrollbar-thumb { background: rgba(159, 255, 34, 0.2); border-radius: 10px; }
+    .qs-select-dropdown.scroll-custom::-webkit-scrollbar-thumb:hover { background: rgba(159, 255, 34, 0.4); }
+    :host-context([data-theme="light"]) .qs-select-dropdown.scroll-custom::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.02); }
+    :host-context([data-theme="light"]) .qs-select-dropdown.scroll-custom::-webkit-scrollbar-thumb { background: rgba(134, 219, 0, 0.3); }
+    :host-context([data-theme="light"]) .qs-select-dropdown.scroll-custom::-webkit-scrollbar-thumb:hover { background: rgba(134, 219, 0, 0.5); }
+    .qs-select-option {
+      padding: 0.6rem 1rem;
+      color: var(--theme-text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .qs-select-option:hover {
+      background: rgba(134, 219, 0, 0.1);
+      color: var(--theme-brand-neon);
+    }
+    .qs-select-option.is-active {
+      background: rgba(134, 219, 0, 0.15);
+      color: var(--theme-brand-neon);
+      font-weight: 700;
+      border-left: 2px solid var(--theme-brand-neon);
+    }
+    :host-context([data-theme="light"]) .qs-select-dropdown {
+      background: #fff;
+      border-color: #e2e8f0;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    :host-context([data-theme="light"]) .qs-select-option {
+      color: #1e293b;
+    }
+    :host-context([data-theme="light"]) .qs-select-option:hover {
+      background: rgba(134, 219, 0, 0.1);
+    }
+    .qs-btn-icon-ia { width: 18px; height: 18px; margin-right: 8px; }
 
     .qs-main-scroll { 
-      flex: 1; 
+      grid-column: 1;
       overflow-y: auto; 
-      padding: 1.5rem 3rem; 
+      padding: 1.5rem 2rem 1.5rem 4rem; 
       scroll-behavior: smooth; 
+      height: 100%;
+      display: flex;
+      justify-content: center;
     }
+    .qs-main-scroll::-webkit-scrollbar { width: 10px; }
+    .qs-main-scroll::-webkit-scrollbar-track { background: transparent; }
+    .qs-main-scroll::-webkit-scrollbar-thumb {
+      background: rgba(134, 219, 0, 0.2);
+      border-radius: 10px;
+      border: 3px solid transparent;
+      background-clip: content-box;
+    }
+    .qs-main-scroll::-webkit-scrollbar-thumb:hover { background: rgba(134, 219, 0, 0.4); }
 
     .qs-cloze-filled { 
       color: var(--theme-brand-neon); 
@@ -427,19 +569,24 @@ const TIPO_MAP: Record<string, { label: string }> = {
     }
     .is-selected .qs-mark-order { color: #000 !important; }
 
-    .qs-actions { margin-top: 1.5rem; display: flex; justify-content: flex-end; }
+    .qs-actions { margin-top: 1.5rem; display: flex; }
     .qs-validate-btn {
       background: var(--theme-brand-neon);
       color: #000;
       border: none;
-      padding: 0.75rem 1.75rem;
+      padding: 0.65rem 1.4rem;
       border-radius: 8px;
       font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
-      font-size: 0.75rem;
+      font-weight: 800;
+      font-size: 0.72rem;
       cursor: pointer;
-      box-shadow: 0 0 15px rgba(134, 219, 0, 0.3);
+      box-shadow: 0 0 15px rgba(134, 219, 0, 0.2);
       transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      letter-spacing: 0.02em;
     }
     .qs-validate-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(134, 219, 0, 0.5); }
     .qs-validate-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
@@ -479,6 +626,42 @@ const TIPO_MAP: Record<string, { label: string }> = {
     .preview-num { color: var(--theme-brand-neon); font-weight: 900; min-width: 0.8rem; }
     .preview-txt { color: var(--theme-text); white-space: normal; line-height: 1.3; opacity: 0.8; }
 
+    .qs-options-v.is-ia-type { flex: 1; display: flex; flex-direction: column; gap: 1rem; }
+    .qs-textarea {
+      width: 100%;
+      min-height: 180px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--theme-border);
+      border-radius: 12px;
+      padding: 1rem;
+      color: var(--theme-text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      resize: vertical;
+      transition: all 0.2s;
+    }
+    .qs-textarea:focus { border-color: var(--theme-brand-neon); outline: none; background: rgba(0, 0, 0, 0.3); }
+    .qs-ia-actions { display: flex; gap: 1rem; }
+    .qs-validate-btn.secondary { 
+       background: rgba(255, 255, 255, 0.05); 
+       color: var(--theme-text); 
+       border: 1px solid var(--theme-border);
+       box-shadow: none;
+    }
+    .qs-validate-btn.secondary:hover { background: rgba(255, 255, 255, 0.1); }
+    
+    .qs-btn-icon-ia { width: 14px; height: 14px; opacity: 0.8; }
+    
+    .qs-ia-loader {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(0,0,0,0.1);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: qs-spin 0.8s linear infinite;
+    }
+    @keyframes qs-spin { to { transform: rotate(360deg); } }
+
     .qs-context-card {
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(255, 255, 255, 0.05);
@@ -514,6 +697,113 @@ const TIPO_MAP: Record<string, { label: string }> = {
       font-family: 'Inter', sans-serif;
       font-style: italic;
       opacity: 0.85;
+      white-space: pre-wrap;
+    }
+
+    .qs-question { white-space: pre-wrap; }
+    
+    ::ng-deep .qs-code-window {
+      margin: 0.5rem 0;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #1e1e1e;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      max-width: 85%;
+    }
+    ::ng-deep .qs-code-header {
+      background: #2d2d2d;
+      padding: 0.35rem 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    ::ng-deep .qs-mac-dots { display: flex; gap: 5px; }
+    ::ng-deep .qs-mac-dots span { width: 8px; height: 8px; border-radius: 50%; }
+    ::ng-deep .qs-mac-dots span:nth-child(1) { background: #ff5f56; }
+    ::ng-deep .qs-mac-dots span:nth-child(2) { background: #ffbd2e; }
+    ::ng-deep .qs-mac-dots span:nth-child(3) { background: #27c93f; }
+    
+    ::ng-deep .qs-code-lang {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.55rem;
+      color: #858585;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+    }
+    
+    ::ng-deep .qs-question pre, 
+    ::ng-deep .qs-context-body pre, 
+    ::ng-deep .qs-code-block {
+      background: transparent;
+      padding: 0.75rem 1rem;
+      margin: 0;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 300;
+      color: #d4d4d4;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+    
+    ::ng-deep .qs-code-block .token.keyword { color: #569cd6; }
+    ::ng-deep .qs-code-block .token.string { color: #ce9178; }
+    ::ng-deep .qs-code-block .token.comment { color: #6a9955; font-style: italic; }
+    ::ng-deep .qs-code-block .token.function { color: #dcdcaa; }
+    ::ng-deep .qs-code-block .token.number { color: #b5cea8; }
+    ::ng-deep .qs-code-block .token.decorator, ::ng-deep .qs-code-block .token.class-name { color: #4ec9b0; }
+    ::ng-deep .qs-code-block .token.operator, ::ng-deep .qs-code-block .token.punctuation { color: #d4d4d4; }
+    ::ng-deep .qs-code-block .token.property { color: #9cdcfe; }
+    ::ng-deep .qs-code-block .token.boolean { color: #569cd6; }
+    ::ng-deep .qs-code-block .token.builtin { color: #4ec9b0; }
+    ::ng-deep .qs-code-block .token.regex { color: #d16969; }
+
+    ::ng-deep .qs-question code:not(pre code), ::ng-deep .qs-context-body code:not(pre code), ::ng-deep .qs-inline-code {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 400;
+      font-size: 0.9em;
+      color: var(--theme-brand-neon);
+    }
+    
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-window {
+      background: #fdfdfd;
+      border-color: #e2e8f0;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-header {
+      background: #f1f5f9;
+      border-bottom-color: #e2e8f0;
+    }
+    :host-context([data-theme="light"]) ::ng-deep .qs-question pre,
+    :host-context([data-theme="light"]) ::ng-deep .qs-context-body pre,
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-block {
+      color: #1e293b;
+    }
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-block .token.keyword,
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-block .token.boolean { color: #0000ff; }
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-block .token.string { color: #a31515; }
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-block .token.comment { color: #008000; }
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-block .token.function { color: #795e26; }
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-block .token.number { color: #098658; }
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-block .token.decorator,
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-block .token.class-name,
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-block .token.builtin { color: #267f99; }
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-block .token.operator,
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-block .token.punctuation { color: #1e293b; }
+    :host-context([data-theme="light"]) ::ng-deep .qs-code-block .token.property { color: #001080; }
+    
+    :host-context([data-theme="light"]) ::ng-deep .qs-question code:not(pre code),
+    :host-context([data-theme="light"]) ::ng-deep .qs-context-body code:not(pre code),
+    :host-context([data-theme="light"]) ::ng-deep .qs-inline-code {
+      background: rgba(0, 0, 0, 0.05);
+      color: #0f172a;
     }
 
     :host-context([data-theme="light"]) .qs-context-card {
@@ -529,24 +819,21 @@ const TIPO_MAP: Record<string, { label: string }> = {
       opacity: 1;
     }
 
-    /* MAP FLOATING CARD (PREMIUM) */
+    /* MAP FLOATING CARD (GRID CONSTRAINED) */
     .qs-map-sidebar {
-      position: absolute;
-      top: 1.5rem;
-      right: 2rem;
-      width: 260px;
-      background: rgba(18, 18, 22, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
+      grid-column: 2;
+      width: 300px;
+      background: var(--theme-surface-solid);
+      border-left: 1px solid var(--theme-border);
       display: flex;
       flex-direction: column;
-      padding: 1.5rem;
+      padding: 2rem 1.5rem;
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-      z-index: 1000;
-      transition: all 0.3s ease;
-      animation: qs-slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+      z-index: 10;
+      height: 100%;
+      position: sticky;
+      top: 0;
     }
 
     :host-context([data-theme="light"]) .qs-map-sidebar {
@@ -711,13 +998,12 @@ const TIPO_MAP: Record<string, { label: string }> = {
 
     .qs-exam-list { 
       width: 100%;
-      max-width: 1450px;
+      max-width: 1000px;
       display: flex; 
       flex-direction: column; 
-      gap: 1.75rem; 
+      gap: 3rem; 
       margin: 0; 
-      padding-left: 1.5rem;
-      padding-right: 320px; 
+      padding: 0;
       transition: all 0.3s ease;
     }
 
@@ -776,8 +1062,9 @@ const TIPO_MAP: Record<string, { label: string }> = {
     .is-failed .qs-mark { background: #ef4444; border-color: #ef4444; }
 
     .qs-history-log { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
-    .qs-log-entry { display: flex; gap: 0.75rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 3px solid #f87171; font-size: 0.8rem; }
+    .qs-log-entry { display: flex; gap: 0.75rem; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 3px solid #f87171; font-size: 0.85rem; align-items: flex-start; overflow-x: auto; }
     .qs-log-entry.is-correct { border-left-color: var(--theme-brand-neon); background: rgba(134, 219, 0, 0.03); }
+    .log-txt { flex: 1; white-space: pre-wrap; line-height: 1.6; color: rgba(255,255,255,0.85); width: 100%; }
 
     ::ng-deep .qs-cloze-blank { 
       display: inline-flex; 
@@ -1067,10 +1354,39 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
   @Output() onClose = new EventEmitter<void>();
   @Output() onFinished = new EventEmitter<void>();
 
+  isModelDropdownOpen = false;
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.model-picker')) {
+      this.isModelDropdownOpen = false;
+    }
+  }
+
+  toggleModelDropdown() {
+    this.isModelDropdownOpen = !this.isModelDropdownOpen;
+  }
+
+  selectModel(modelId: string, event: Event) {
+    event.stopPropagation();
+    this.selectedModel = modelId;
+    this.isModelDropdownOpen = false;
+  }
+
+  getSelectedModelLabel(): string {
+    return this.availableModels.find(m => m.id === this.selectedModel)?.label || 'Seleccionar Modelo';
+  }
+
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly toast = inject(ToastService);
   private readonly db = inject(DatabaseService);
   private readonly layoutService = inject(LayoutService);
+  private readonly ingestionService = inject(IngestionService);
+  private readonly cryptoService = inject(CryptoService);
+  private readonly authService = inject(AuthService);
+  private readonly sanitizer = inject(DomSanitizer);
+  
   readonly ICONS = TYPE_ICONS;
   protected readonly UI_ICONS = UI_ICONS;
 
@@ -1085,24 +1401,46 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
   private timerInterval: any;
   nodeStates: { [nodeId: number]: NodeState } = {};
   hintsVisible: { [nodeId: number]: boolean } = {};
+  isEvaluatingWithIA: { [nodeId: number]: boolean } = {};
   isConfirmingExit = false;
   private exitTimeout: any;
 
+  availableModels: any[] = [];
+  selectedModel: string = 'gemini-2.5-flash';
+
   isCurrentNode(index: number): boolean {
-    // Determine which node is currently "active" in the scroll view or focus.
-    // For now, we simple highlight the active page's items if relevant.
-    return false; // Gray out everything unless answered or finished.
+    return false;
   }
 
-  ngOnInit() {
-    // Ensuring it always collapses on start
+  async ngOnInit() {
     this.layoutService.setExpanded(false);
-
-    // Aleatorizar el orden de las preguntas cada vez que se inicia un quiz o repaso
     this.nodes = this.shuffleArray([...this.nodes]);
-
     this.initNodeStates();
     this.startTimer();
+    await this.loadAvailableModels();
+  }
+
+  async loadAvailableModels() {
+    try {
+      const encryptedKey = await this.db.getApiKey('gemini');
+      if (!encryptedKey) return;
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser) return;
+      
+      const keyMaterial = await this.cryptoService.deriveKeyFromUid(currentUser.uid);
+      const apiKey = await this.cryptoService.decrypt(encryptedKey, keyMaterial);
+      
+      const models = await this.ingestionService.getAvailableModels(apiKey);
+      this.availableModels = models
+        .filter(m => m.supportedGenerationMethods.includes('generateContent'))
+        .map(m => ({
+          id: m.name.replace('models/', ''),
+          label: m.displayName
+        }));
+      this.cdr.detectChanges();
+    } catch (e) {
+      console.warn('[QuizSession] No se pudieron cargar modelos:', e);
+    }
   }
 
   private shuffleArray<T>(array: T[]): T[] {
@@ -1268,23 +1606,65 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
 
   isInputType(node: NodeChallenge): boolean {
     const t = this.normalizeType(node.tipo_reto);
-    return t.includes('output'); // We removed cloze from here so it doesn't double-trigger
+    return t.includes('output') || this.isIAType(node);
   }
 
-  getFormattedQuestion(node: NodeChallenge): string {
-    const p = node.pregunta || '';
+  isIAType(node: NodeChallenge): boolean {
     const t = this.normalizeType(node.tipo_reto);
-    if (!t.includes('cloze')) return p;
+    return t.includes('anomaly') || t.includes('optimization') || t.includes('case_analysis') || t.includes('feynman');
+  }
 
-    // Replace ____ with a styling span, or if answered, fill it.
-    const state = this.nodeStates[node.id!];
-    const isSolved = this.isNodeSolved(node.id!);
+  getFormattedQuestion(node: NodeChallenge): SafeHtml {
+    let p = node.pregunta || '';
+    const t = this.normalizeType(node.tipo_reto);
 
-    if (isSolved && state.userAnswer) {
-      return p.replace(/_{2,}|\{\{.*?\}\}/g, `<span class="qs-cloze-filled">${state.userAnswer}</span>`);
-    } else {
-      return p.replace(/_{2,}|\{\{.*?\}\}/g, `<span class="qs-cloze-blank"></span>`);
+    if (t.includes('cloze')) {
+      const state = this.nodeStates[node.id!];
+      const isSolved = this.isNodeSolved(node.id!);
+
+      if (isSolved && state.userAnswer) {
+        p = p.replace(/_{2,}|\{\{.*?\}\}/g, `<span class="qs-cloze-filled">${state.userAnswer}</span>`);
+      } else {
+        p = p.replace(/_{2,}|\{\{.*?\}\}/g, `<span class="qs-cloze-blank"></span>`);
+      }
     }
+
+    return this.formatMarkdown(p);
+  }
+
+  formatMarkdown(text: string): SafeHtml {
+    if (!text) return '';
+    
+    const codeBlocks: string[] = [];
+    
+    let formatted = text.replace(/\s*```(\w*)\s*\n?([\s\S]*?)```\s*/g, (match, lang, code) => {
+      code = code.trim();
+      
+      // DOMPurify transformó entidades, las regresamos a texto plano ANTES de pasarlo por PrismJS
+      code = code.replace(/&#039;/g, "'")
+                 .replace(/&quot;/g, '"')
+                 .replace(/&lt;/g, '<')
+                 .replace(/&gt;/g, '>')
+                 .replace(/&amp;/g, '&');
+                 
+      const displayLang = lang || 'typescript';
+      const validLang = Prism.languages[displayLang] ? displayLang : 'typescript';
+      
+      const highlighted = Prism.highlight(code, Prism.languages[validLang], validLang);
+      
+      const blockHtml = `<br><div class="qs-code-window"><div class="qs-code-header"><div class="qs-mac-dots"><span></span><span></span><span></span></div><span class="qs-code-lang">${displayLang}</span></div><pre class="qs-code-block"><code class="language-${displayLang}">${highlighted}</code></pre></div><br>`;
+      
+      codeBlocks.push(blockHtml);
+      return `___CODE_BLOCK_${codeBlocks.length - 1}___`;
+    });
+    
+    formatted = formatted.replace(/`([^`]+)`/g, '<code class="qs-inline-code">$1</code>');
+    
+    formatted = formatted.replace(/___CODE_BLOCK_(\d+)___/g, (match, index) => {
+      return codeBlocks[parseInt(index, 10)];
+    });
+    
+    return this.sanitizer.bypassSecurityTrustHtml(formatted);
   }
 
   isNodeSolved(nodeId: number): boolean {
@@ -1466,6 +1846,63 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     const labelMatch = item.match(/^([A-Z])\./);
     const key = labelMatch ? labelMatch[1] : item;
     return node.retroalimentaciones_opciones?.[key] || '';
+  }
+
+  async validateWithIA(node: NodeChallenge) {
+    const state = this.nodeStates[node.id!];
+    const user = (state.userAnswer as string || '').trim();
+    if (!user) return;
+
+    this.isEvaluatingWithIA[node.id!] = true;
+    this.cdr.detectChanges();
+
+    try {
+      // 1. Obtener API Key de Gemini
+      const encryptedKey = await this.db.getApiKey('gemini');
+      if (!encryptedKey) {
+        throw new Error('No se encontró una API Key configurada para Gemini.');
+      }
+
+      // 2. Decriptar (usando el UID del usuario actual)
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser) throw new Error('Sesión de usuario no encontrada.');
+      
+      const keyMaterial = await this.cryptoService.deriveKeyFromUid(currentUser.uid);
+      const apiKey = await this.cryptoService.decrypt(encryptedKey, keyMaterial);
+
+      // 3. Evaluar
+      const result = await this.ingestionService.evaluateResponseWithIA(
+        node, 
+        user, 
+        apiKey, 
+        this.quiz.auditor_persona || 'Socrático',
+        this.selectedModel
+      );
+
+      if (result.isCorrect) {
+        if (state.isCorrect === null) {
+          state.isCorrect = true;
+          this.totalCorrect++;
+        }
+        state.isCompleted = true;
+      } else {
+        state.wrongAttempts++;
+        if (state.isCorrect === null) state.isCorrect = false;
+      }
+
+      state.history.push({
+        selection: 'Evaluación Cognitiva IA ✨',
+        feedback: result.feedback,
+        isCorrect: result.isCorrect
+      });
+
+    } catch (err: any) {
+      console.error('[QuizSession] IA Error:', err);
+      this.toast.error(err.message || 'Error al validar con IA');
+    } finally {
+      this.isEvaluatingWithIA[node.id!] = false;
+      this.onAnswerChange();
+    }
   }
 
   isSelected(node: NodeChallenge, opt: string): boolean {

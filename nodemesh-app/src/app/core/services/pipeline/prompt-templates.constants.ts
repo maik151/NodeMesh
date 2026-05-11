@@ -102,7 +102,7 @@ El único resultado aceptable (OUTPUT) que me debes devolver es UN SOLO OBJETO J
       {
         "id_temp": "nodo_1",
         "tipo_reto": "DEBE ser uno de: single_choice, multi_choice, cloze_deletion, output_prediction, ordering, anomaly_detection, optimization, case_analysis, feynman_synthesis",
-        "requiere_ia": false,${config.incluirContexto ? '\n        "contexto": "...",' : ''}
+        "requiere_ia": "BOOLEAN: true solo si el tipo de reto es (anomaly_detection, optimization, case_analysis o feynman_synthesis). De lo contrario false.",${config.incluirContexto ? '\n        "contexto": "...",' : ''}
         "pregunta": "...",
         "opciones": ["Opción A", "Opción B", "Opción C", "Opción D"],
         "retroalimentaciones_opciones": {

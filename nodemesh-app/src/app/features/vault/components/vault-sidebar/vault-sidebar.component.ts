@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
@@ -869,7 +869,7 @@ import { FolderTheme, QuizSession } from '../../../../core/models/node.model';
     }
   `]
 })
-export class VaultSidebarComponent implements OnInit {
+export class VaultSidebarComponent implements OnInit, OnChanges {
   @Input() folders: FolderTheme[] = [];
   @Input() quizzesByFolder: { [key: string]: QuizSession[] } = {};
   @Input() activeThemeId: string | null = null;
@@ -894,6 +894,12 @@ export class VaultSidebarComponent implements OnInit {
   @Output() onToggleCollapse = new EventEmitter<void>();
 
   ngOnInit() {}
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['activeThemeId'] && this.activeThemeId) {
+      this.expandedFolders.add(this.activeThemeId);
+    }
+  }
 
   get filteredFolders(): FolderTheme[] {
     if (!this.searchTerm.trim()) return this.folders;

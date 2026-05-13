@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DatabaseService } from '../../../../core/services/storage/database.service';
 import { FolderTheme, NodeChallenge, QuizSession } from '../../../../core/models/node.model';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { VaultSidebarComponent } from '../../components/vault-sidebar/vault-sidebar.component';
 import { QuizPreviewComponent } from '../../components/quiz-preview/quiz-preview.component';
 import { QuizSessionComponent } from '../../components/quiz-session/quiz-session.component';
@@ -167,6 +167,7 @@ import { ToastService } from '../../../../core/services/ui/toast.service';
 export class VaultComponent implements OnInit {
   private readonly db = inject(DatabaseService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly layoutService = inject(LayoutService);
   private readonly toast = inject(ToastService);
@@ -187,6 +188,39 @@ export class VaultComponent implements OnInit {
 
   async ngOnInit() {
     await this.loadData();
+    this.route.queryParams.subscribe(async params => {
+      const playFolderId = params['playFolder'];
+      if (playFolderId) {
+        await this.handlePlayFolder(playFolderId);
+      }
+    });
+  }
+
+  private async handlePlayFolder(folderId: string) {
+    const folder = this.allFolders.find(f => f.folder_id === folderId);
+    if (!folder) return;
+    
+    // Select the folder
+    this.selectedTheme = folder;
+    
+    const quizzes = this.folderQuizzes[folderId] || [];
+    if (quizzes.length === 0) return;
+    
+    // Find the most urgent quiz based on some logic. 
+    // Usually, the quiz with the oldest next_review or just the first one.
+    // For now, let's sort by some property or just pick the first one if it's already sorted.
+    // Assuming quizzes might not be sorted by urgency, we can sort them by `retencion` or just pick the first one.
+    const urgentQuiz = quizzes.reduce((prev, current) => {
+      // Logic for urgency. For now, let's pick the first one or if we have 'retencion' or 'next_review' we'd use that.
+      // If we don't have explicit urgency at quiz level, we just pick the first one.
+      return prev; // simplified
+    });
+    
+    // Select the quiz (this opens the preview)
+    this.selectQuiz(urgentQuiz);
+    
+    // Clean query params so it doesn't auto-play on refresh
+    this.router.navigate([], { queryParams: { playFolder: null }, queryParamsHandling: 'merge', replaceUrl: true });
   }
 
   async loadData() {

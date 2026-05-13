@@ -7,11 +7,13 @@ import { Router } from '@angular/router';
 import { DatabaseService } from '../../../../core/services/storage/database.service';
 import { TestUploadComponent } from '../../components/test-upload/test-upload.component';
 import { PromptCompilerComponent } from '../../components/prompt-compiler/prompt-compiler.component';
+import { TriageQueueComponent } from '../../components/triage-queue/triage-queue.component';
+import { FocusTargetBentoComponent } from '../../components/focus-target-bento/focus-target-bento.component';
 
 @Component({
   selector: 'app-command-center',
   standalone: true,
-  imports: [CommonModule, FormsModule, LiquidGlassComponent, TestUploadComponent, PromptCompilerComponent],
+  imports: [CommonModule, FormsModule, LiquidGlassComponent, TestUploadComponent, PromptCompilerComponent, TriageQueueComponent, FocusTargetBentoComponent],
   template: `
     <div class="command-center-container">
       <header class="cc-header">
@@ -62,39 +64,19 @@ import { PromptCompilerComponent } from '../../components/prompt-compiler/prompt
         </div>
 
         <!-- ACTION: FORZAR SPRINT -->
-        <div class="cc-card span-4 row-2 card-action-main">
-          <app-liquid-glass [simple]="true" [radius]="20" [depth]="3" [blur]="20" [backgroundColor]="'var(--glass-fill-accent)'">
-            <div class="card-inner centered gap-compact">
-              <span class="material-symbols-rounded size-big neon-text">bolt</span>
-              <button class="btn-sprint-main-compact" (click)="startInterleaving()">FORZAR_SPRINT</button>
-              <div class="stress-meter-mini">
-                <div class="meter-bar" style="width: 85%"></div>
-                <span class="label-micro">STRESS_LVL: MAX</span>
-              </div>
-            </div>
-          </app-liquid-glass>
+        <div class="cc-card span-4 row-2 card-action-main" style="background: transparent; border: none; box-shadow: none;">
+          <app-focus-target-bento
+             [folders]="allFolders"
+             (onSprintStart)="startSprint($event)">
+          </app-focus-target-bento>
         </div>
 
         <!-- TRIAGE: QUEUE -->
-        <div class="cc-card span-4 row-4 card-triage">
-          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="16" [backgroundColor]="'var(--glass-fill)'">
-            <div class="card-inner no-padding">
-              <div class="header-micro-technical">
-                <span class="material-symbols-rounded size-mini-icon">priority_high</span>
-                <span class="label-micro">TRIAGE_QUEUE</span>
-              </div>
-              <div class="body-list-compact scroll-hide">
-                <div *ngIf="dueModules.length === 0" class="empty-state-compact">
-                  <p class="label-micro">SYSTEM_OPTIMIZED</p>
-                </div>
-                <div class="triage-item-compact" *ngFor="let mod of dueModules" (click)="startSprint(mod.folder_id)">
-                  <div class="triage-status" [class.overdue]="mod.status === 'overdue'"></div>
-                  <span class="triage-name">{{ mod.nombre_tema }}</span>
-                  <span class="triage-count mono">{{ mod.count }}</span>
-                </div>
-              </div>
-            </div>
-          </app-liquid-glass>
+        <div class="cc-card span-4 row-4 card-triage" style="background: transparent; border: none; box-shadow: none;">
+          <app-triage-queue 
+            [dueModules]="dueModules" 
+            (onSprintStart)="startSprint($event)">
+          </app-triage-queue>
         </div>
 
         <!-- INSIGHTS: HEATMAP -->
@@ -250,10 +232,7 @@ import { PromptCompilerComponent } from '../../components/prompt-compiler/prompt
     .btn-explore-v2:active { transform: translateY(0); box-shadow: 0 0 5px var(--theme-brand-neon); }
     .header-micro-technical { padding: 0.8rem 1rem; display: flex; align-items: center; gap: 0.6rem; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--theme-border); }
     .label-micro { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; color: var(--theme-text-secondary); font-family: 'JetBrains Mono', monospace; opacity: 0.5; }
-    .triage-item-compact { padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.75rem; cursor: pointer; transition: 0.2s; border-radius: 8px; margin: 0.2rem 0.5rem; }
-    .triage-item-compact:hover { background: rgba(159, 255, 34, 0.05); }
-    .triage-name { font-size: 0.7rem; font-weight: 600; flex: 1; opacity: 0.8; }
-    .triage-count { font-size: 0.7rem; opacity: 0.5; font-weight: 800; }
+
     .heatmap-container-v2 { padding: 1rem; display: flex; align-items: center; justify-content: center; }
     .heatmap-svg-v2 { width: 100%; height: auto; }
     .widget-square-compact { height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; }
@@ -304,6 +283,7 @@ export class CommandCenterComponent implements OnInit {
 
   // Dashboard State
   dueModules: any[] = [];
+  allFolders: any[] = [];
   heatmapNodes: any[] = [];
   streak: number = 0;
   masteryRatio: number = 0;
@@ -343,6 +323,7 @@ export class CommandCenterComponent implements OnInit {
 
   async refreshAllData() {
     this.dueModules = await this.db.getDueNodesSummary();
+    this.allFolders = await this.db.getAllFolders();
     const activity = await this.db.getDailyActivity(365);
     this.masteryRatio = await this.db.getMasteryRatio() || 0;
     
@@ -359,6 +340,7 @@ export class CommandCenterComponent implements OnInit {
 
   // --- MÉTODOS DE SOPORTE UI DASHBOARD ---
   floor(n: number): number { return Math.floor(n); }
+
 
   getHeatColor(count: number): string {
     const isDark = !document.body.classList.contains('light-theme') && document.body.getAttribute('data-theme') !== 'light';
@@ -450,7 +432,7 @@ export class CommandCenterComponent implements OnInit {
   }
 
   startInterleaving() { this.router.navigate(['/simulator'], { queryParams: { interleaving: 'true' } }); }
-  startSprint(folderId: string) { this.router.navigate(['/simulator'], { queryParams: { folder: folderId } }); }
+  startSprint(folderId: string) { this.router.navigate(['/vault'], { queryParams: { playFolder: folderId } }); }
 
   closeUploadModal() {
     this.showUploadModal = false;

@@ -106,7 +106,7 @@ export class DatabaseService {
         return this.db.table(name);
     }
 
-    async getDueNodesSummary(): Promise<{ folder_id: string, nombre_tema: string, count: number, status: 'overdue' | 'due' }[]> {
+    async getDueNodesSummary(): Promise<{ folder_id: string, nombre_tema: string, count: number, status: 'overdue' | 'due', retention: number, estimatedTime: number }[]> {
         if (!this.db) throw new Error('Database not initialized');
         
         const now = new Date();
@@ -133,12 +133,33 @@ export class DatabaseService {
           if (node.nextReviewDate < entry.maxOverdue) entry.maxOverdue = node.nextReviewDate;
         }
 
-        return Array.from(summaryMap.values()).map(e => ({
-          folder_id: e.id,
-          nombre_tema: e.name,
-          count: e.count,
-          status: (now.getTime() - e.maxOverdue.getTime() > 86400000) ? 'overdue' : 'due'
-        }));
+        const results: { folder_id: string, nombre_tema: string, count: number, status: 'overdue' | 'due', retention: number, estimatedTime: number }[] = [];
+        
+        for (const e of summaryMap.values()) {
+          const quizzes = await this.db.table('quizzes').where('folder_id').equals(e.id).toArray();
+          let totalRetention = 0;
+          let validQuizzes = 0;
+          for (const q of quizzes) {
+            if (q.estadisticas_globales && q.estadisticas_globales.ultimo_score_porcentaje != null) {
+              totalRetention += q.estadisticas_globales.ultimo_score_porcentaje;
+              validQuizzes++;
+            }
+          }
+          const avgRetention = validQuizzes > 0 ? Math.round(totalRetention / validQuizzes) : 45; // Default to 45 if no data as per image fallback
+          
+          const estimatedTime = Math.max(1, Math.ceil(e.count / 4)); // Approx 1 min per 4 questions like in image (81 -> 20, 32 -> 8)
+
+          results.push({
+            folder_id: e.id,
+            nombre_tema: e.name,
+            count: e.count,
+            status: (now.getTime() - e.maxOverdue.getTime() > 86400000) ? 'overdue' : 'due',
+            retention: avgRetention,
+            estimatedTime: estimatedTime
+          });
+        }
+
+        return results;
     }
 
     async getDailyActivity(days: number = 30): Promise<{ date: string, count: number }[]> {

@@ -170,13 +170,18 @@ import { UI_ICONS } from '../../../../shared/constants/icons.constants';
     }
 
     .heatmap-wrapper {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 8px;
+      position: relative;
       width: 100%;
+      padding-left: 16px;
+      box-sizing: border-box;
     }
 
     .heatmap-labels-y {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 12px;
       display: grid;
       grid-template-rows: repeat(7, 1fr);
       gap: 3px;
@@ -190,6 +195,8 @@ import { UI_ICONS } from '../../../../shared/constants/icons.constants';
       display: flex;
       align-items: center;
       justify-content: flex-end;
+      height: 100%;
+      line-height: 1;
     }
 
     .heatmap-body {

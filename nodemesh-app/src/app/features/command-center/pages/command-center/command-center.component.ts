@@ -10,12 +10,13 @@ import { PromptCompilerComponent } from '../../components/prompt-compiler/prompt
 import { TriageQueueComponent } from '../../components/triage-queue/triage-queue.component';
 import { FocusTargetBentoComponent } from '../../components/focus-target-bento/focus-target-bento.component';
 import { CognitiveActivityMapComponent } from '../../components/cognitive-activity-map/cognitive-activity-map.component';
+import { StreakBentoComponent } from '../../components/streak-bento/streak-bento.component';
 import { UI_ICONS } from '../../../../shared/constants/icons.constants';
 
 @Component({
   selector: 'app-command-center',
   standalone: true,
-  imports: [CommonModule, FormsModule, LiquidGlassComponent, TestUploadComponent, PromptCompilerComponent, TriageQueueComponent, FocusTargetBentoComponent, CognitiveActivityMapComponent],
+  imports: [CommonModule, FormsModule, LiquidGlassComponent, TestUploadComponent, PromptCompilerComponent, TriageQueueComponent, FocusTargetBentoComponent, CognitiveActivityMapComponent, StreakBentoComponent],
   template: `
     <div class="command-center-container">
       <header class="cc-header">
@@ -88,62 +89,43 @@ import { UI_ICONS } from '../../../../shared/constants/icons.constants';
 
         <!-- WIDGETS -->
         <div class="cc-card span-4 row-2 glassy-card-container">
-          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="16" backgroundColor="var(--glass-fill)" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
-            <div class="streak-widget-container">
-              <div class="streak-header">
-                <div class="streak-title-box">
-                  <svg class="streak-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-                    <path [attr.d]="UI_ICONS.streak_comet" fill="currentColor"></path>
-                  </svg>
-                  <span class="streak-title">Sistema de Rachas</span>
-                </div>
-                <div class="streak-kpis">
-                  <span class="kpi-streak-value">{{ streak }}</span>
-                  <span class="material-symbols-rounded neon-text" style="font-size: 1.3rem;">local_fire_department</span>
-                </div>
-              </div>
-              
-              <div class="streak-week-grid">
-                <div class="streak-day" *ngFor="let day of weekDays" [class.active]="day.status === 'active'" [class.frozen]="day.status === 'frozen'" [class.empty]="day.status === 'empty'">
-                  <span class="day-label">{{ day.label }}</span>
-                  <div class="day-icon-wrapper">
-                    <!-- ICON FOR ACTIVE -->
-                    <span class="material-symbols-rounded icon-active" *ngIf="day.status === 'active'">local_fire_department</span>
-                    <!-- ICON FOR FROZEN -->
-                    <span class="material-symbols-rounded icon-frozen" *ngIf="day.status === 'frozen'">ac_unit</span>
-                    <!-- ICON FOR EMPTY -->
-                    <span class="material-symbols-rounded icon-empty" *ngIf="day.status === 'empty'">radio_button_unchecked</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </app-liquid-glass>
+          <app-streak-bento [activityData]="dailyActivity"></app-streak-bento>
         </div>
 
-        <div class="cc-card span-3 row-2 glassy-card-container">
+        <div class="cc-card span-4 row-2 glassy-card-container">
           <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="16" backgroundColor="var(--glass-fill)" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
             <div class="widget-mastery-compact">
-              <span class="label-micro" style="margin-bottom: 0.2rem;">TOTAL_MASTERY</span>
-              <div class="circular-progress-small">
-                <svg class="chart-svg" viewBox="0 0 36 36">
-                  <circle class="circle-bg" cx="18" cy="18" r="15.5"></circle>
-                  <circle class="circle-fg" cx="18" cy="18" r="15.5" [attr.stroke-dasharray]="masteryRatio + ', 100'"></circle>
-                </svg>
-                <div class="perc-text-mini">{{ masteryRatio }}%</div>
+              <div class="mastery-header">
+                <span class="label-micro">TOTAL_MASTERY</span>
+              </div>
+              <div class="mastery-body">
+                <div class="circular-progress-small">
+                  <svg class="chart-svg" viewBox="0 0 36 36">
+                    <circle class="circle-bg" cx="18" cy="18" r="15.5"></circle>
+                    <circle class="circle-fg" cx="18" cy="18" r="15.5" [attr.stroke-dasharray]="masteryRatio + ', 100'"></circle>
+                  </svg>
+                  <div class="perc-text-mini">{{ masteryRatio }}%</div>
+                </div>
+                <div class="mastery-info">
+                  <span class="mastery-value">{{ masteryRatio }}%</span>
+                  <span class="mastery-sub">Global Mastery</span>
+                </div>
               </div>
             </div>
           </app-liquid-glass>
         </div>
 
-        <div class="cc-card span-5 row-2 glassy-card-container">
+        <div class="cc-card span-4 row-2 glassy-card-container">
           <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="16" backgroundColor="var(--glass-fill)" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
              <div class="widget-square-compact">
                <div class="widget-header">
                   <span class="label-micro">POMODORO_SESSION</span>
                   <span class="clickable material-symbols-rounded size-medium" (click)="togglePomo()">{{ pomo.running ? 'pause_circle' : 'play_circle' }}</span>
                </div>
-               <div class="widget-value-compact mono" style="font-size: 2.5rem; text-align: center; width: 100%; letter-spacing: -1px;">{{ pomoTime }}</div>
-               <div class="meter-bar-mini"><div [style.width]="(pomo.seconds / 1500 * 100) + '%'" class="meter-fill"></div></div>
+               <div class="pomo-body">
+                 <div class="widget-value-compact mono" style="font-size: 2.2rem; text-align: left; letter-spacing: -1px;">{{ pomoTime }}</div>
+                 <div class="meter-bar-mini"><div [style.width]="(pomo.seconds / 1500 * 100) + '%'" class="meter-fill"></div></div>
+               </div>
              </div>
           </app-liquid-glass>
         </div>
@@ -245,16 +227,30 @@ import { UI_ICONS } from '../../../../shared/constants/icons.constants';
 
     .heatmap-container-v2 { padding: 1rem; display: flex; align-items: center; justify-content: center; }
     .heatmap-svg-v2 { width: 100%; height: auto; }
-    .widget-square-compact { height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; }
-    .widget-header { display: flex; justify-content: space-between; align-items: center; }
+    .widget-square-compact { height: 100%; display: flex; flex-direction: column; padding: 1rem 1.25rem; }
+    .widget-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
     .widget-value-compact { font-size: 1.4rem; font-weight: 800; color: var(--theme-text); }
     .sparkline-mini { height: 25px; margin-top: 0.5rem; opacity: 0.6; }
-    .widget-mastery-compact { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 0.8rem; }
-    .circular-progress-small { position: relative; width: 55px; height: 55px; }
-    .perc-text-mini { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; opacity: 0.9; }
+    
+    .widget-mastery-compact { display: flex; flex-direction: column; height: 100%; padding: 1rem 1.25rem; }
+    .mastery-header { margin-bottom: 0.5rem; }
+    .mastery-body { display: flex; align-items: center; gap: 1rem; flex: 1; }
+    .mastery-info { display: flex; flex-direction: column; }
+    .mastery-value { font-size: 1.4rem; font-weight: 800; color: var(--theme-text); line-height: 1.1; }
+    .mastery-sub { font-size: 0.65rem; color: var(--theme-text-secondary); opacity: 0.6; font-weight: 700; text-transform: uppercase; }
+    
+    .pomo-body { display: flex; flex-direction: column; justify-content: center; flex: 1; }
+
+    .circular-progress-small { position: relative; width: 50px; height: 50px; flex-shrink: 0; }
+    .perc-text-mini { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800; opacity: 0.8; }
+    .chart-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+    .circle-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 3; }
+    .circle-fg { fill: none; stroke: var(--theme-brand-neon); stroke-width: 3; stroke-linecap: round; transition: stroke-dasharray 0.3s ease; }
+    :host-context([data-theme="light"]) .circle-bg { stroke: rgba(0,0,0,0.05); }
+
     .btn-sprint-main-compact { background: var(--theme-brand-neon); color: #000; border: none; padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 900; font-size: 0.8rem; cursor: pointer; font-family: 'JetBrains Mono', monospace; }
     .size-big { font-size: 2.2rem; } .size-mini-icon { font-size: 1rem; opacity: 0.5; }
-    .meter-bar-mini { height: 3px; background: rgba(255,255,255,0.05); border-radius: 100px; overflow: hidden; margin-top: 0.5rem; }
+    .meter-bar-mini { height: 4px; background: rgba(255,255,255,0.05); border-radius: 100px; overflow: hidden; margin-top: 0.5rem; }
     .meter-fill { height: 100%; background: var(--theme-brand-neon); transition: width 1s linear; }
     .injection-toast { position: fixed; bottom: 1.5rem; right: 1.5rem; padding: 0.8rem 1.25rem; border-radius: 10px; display: flex; align-items: center; gap: 0.7rem; z-index: 2000; font-size: 0.85rem; }
     .injection-toast.success { background: var(--theme-brand-neon); color: #000; box-shadow: 0 10px 30px rgba(159, 255, 34, 0.2); }
@@ -282,120 +278,6 @@ import { UI_ICONS } from '../../../../shared/constants/icons.constants';
     :host-context([data-theme="light"]) .btn-generate-prompt-original:hover { background: #ebebef; color: #222; }
     :host-context([data-theme="light"]) .btn-explore-v2 { color: #fff; }
 
-    /* STREAK WIDGET STYLES */
-    .streak-widget-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-      padding: 1rem 1.2rem;
-    }
-    
-    .streak-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .streak-title-box {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      color: var(--theme-text-secondary);
-      font-family: 'JetBrains Mono', monospace;
-    }
-    :host-context([data-theme="light"]) .streak-title-box {
-      color: #333;
-    }
-
-    .streak-icon {
-      width: 20px;
-      height: 20px;
-      opacity: 0.7;
-    }
-
-    .streak-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      letter-spacing: -0.3px;
-      opacity: 0.8;
-    }
-
-    .streak-kpis {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .kpi-streak-value {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--theme-text);
-      font-family: 'JetBrains Mono', monospace;
-      line-height: 1;
-    }
-
-    .streak-week-grid {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      width: 100%;
-      margin-top: 1rem;
-    }
-
-    .streak-day {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .day-label {
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: var(--theme-text-secondary);
-      opacity: 0.6;
-    }
-
-    .day-icon-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.05);
-      border: 1px dashed rgba(255,255,255,0.1);
-    }
-    :host-context([data-theme="light"]) .day-icon-wrapper {
-      background: rgba(0,0,0,0.03);
-      border-color: rgba(0,0,0,0.1);
-    }
-
-    .streak-day.active .day-icon-wrapper {
-      background: rgba(159, 255, 34, 0.15);
-      border: 1px solid rgba(159, 255, 34, 0.3);
-      color: var(--theme-brand-neon);
-    }
-
-    .streak-day.frozen .day-icon-wrapper {
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      color: #38bdf8;
-    }
-
-    .streak-day.empty .day-icon-wrapper {
-      color: var(--theme-text-secondary);
-      opacity: 0.5;
-    }
-
-    .icon-active, .icon-frozen {
-      font-size: 1.2rem;
-    }
-    
-    .icon-empty {
-      font-size: 1rem;
-    }
   `]
 })
 export class CommandCenterComponent implements OnInit {
@@ -411,20 +293,9 @@ export class CommandCenterComponent implements OnInit {
   dueModules: any[] = [];
   allFolders: any[] = [];
   dailyActivity: { date: string, count: number }[] = [];
-  streak: number = 0;
   masteryRatio: number = 0;
   retentionPath: string = '';
   sparklinePath: string = '';
-
-  weekDays = [
-    { label: 'D', status: 'active' },
-    { label: 'L', status: 'frozen' },
-    { label: 'M', status: 'empty' },
-    { label: 'X', status: 'empty' },
-    { label: 'J', status: 'empty' },
-    { label: 'V', status: 'empty' },
-    { label: 'S', status: 'empty' }
-  ];
 
   // UI Flow State
   isDragging = false;
@@ -463,54 +334,6 @@ export class CommandCenterComponent implements OnInit {
     this.dailyActivity = activity;
     this.masteryRatio = await this.db.getMasteryRatio() || 0;
     
-    let currentStreak = 0;
-    const sortedActivity = [...activity].reverse();
-    const todayStr = (() => {
-      const d = new Date();
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    })();
-
-    for (const day of sortedActivity) {
-      if (day.count > 0) currentStreak++;
-      else if (day.date === todayStr) continue;
-      else break;
-    }
-    this.streak = currentStreak;
-
-    // Calcular la semana de racha (Lunes a Domingo de los últimos 7 días terminando hoy)
-    const today = new Date();
-    // Ajustar para empezar en Lunes (1) hasta Domingo (0 -> 7)
-    const dayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1; 
-    
-    const weekLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-    this.weekDays = weekLabels.map((label, index) => {
-      const date = new Date(today);
-      date.setDate(today.getDate() - dayOfWeek + index);
-      
-      const yyyy = date.getFullYear();
-      const mm = String(date.getMonth() + 1).padStart(2, '0');
-      const dd = String(date.getDate()).padStart(2, '0');
-      const dateString = `${yyyy}-${mm}-${dd}`;
-      
-      const todayYyyy = today.getFullYear();
-      const todayMm = String(today.getMonth() + 1).padStart(2, '0');
-      const todayDd = String(today.getDate()).padStart(2, '0');
-      const todayString = `${todayYyyy}-${todayMm}-${todayDd}`;
-      
-      const activityForDay = this.dailyActivity.find(d => d.date === dateString);
-      const count = activityForDay ? activityForDay.count : 0;
-      
-      let status = 'empty';
-      if (count > 0) {
-        status = 'active';
-      } else if (dateString < todayString) {
-        status = 'frozen';
-      } else {
-        status = 'empty'; // Futuro o hoy sin hacer
-      }
-      return { label, status };
-    });
-
     this.cdr.detectChanges();
   }
 

@@ -86,41 +86,47 @@ import { CognitiveActivityMapComponent } from '../../components/cognitive-activi
         </div>
 
         <!-- WIDGETS -->
-        <div class="cc-card span-4 row-2">
-          <div class="widget-square-compact">
-            <div class="widget-header">
-              <span class="label-micro">CURRENT_STREAK</span>
-              <span class="material-symbols-rounded size-small neon-text">local_fire_department</span>
+        <div class="cc-card span-4 row-2 glassy-card-container">
+          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="16" backgroundColor="var(--glass-fill)" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
+            <div class="widget-square-compact">
+              <div class="widget-header">
+                <span class="label-micro">CURRENT_STREAK</span>
+                <span class="material-symbols-rounded size-small neon-text">local_fire_department</span>
+              </div>
+              <div class="widget-value-compact mono">{{ streak }} DAYS</div>
+              <div class="sparkline-mini">
+                 <svg width="100%" height="25"><path [attr.d]="sparklinePath" fill="none" stroke="var(--theme-brand-neon)" stroke-width="2" /></svg>
+              </div>
             </div>
-            <div class="widget-value-compact mono">{{ streak }} DAYS</div>
-            <div class="sparkline-mini">
-               <svg width="100%" height="25"><path [attr.d]="sparklinePath" fill="none" stroke="var(--theme-brand-neon)" stroke-width="2" /></svg>
-            </div>
-          </div>
+          </app-liquid-glass>
         </div>
 
-        <div class="cc-card span-3 row-2">
-          <div class="widget-mastery-compact">
-            <span class="label-micro" style="margin-bottom: 0.2rem;">TOTAL_MASTERY</span>
-            <div class="circular-progress-small">
-              <svg class="chart-svg" viewBox="0 0 36 36">
-                <circle class="circle-bg" cx="18" cy="18" r="15.5"></circle>
-                <circle class="circle-fg" cx="18" cy="18" r="15.5" [attr.stroke-dasharray]="masteryRatio + ', 100'"></circle>
-              </svg>
-              <div class="perc-text-mini">{{ masteryRatio }}%</div>
+        <div class="cc-card span-3 row-2 glassy-card-container">
+          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="16" backgroundColor="var(--glass-fill)" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
+            <div class="widget-mastery-compact">
+              <span class="label-micro" style="margin-bottom: 0.2rem;">TOTAL_MASTERY</span>
+              <div class="circular-progress-small">
+                <svg class="chart-svg" viewBox="0 0 36 36">
+                  <circle class="circle-bg" cx="18" cy="18" r="15.5"></circle>
+                  <circle class="circle-fg" cx="18" cy="18" r="15.5" [attr.stroke-dasharray]="masteryRatio + ', 100'"></circle>
+                </svg>
+                <div class="perc-text-mini">{{ masteryRatio }}%</div>
+              </div>
             </div>
-          </div>
+          </app-liquid-glass>
         </div>
 
-        <div class="cc-card span-5 row-2">
-           <div class="widget-square-compact">
-             <div class="widget-header">
-                <span class="label-micro">POMODORO_SESSION</span>
-                <span class="clickable material-symbols-rounded size-medium" (click)="togglePomo()">{{ pomo.running ? 'pause_circle' : 'play_circle' }}</span>
+        <div class="cc-card span-5 row-2 glassy-card-container">
+          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="16" backgroundColor="var(--glass-fill)" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
+             <div class="widget-square-compact">
+               <div class="widget-header">
+                  <span class="label-micro">POMODORO_SESSION</span>
+                  <span class="clickable material-symbols-rounded size-medium" (click)="togglePomo()">{{ pomo.running ? 'pause_circle' : 'play_circle' }}</span>
+               </div>
+               <div class="widget-value-compact mono" style="font-size: 2.5rem; text-align: center; width: 100%; letter-spacing: -1px;">{{ pomoTime }}</div>
+               <div class="meter-bar-mini"><div [style.width]="(pomo.seconds / 1500 * 100) + '%'" class="meter-fill"></div></div>
              </div>
-             <div class="widget-value-compact mono" style="font-size: 2.5rem; text-align: center; width: 100%; letter-spacing: -1px;">{{ pomoTime }}</div>
-             <div class="meter-bar-mini"><div [style.width]="(pomo.seconds / 1500 * 100) + '%'" class="meter-fill"></div></div>
-           </div>
+          </app-liquid-glass>
         </div>
       </div>
 
@@ -175,7 +181,7 @@ import { CognitiveActivityMapComponent } from '../../components/cognitive-activi
 
     .status-pill { background: var(--theme-border); padding: 0.3rem 0.6rem; border-radius: 6px; display: flex; align-items: center; gap: 0.5rem; font-size: 0.6rem; font-weight: 800; border: 1px solid rgba(255,255,255,0.05); }
     .cc-grid { display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: minmax(50px, auto); gap: 10px; }
-    .span-12 { grid-column: span 12; } .span-8 { grid-column: span 8; } .span-6 { grid-column: span 6; } .span-4 { grid-column: span 4; } .span-3 { grid-column: span 3; }
+    .span-12 { grid-column: span 12; } .span-8 { grid-column: span 8; } .span-6 { grid-column: span 6; } .span-5 { grid-column: span 5; } .span-4 { grid-column: span 4; } .span-3 { grid-column: span 3; }
     .row-4 { grid-row: span 4; } .row-2 { grid-row: span 2; }
     .cc-card { position: relative; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; background: var(--theme-surface-solid); border: 1px solid var(--theme-border); transition: 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); }
     .cc-card:hover { transform: translateY(-2px); border-color: rgba(159, 255, 34, 0.3); }

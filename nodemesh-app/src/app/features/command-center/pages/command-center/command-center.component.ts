@@ -93,7 +93,7 @@ import { UI_ICONS } from '../../../../shared/constants/icons.constants';
               <div class="streak-header">
                 <div class="streak-title-box">
                   <svg class="streak-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-                    <path [attr.d]="UI_ICONS.streak_calendar" fill="currentColor"></path>
+                    <path [attr.d]="UI_ICONS.streak_comet" fill="currentColor"></path>
                   </svg>
                   <span class="streak-title">Sistema de Rachas</span>
                 </div>

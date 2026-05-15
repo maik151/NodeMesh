@@ -9,11 +9,12 @@ import { TestUploadComponent } from '../../components/test-upload/test-upload.co
 import { PromptCompilerComponent } from '../../components/prompt-compiler/prompt-compiler.component';
 import { TriageQueueComponent } from '../../components/triage-queue/triage-queue.component';
 import { FocusTargetBentoComponent } from '../../components/focus-target-bento/focus-target-bento.component';
+import { CognitiveActivityMapComponent } from '../../components/cognitive-activity-map/cognitive-activity-map.component';
 
 @Component({
   selector: 'app-command-center',
   standalone: true,
-  imports: [CommonModule, FormsModule, LiquidGlassComponent, TestUploadComponent, PromptCompilerComponent, TriageQueueComponent, FocusTargetBentoComponent],
+  imports: [CommonModule, FormsModule, LiquidGlassComponent, TestUploadComponent, PromptCompilerComponent, TriageQueueComponent, FocusTargetBentoComponent, CognitiveActivityMapComponent],
   template: `
     <div class="command-center-container">
       <header class="cc-header">
@@ -64,7 +65,7 @@ import { FocusTargetBentoComponent } from '../../components/focus-target-bento/f
         </div>
 
         <!-- ACTION: FORZAR SPRINT -->
-        <div class="cc-card span-4 row-2 card-action-main" style="background: transparent; border: none; box-shadow: none;">
+        <div class="cc-card span-4 row-2 card-action-main glassy-card-container">
           <app-focus-target-bento
              [folders]="allFolders"
              (onSprintStart)="startSprint($event)">
@@ -72,7 +73,7 @@ import { FocusTargetBentoComponent } from '../../components/focus-target-bento/f
         </div>
 
         <!-- TRIAGE: QUEUE -->
-        <div class="cc-card span-4 row-4 card-triage" style="background: transparent; border: none; box-shadow: none;">
+        <div class="cc-card span-4 row-4 card-triage glassy-card-container">
           <app-triage-queue 
             [dueModules]="dueModules" 
             (onSprintStart)="startSprint($event)">
@@ -80,32 +81,12 @@ import { FocusTargetBentoComponent } from '../../components/focus-target-bento/f
         </div>
 
         <!-- INSIGHTS: HEATMAP -->
-        <div class="cc-card span-8 row-4">
-          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="16" [backgroundColor]="'var(--glass-fill)'">
-             <div class="card-inner no-padding">
-               <div class="header-micro-technical">
-                 <span class="material-symbols-rounded size-mini-icon">grid_view</span>
-                 <span class="label-micro">COGNITIVE_ACTIVITY_MAP</span>
-               </div>
-               <div class="heatmap-container-v2">
-                 <svg class="heatmap-svg-v2" viewBox="0 0 740 100">
-                   <g *ngFor="let node of heatmapNodes; let i = index">
-                     <rect class="heat-node"
-                       [attr.x]="floor(i / 7) * 13"
-                       [attr.y]="(i % 7) * 13"
-                       width="11" height="11" rx="2"
-                       [attr.fill]="getHeatColor(node.count)">
-                       <title>{{ node.date }}: {{ node.count }} repasos</title>
-                     </rect>
-                   </g>
-                 </svg>
-               </div>
-             </div>
-          </app-liquid-glass>
+        <div class="cc-card span-8 row-4 glassy-card-container">
+          <app-cognitive-activity-map [activityData]="dailyActivity"></app-cognitive-activity-map>
         </div>
 
         <!-- WIDGETS -->
-        <div class="cc-card span-3 row-2">
+        <div class="cc-card span-4 row-2">
           <div class="widget-square-compact">
             <div class="widget-header">
               <span class="label-micro">CURRENT_STREAK</span>
@@ -131,7 +112,7 @@ import { FocusTargetBentoComponent } from '../../components/focus-target-bento/f
           </div>
         </div>
 
-        <div class="cc-card span-6 row-2">
+        <div class="cc-card span-5 row-2">
            <div class="widget-square-compact">
              <div class="widget-header">
                 <span class="label-micro">POMODORO_SESSION</span>
@@ -198,6 +179,10 @@ import { FocusTargetBentoComponent } from '../../components/focus-target-bento/f
     .row-4 { grid-row: span 4; } .row-2 { grid-row: span 2; }
     .cc-card { position: relative; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; background: var(--theme-surface-solid); border: 1px solid var(--theme-border); transition: 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); }
     .cc-card:hover { transform: translateY(-2px); border-color: rgba(159, 255, 34, 0.3); }
+    
+    .glassy-card-container { background: transparent; border: none; box-shadow: none; }
+    :host-context([data-theme="light"]) .glassy-card-container { background: var(--theme-surface-solid); border: 1px solid var(--theme-border); box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+
     .card-inner { height: 100%; padding: 1rem; position: relative; z-index: 2; }
     .card-inner.no-padding { padding: 0; }
     .centered { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
@@ -284,7 +269,7 @@ export class CommandCenterComponent implements OnInit {
   // Dashboard State
   dueModules: any[] = [];
   allFolders: any[] = [];
-  heatmapNodes: any[] = [];
+  dailyActivity: { date: string, count: number }[] = [];
   streak: number = 0;
   masteryRatio: number = 0;
   retentionPath: string = '';
@@ -305,7 +290,6 @@ export class CommandCenterComponent implements OnInit {
   pomo = { seconds: 1500, running: false, interval: null as any };
 
   async ngOnInit() {
-    this.generateMockHeatmap();
     this.generateRetentionPath();
     this.generateSparkline();
     await this.refreshAllData();
@@ -325,6 +309,7 @@ export class CommandCenterComponent implements OnInit {
     this.dueModules = await this.db.getDueNodesSummary();
     this.allFolders = await this.db.getAllFolders();
     const activity = await this.db.getDailyActivity(365);
+    this.dailyActivity = activity;
     this.masteryRatio = await this.db.getMasteryRatio() || 0;
     
     let currentStreak = 0;
@@ -339,20 +324,6 @@ export class CommandCenterComponent implements OnInit {
   }
 
   // --- MÉTODOS DE SOPORTE UI DASHBOARD ---
-  floor(n: number): number { return Math.floor(n); }
-
-
-  getHeatColor(count: number): string {
-    const isDark = !document.body.classList.contains('light-theme') && document.body.getAttribute('data-theme') !== 'light';
-    if (count === 0) return isDark ? '#111411' : '#e9ecef';
-    if (count < 5) return 'rgba(159, 255, 34, 0.2)';
-    if (count < 15) return 'rgba(159, 255, 34, 0.5)';
-    return '#9FFF22';
-  }
-
-  generateMockHeatmap() {
-    this.heatmapNodes = Array.from({ length: 364 }, (_, i) => ({ date: `Day ${i}`, count: Math.floor(Math.random() * 20) }));
-  }
 
   generateRetentionPath() {
     let p = 'M 0 150';

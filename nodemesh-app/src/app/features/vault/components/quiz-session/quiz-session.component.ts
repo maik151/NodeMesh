@@ -2004,6 +2004,12 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
           intervalDays: intervalDays,
           intentos: (node.intentos || 0) + 1
         });
+        
+        await this.db.table('history').add({
+          nodeId: node.id,
+          date: now.toISOString(),
+          grade: state.isCorrect ? 1 : 0
+        });
       }
 
       this.impactSummary.avgDisplacement = correctC > 0 ? parseFloat((totalDisp / correctC).toFixed(1)) : 0;

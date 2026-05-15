@@ -465,9 +465,14 @@ export class CommandCenterComponent implements OnInit {
     
     let currentStreak = 0;
     const sortedActivity = [...activity].reverse();
+    const todayStr = (() => {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    })();
+
     for (const day of sortedActivity) {
       if (day.count > 0) currentStreak++;
-      else if (day.date === new Date().toISOString().split('T')[0]) continue;
+      else if (day.date === todayStr) continue;
       else break;
     }
     this.streak = currentStreak;

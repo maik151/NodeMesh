@@ -323,7 +323,7 @@ export class CognitiveActivityMapComponent implements OnChanges {
     for (let i = 0; i <= 364; i++) {
       const d = new Date(startDate);
       d.setDate(d.getDate() + i);
-      const dateStr = d.toISOString().split('T')[0];
+      const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       const count = map.get(dateStr) || 0;
       this.gridNodes.push({ date: dateStr, count });
     }

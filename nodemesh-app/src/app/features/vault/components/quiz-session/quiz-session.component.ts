@@ -2016,7 +2016,11 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
       this.impactSummary.degradedCount = degradC;
 
       // Racha diaria con localStorage
-      const today = now.toISOString().split('T')[0];
+      const getLocalIsoDateString = (d: Date) => {
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      };
+
+      const today = getLocalIsoDateString(now);
       const lastDay = localStorage.getItem('nm_streak_date');
       let streak = parseInt(localStorage.getItem('nm_streak') || '0', 10);
 
@@ -2025,7 +2029,7 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
       } else {
         const yesterday = new Date(now);
         yesterday.setDate(yesterday.getDate() - 1);
-        const yStr = yesterday.toISOString().split('T')[0];
+        const yStr = getLocalIsoDateString(yesterday);
         streak = lastDay === yStr ? streak + 1 : 1;
         localStorage.setItem('nm_streak', streak.toString());
         localStorage.setItem('nm_streak_date', today);

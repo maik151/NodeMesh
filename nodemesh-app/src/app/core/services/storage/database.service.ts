@@ -174,15 +174,23 @@ export class DatabaseService {
 
         const activityMap = new Map<string, number>();
         
+        const getLocalIsoDateString = (d: Date) => {
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          return `${yyyy}-${mm}-${dd}`;
+        };
+        
         // Inicializar últimos X días con 0
         for (let i = 0; i < days; i++) {
           const d = new Date();
           d.setDate(d.getDate() - i);
-          activityMap.set(d.toISOString().split('T')[0], 0);
+          activityMap.set(getLocalIsoDateString(d), 0);
         }
 
         for (const entry of history) {
-          const day = new Date(entry.date).toISOString().split('T')[0];
+          const d = new Date(entry.date);
+          const day = getLocalIsoDateString(d);
           if (activityMap.has(day)) {
             activityMap.set(day, (activityMap.get(day) || 0) + 1);
           }

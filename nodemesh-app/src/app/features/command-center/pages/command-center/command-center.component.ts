@@ -10,6 +10,7 @@ import { PromptCompilerComponent } from '../../components/prompt-compiler/prompt
 import { TriageQueueComponent } from '../../components/triage-queue/triage-queue.component';
 import { FocusTargetBentoComponent } from '../../components/focus-target-bento/focus-target-bento.component';
 import { CognitiveActivityMapComponent } from '../../components/cognitive-activity-map/cognitive-activity-map.component';
+import { UI_ICONS } from '../../../../shared/constants/icons.constants';
 
 @Component({
   selector: 'app-command-center',
@@ -88,14 +89,32 @@ import { CognitiveActivityMapComponent } from '../../components/cognitive-activi
         <!-- WIDGETS -->
         <div class="cc-card span-4 row-2 glassy-card-container">
           <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="16" backgroundColor="var(--glass-fill)" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
-            <div class="widget-square-compact">
-              <div class="widget-header">
-                <span class="label-micro">CURRENT_STREAK</span>
-                <span class="material-symbols-rounded size-small neon-text">local_fire_department</span>
+            <div class="streak-widget-container">
+              <div class="streak-header">
+                <div class="streak-title-box">
+                  <svg class="streak-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                    <path [attr.d]="UI_ICONS.streak_calendar" fill="currentColor"></path>
+                  </svg>
+                  <span class="streak-title">Sistema de Rachas</span>
+                </div>
+                <div class="streak-kpis">
+                  <span class="kpi-streak-value">{{ streak }}</span>
+                  <span class="material-symbols-rounded neon-text" style="font-size: 1.3rem;">local_fire_department</span>
+                </div>
               </div>
-              <div class="widget-value-compact mono">{{ streak }} DAYS</div>
-              <div class="sparkline-mini">
-                 <svg width="100%" height="25"><path [attr.d]="sparklinePath" fill="none" stroke="var(--theme-brand-neon)" stroke-width="2" /></svg>
+              
+              <div class="streak-week-grid">
+                <div class="streak-day" *ngFor="let day of weekDays" [class.active]="day.status === 'active'" [class.frozen]="day.status === 'frozen'" [class.empty]="day.status === 'empty'">
+                  <span class="day-label">{{ day.label }}</span>
+                  <div class="day-icon-wrapper">
+                    <!-- ICON FOR ACTIVE -->
+                    <span class="material-symbols-rounded icon-active" *ngIf="day.status === 'active'">local_fire_department</span>
+                    <!-- ICON FOR FROZEN -->
+                    <span class="material-symbols-rounded icon-frozen" *ngIf="day.status === 'frozen'">ac_unit</span>
+                    <!-- ICON FOR EMPTY -->
+                    <span class="material-symbols-rounded icon-empty" *ngIf="day.status === 'empty'">radio_button_unchecked</span>
+                  </div>
+                </div>
               </div>
             </div>
           </app-liquid-glass>
@@ -262,6 +281,121 @@ import { CognitiveActivityMapComponent } from '../../components/cognitive-activi
     :host-context([data-theme="light"]) .btn-generate-prompt-original { background: #f5f5f7; border-color: #d1d5db; color: #444; }
     :host-context([data-theme="light"]) .btn-generate-prompt-original:hover { background: #ebebef; color: #222; }
     :host-context([data-theme="light"]) .btn-explore-v2 { color: #fff; }
+
+    /* STREAK WIDGET STYLES */
+    .streak-widget-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      padding: 1rem 1.2rem;
+    }
+    
+    .streak-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .streak-title-box {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--theme-text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    :host-context([data-theme="light"]) .streak-title-box {
+      color: #333;
+    }
+
+    .streak-icon {
+      width: 20px;
+      height: 20px;
+      opacity: 0.7;
+    }
+
+    .streak-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      opacity: 0.8;
+    }
+
+    .streak-kpis {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .kpi-streak-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--theme-text);
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1;
+    }
+
+    .streak-week-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .streak-day {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .day-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--theme-text-secondary);
+      opacity: 0.6;
+    }
+
+    .day-icon-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      border: 1px dashed rgba(255,255,255,0.1);
+    }
+    :host-context([data-theme="light"]) .day-icon-wrapper {
+      background: rgba(0,0,0,0.03);
+      border-color: rgba(0,0,0,0.1);
+    }
+
+    .streak-day.active .day-icon-wrapper {
+      background: rgba(159, 255, 34, 0.15);
+      border: 1px solid rgba(159, 255, 34, 0.3);
+      color: var(--theme-brand-neon);
+    }
+
+    .streak-day.frozen .day-icon-wrapper {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+    }
+
+    .streak-day.empty .day-icon-wrapper {
+      color: var(--theme-text-secondary);
+      opacity: 0.5;
+    }
+
+    .icon-active, .icon-frozen {
+      font-size: 1.2rem;
+    }
+    
+    .icon-empty {
+      font-size: 1rem;
+    }
   `]
 })
 export class CommandCenterComponent implements OnInit {
@@ -270,6 +404,7 @@ export class CommandCenterComponent implements OnInit {
   private readonly themeService = inject(ThemeService);
   private readonly cdr = inject(ChangeDetectorRef);
   
+  protected readonly UI_ICONS = UI_ICONS;
   isDark$ = this.themeService.isDark$;
 
   // Dashboard State
@@ -280,6 +415,16 @@ export class CommandCenterComponent implements OnInit {
   masteryRatio: number = 0;
   retentionPath: string = '';
   sparklinePath: string = '';
+
+  weekDays = [
+    { label: 'D', status: 'active' },
+    { label: 'L', status: 'frozen' },
+    { label: 'M', status: 'empty' },
+    { label: 'X', status: 'empty' },
+    { label: 'J', status: 'empty' },
+    { label: 'V', status: 'empty' },
+    { label: 'S', status: 'empty' }
+  ];
 
   // UI Flow State
   isDragging = false;
@@ -326,6 +471,41 @@ export class CommandCenterComponent implements OnInit {
       else break;
     }
     this.streak = currentStreak;
+
+    // Calcular la semana de racha (Lunes a Domingo de los últimos 7 días terminando hoy)
+    const today = new Date();
+    // Ajustar para empezar en Lunes (1) hasta Domingo (0 -> 7)
+    const dayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1; 
+    
+    const weekLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+    this.weekDays = weekLabels.map((label, index) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() - dayOfWeek + index);
+      
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const dateString = `${yyyy}-${mm}-${dd}`;
+      
+      const todayYyyy = today.getFullYear();
+      const todayMm = String(today.getMonth() + 1).padStart(2, '0');
+      const todayDd = String(today.getDate()).padStart(2, '0');
+      const todayString = `${todayYyyy}-${todayMm}-${todayDd}`;
+      
+      const activityForDay = this.dailyActivity.find(d => d.date === dateString);
+      const count = activityForDay ? activityForDay.count : 0;
+      
+      let status = 'empty';
+      if (count > 0) {
+        status = 'active';
+      } else if (dateString < todayString) {
+        status = 'frozen';
+      } else {
+        status = 'empty'; // Futuro o hoy sin hacer
+      }
+      return { label, status };
+    });
+
     this.cdr.detectChanges();
   }
 

@@ -38,13 +38,13 @@ import { UI_ICONS } from '../../../../shared/constants/icons.constants';
         <div class="heatmap-layout">
           <div class="heatmap-wrapper">
             <div class="heatmap-labels-y">
-              <span></span>
-              <span>Lun</span>
-              <span></span>
-              <span>Mié</span>
-              <span></span>
-              <span>Vie</span>
-              <span></span>
+              <span>D</span>
+              <span>L</span>
+              <span>M</span>
+              <span>X</span>
+              <span>J</span>
+              <span>V</span>
+              <span>S</span>
             </div>
             
             <div class="heatmap-body">

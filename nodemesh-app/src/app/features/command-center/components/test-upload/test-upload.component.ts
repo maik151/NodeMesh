@@ -389,6 +389,16 @@ export class TestUploadComponent implements OnInit {
       return;
     }
 
+    // Validar XSS antes de intentar parsear JSON (para atrapar payloads maliciosos no firmados que puedan fallar al parsear)
+    const isSignedRaw = /"signature"\s*:\s*"nodemesh-v1"/.test(this.payload);
+    if (!isSignedRaw) {
+      const HighRiskXSS = /<script\b[^>]*>([\s\S]*?)<\/script>|javascript:|onerror\s*=|onload\s*=/gi;
+      if (HighRiskXSS.test(this.payload)) {
+        this.uploadStats.errorMessage = 'ALERTA SEGURIDAD: XSS Detectado.';
+        return;
+      }
+    }
+
     try {
       const parsed = JSON.parse(this.payload);
 
@@ -405,6 +415,10 @@ export class TestUploadComponent implements OnInit {
         if (!this.uploadConfig.quizTitle) {
            this.uploadConfig.quizTitle = meta.tema_objetivo;
         }
+      }
+
+      if (meta.titulo_quiz && !this.uploadConfig.quizTitle) {
+        this.uploadConfig.quizTitle = meta.titulo_quiz;
       }
 
       // Si no hay tema_objetivo pero hay folder, usamos folder como fallback

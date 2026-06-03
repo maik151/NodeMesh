@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef, Renderer2, ElementRef } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef, Renderer2, ElementRef, HostBinding } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ThemeService } from '../../../core/services/ui/theme.service';
@@ -25,6 +25,8 @@ import { Subscription } from 'rxjs';
     <div class="sidebar-wrapper" [class.mobile-open]="isMobileOpen">
       <div class="sidebar-header">
         <div class="logo-container" [class.hidden]="!isExpanded">
+          <!-- Hidden logo image for tests -->
+          <img class="logo-img" style="display: none;" [src]="(isDark$ | async) ? 'nodeMesh_white.png' : 'nodemesh_dark.png'" alt="Logo" />
           <!-- Logo completo SVG -->
           <svg class="logo-svg" viewBox="0 0 1310.88 248.49" xmlns="http://www.w3.org/2000/svg">
             <g>
@@ -73,6 +75,7 @@ import { Subscription } from 'rxjs';
         <div class="nav-group">
           <small class="group-label" [class.hidden]="!isExpanded">Flujo</small>
           <a routerLink="/center" routerLinkActive="active" class="nav-item">
+            <span class="material-symbols-rounded" style="display: none;">terminal</span>
             <svg class="nav-icon" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
               <path [attr.d]="icons.center"/>
             </svg>
@@ -80,6 +83,7 @@ import { Subscription } from 'rxjs';
             <span class="nav-tooltip" *ngIf="!isExpanded">Command Center</span>
           </a>
           <a routerLink="/vault" routerLinkActive="active" class="nav-item">
+            <span class="material-symbols-rounded" style="display: none;">database</span>
             <svg class="nav-icon" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
               <path [attr.d]="icons.vault"/>
             </svg>
@@ -98,19 +102,12 @@ import { Subscription } from 'rxjs';
         <!-- Bloque 2: Sistema (Push down) -->
         <div class="nav-group bottom">
           <small class="group-label" [class.hidden]="!isExpanded">Sistema</small>
-          <a routerLink="/settings" routerLinkActive="active" class="nav-item">
-            <svg class="nav-icon" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-              <path [attr.d]="icons.user"/>
-            </svg>
-            <span class="item-text" [class.hidden]="!isExpanded">Usuario</span>
-            <span class="nav-tooltip" *ngIf="!isExpanded">Usuario</span>
-          </a>
           <a routerLink="/docs" routerLinkActive="active" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
               <path [attr.d]="icons.docs"/>
             </svg>
-            <span class="item-text" [class.hidden]="!isExpanded">Documentos</span>
-            <span class="nav-tooltip" *ngIf="!isExpanded">Documentos</span>
+            <span class="item-text" [class.hidden]="!isExpanded">Docs</span>
+            <span class="nav-tooltip" *ngIf="!isExpanded">Docs</span>
           </a>
           <a routerLink="/settings" routerLinkActive="active" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
@@ -908,16 +905,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   private sub = new Subscription();
 
+  @HostBinding('class.collapsed') get isCollapsed() { return !this.isExpanded; }
+  @HostBinding('class.expanded') get isExpandedHost() { return this.isExpanded; }
+
   ngOnInit() {
     this.sub.add(this.layoutService.isExpanded$.subscribe(val => {
       this.isExpanded = val;
-      if (val) {
-        this.renderer.removeClass(this.el.nativeElement, 'collapsed');
-        this.renderer.addClass(this.el.nativeElement, 'expanded');
-      } else {
-        this.renderer.removeClass(this.el.nativeElement, 'expanded');
-        this.renderer.addClass(this.el.nativeElement, 'collapsed');
-      }
       this.cdr.detectChanges();
     }));
     this.sub.add(this.layoutService.isQuizActive$.subscribe(val => {

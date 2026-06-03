@@ -3,6 +3,7 @@ import { SidebarComponent } from './sidebar.component';
 import { provideRouter } from '@angular/router';
 import { By } from '@angular/platform-browser';
 import { ThemeService } from '../../../core/services/ui/theme.service';
+import { LayoutService } from '../../../core/services/ui/layout.service';
 import { BehaviorSubject } from 'rxjs';
 
 describe('SidebarComponent (TDD)', () => {
@@ -54,7 +55,8 @@ describe('SidebarComponent (TDD)', () => {
   });
 
   it('debe aplicar la clase host "collapsed" al contraerse', () => {
-    component.isExpanded = false;
+    const layoutService = TestBed.inject(LayoutService);
+    layoutService.setExpanded(false);
     fixture.detectChanges();
     expect(fixture.debugElement.classes['collapsed']).toBeTruthy();
     expect(fixture.debugElement.classes['expanded']).toBeFalsy();

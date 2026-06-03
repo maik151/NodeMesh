@@ -13,7 +13,8 @@ describe('TestUploadComponent', () => {
     getDueNodesSummary: () => Promise.resolve([]),
     getRecentFolders: () => Promise.resolve([]),
     saveFolder: () => Promise.resolve(),
-    saveNodes: () => Promise.resolve()
+    saveNodes: () => Promise.resolve(),
+    saveQuiz: () => Promise.resolve()
   };
 
   beforeEach(async () => {
@@ -40,7 +41,7 @@ describe('TestUploadComponent', () => {
   it('debe permitir caracteres técnicos conflictivos si el payload tiene firma nodemesh-v1', () => {
     const signedJson = JSON.stringify({
       metadata: { signature: 'nodemesh-v1', titulo_quiz: 'Test Pro' },
-      nodos: [{ pregunta: '¿Cómo funciona onclick=?', tipo_reto: 'single_choice', contexto: 'JS' }]
+      nodos: [{ pregunta: '¿Cómo funciona onclick=?', tipo_reto: 'single_choice', contexto: 'JS', respuesta_esperada: 'onclick' }]
     });
     component.payload = signedJson;
     (component as any).analyzePayload();
@@ -51,7 +52,7 @@ describe('TestUploadComponent', () => {
   it('debe auto-rellenar el título del quiz desde los metadatos', () => {
     const jsonStr = JSON.stringify({
       metadata: { titulo_quiz: 'Mastering Angular' },
-      nodos: [{ pregunta: 'Q1', tipo_reto: 'single_choice', contexto: 'Angular' }]
+      nodos: [{ pregunta: 'Q1', tipo_reto: 'single_choice', contexto: 'Angular', respuesta_esperada: 'A' }]
     });
     component.payload = jsonStr;
     (component as any).analyzePayload();
@@ -62,8 +63,8 @@ describe('TestUploadComponent', () => {
     component.payload = JSON.stringify({ 
       metadata: {},
       nodos: [
-        { pregunta: 'A', tipo_reto: 'single_choice', contexto: 'X' }, 
-        { pregunta: 'B', tipo_reto: 'multi_choice', contexto: 'Y' }
+        { pregunta: 'A', tipo_reto: 'single_choice', contexto: 'X', respuesta_esperada: 'A' }, 
+        { pregunta: 'B', tipo_reto: 'multi_choice', contexto: 'Y', respuesta_esperada: 'B' }
       ] 
     });
     (component as any).analyzePayload();
@@ -72,7 +73,7 @@ describe('TestUploadComponent', () => {
   });
 
   it('debe normalizar JSON malformado (Markdown envolvente)', () => {
-    component.payload = '```json\n{"nodos": [{"pregunta": "Z", "tipo_reto": "single_choice", "contexto": "Z"}]}\n```';
+    component.payload = '```json\n{"nodos": [{"pregunta": "Z", "tipo_reto": "single_choice", "contexto": "Z", "respuesta_esperada": "A"}]}\n```';
     component.normalizeJson();
     expect(component.uploadStats.isValid).toBe(true);
     expect(component.uploadStats.nodeCount).toBe(1);
@@ -85,7 +86,7 @@ describe('TestUploadComponent', () => {
     component.uploadConfig.themeName = 'Nuevo Tema';
     component.payload = JSON.stringify({ 
       metadata: { signature: 'nodemesh-v1', titulo_quiz: 'Quiz Final' },
-      nodos: [{ pregunta: 'Pregunta Final', tipo_reto: 'single_choice', contexto: 'Final' }] 
+      nodos: [{ pregunta: 'Pregunta Final', tipo_reto: 'single_choice', contexto: 'Final', respuesta_esperada: 'A' }] 
     });
     
     (component as any).analyzePayload();

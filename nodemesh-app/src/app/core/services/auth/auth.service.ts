@@ -147,7 +147,7 @@ export class AuthService {
             const vaultKey = await this.deriveStorageKey(user.uid);
             await this.dbService.initializeVault(vaultKey);
 
-            localStorage.setItem('nodemesh_session', JSON.stringify({
+            sessionStorage.setItem('nodemesh_session', JSON.stringify({
                 user,
                 token: accessToken,
                 // Extendimos la sesión local a 7 días para un entorno offline/permanente
@@ -186,7 +186,7 @@ export class AuthService {
      * This fulfills RNF-SEG-01's client-side validation requirement.
      */
     isAuthenticated(): boolean {
-        const sessionStr = localStorage.getItem('nodemesh_session');
+        const sessionStr = sessionStorage.getItem('nodemesh_session');
         if (!sessionStr) return false;
 
         try {
@@ -208,7 +208,7 @@ export class AuthService {
     getCurrentUser(): UserProfile | null {
         if (!this.isAuthenticated()) return null;
         try {
-            const session = JSON.parse(localStorage.getItem('nodemesh_session')!);
+            const session = JSON.parse(sessionStorage.getItem('nodemesh_session')!);
             return session.user as UserProfile;
         } catch {
             return null;
@@ -245,7 +245,7 @@ export class AuthService {
      * Clears the current session and vault connection.
      */
     logout(): void {
-        localStorage.removeItem('nodemesh_session');
+        sessionStorage.removeItem('nodemesh_session');
         this.dbService.db?.close();
     }
 

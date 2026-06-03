@@ -14,7 +14,9 @@ describe('App', () => {
 
   beforeEach(async () => {
     authServiceSpy = {
-      isAuthenticated: vi.fn().mockReturnValue(true)
+      isAuthenticated: vi.fn().mockReturnValue(true),
+      getCurrentUser: vi.fn().mockReturnValue({ displayName: 'Mock User', email: 'user@example.com' }),
+      logout: vi.fn()
     };
     
     routerEventsSubject = new BehaviorSubject(new NavigationEnd(1, '/center', '/center'));
@@ -29,17 +31,19 @@ describe('App', () => {
 
     fixture = TestBed.createComponent(App);
     
-    // Manual injection to control the mock more strictly if needed
     const router = TestBed.inject(Router);
     // @ts-ignore - hacking router events for the test
-    (router as any).events = routerEventsSubject.asObservable();
+    Object.defineProperty(router, 'events', {
+      get: () => routerEventsSubject.asObservable(),
+      configurable: true
+    });
     // @ts-ignore
     Object.defineProperty(router, 'url', { get: () => routerEventsSubject.value.url });
     
-    fixture.detectChanges();
   });
 
   it('debe mostrar el sidebar en /center si está autenticado', () => {
+    fixture.detectChanges();
     const sidebar = fixture.debugElement.query(By.css('app-sidebar'));
     expect(sidebar).toBeTruthy();
   });

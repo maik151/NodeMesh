@@ -136,6 +136,84 @@ describe('DatabaseService (TDD - AUT-01) - RED phase', () => {
         expect(filtered[0].pregunta).toBe('Q from source A');
     });
 
+    describe('Folder Mastery Breakdown', () => {
+        it('debe devolver un desglose vacio si no hay carpetas', async () => {
+            await service.initializeVault('nodemesh_vault_test_mastery_empty');
+            const breakdown = await service.getFolderMasteryBreakdown();
+            expect(breakdown).toEqual([]);
+        });
+
+        it('debe calcular correctamente el mastery por carpeta basandose en el umbral de 21 dias', async () => {
+            await service.initializeVault('nodemesh_vault_test_mastery_calc');
+            
+            // Crear carpetas
+            await service.saveFolder({
+                folder_id: 'folder_test_1',
+                nombre_tema: 'Historia del Ecuador',
+                color_tag: 'blue',
+                creado_en: new Date().toISOString()
+            });
+
+            await service.saveFolder({
+                folder_id: 'folder_test_2',
+                nombre_tema: 'Oxford Test',
+                color_tag: 'red',
+                creado_en: new Date().toISOString()
+            });
+
+            const now = new Date();
+            const futureReviewDate = new Date(now.getTime() + 25 * 24 * 60 * 60 * 1000); 
+            const pastReviewDate = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000); 
+
+            const nodes: any[] = [
+                {
+                    id_temp: 'node_1',
+                    tipo_reto: 'single_choice' as const,
+                    requiere_ia: false,
+                    contexto: 'C',
+                    pregunta: 'P1',
+                    opciones: null,
+                    respuesta_esperada: 'A',
+                    folder_id: 'folder_test_1',
+                    nextReviewDate: futureReviewDate
+                },
+                {
+                    id_temp: 'node_2',
+                    tipo_reto: 'single_choice' as const,
+                    requiere_ia: false,
+                    contexto: 'C',
+                    pregunta: 'P2',
+                    opciones: null,
+                    respuesta_esperada: 'B',
+                    folder_id: 'folder_test_1',
+                    nextReviewDate: pastReviewDate
+                },
+                {
+                    id_temp: 'node_3',
+                    tipo_reto: 'single_choice' as const,
+                    requiere_ia: false,
+                    contexto: 'C',
+                    pregunta: 'P3',
+                    opciones: null,
+                    respuesta_esperada: 'C',
+                    folder_id: 'folder_test_2',
+                    nextReviewDate: pastReviewDate
+                }
+            ];
+
+            await service.saveNodes(nodes);
+
+            const breakdown = await service.getFolderMasteryBreakdown();
+            expect(breakdown.length).toBe(2);
+            
+            const f1 = breakdown.find(b => b.folder_id === 'folder_test_1');
+            expect(f1?.mastery).toBe(50);
+
+            const f2 = breakdown.find(b => b.folder_id === 'folder_test_2');
+            expect(f2?.mastery).toBe(0);
+        });
+    });
+
     // --- NUEVAS PRUEBAS PARA COBERTURA (Round 1) ---
 
     describe('Getters y Estados Iniciales', () => {

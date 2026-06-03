@@ -11,12 +11,13 @@ import { TriageQueueComponent } from '../../components/triage-queue/triage-queue
 import { FocusTargetBentoComponent } from '../../components/focus-target-bento/focus-target-bento.component';
 import { CognitiveActivityMapComponent } from '../../components/cognitive-activity-map/cognitive-activity-map.component';
 import { StreakBentoComponent } from '../../components/streak-bento/streak-bento.component';
+import { TotalMasteryBentoComponent } from '../../components/total-mastery-bento/total-mastery-bento.component';
 import { UI_ICONS } from '../../../../shared/constants/icons.constants';
 
 @Component({
   selector: 'app-command-center',
   standalone: true,
-  imports: [CommonModule, FormsModule, LiquidGlassComponent, TestUploadComponent, PromptCompilerComponent, TriageQueueComponent, FocusTargetBentoComponent, CognitiveActivityMapComponent, StreakBentoComponent],
+  imports: [CommonModule, FormsModule, LiquidGlassComponent, TestUploadComponent, PromptCompilerComponent, TriageQueueComponent, FocusTargetBentoComponent, CognitiveActivityMapComponent, StreakBentoComponent, TotalMasteryBentoComponent],
   template: `
     <div class="command-center-container">
       <header class="cc-header">
@@ -93,26 +94,7 @@ import { UI_ICONS } from '../../../../shared/constants/icons.constants';
         </div>
 
         <div class="cc-card span-4 row-2 glassy-card-container">
-          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="16" backgroundColor="var(--glass-fill)" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
-            <div class="widget-mastery-compact">
-              <div class="mastery-header">
-                <span class="label-micro">TOTAL_MASTERY</span>
-              </div>
-              <div class="mastery-body">
-                <div class="circular-progress-small">
-                  <svg class="chart-svg" viewBox="0 0 36 36">
-                    <circle class="circle-bg" cx="18" cy="18" r="15.5"></circle>
-                    <circle class="circle-fg" cx="18" cy="18" r="15.5" [attr.stroke-dasharray]="masteryRatio + ', 100'"></circle>
-                  </svg>
-                  <div class="perc-text-mini">{{ masteryRatio }}%</div>
-                </div>
-                <div class="mastery-info">
-                  <span class="mastery-value">{{ masteryRatio }}%</span>
-                  <span class="mastery-sub">Global Mastery</span>
-                </div>
-              </div>
-            </div>
-          </app-liquid-glass>
+          <app-total-mastery-bento [masteryRatio]="masteryRatio" [folderBreakdown]="folderMasteryBreakdown"></app-total-mastery-bento>
         </div>
 
         <div class="cc-card span-4 row-2 glassy-card-container">
@@ -294,6 +276,7 @@ export class CommandCenterComponent implements OnInit {
   allFolders: any[] = [];
   dailyActivity: { date: string, count: number }[] = [];
   masteryRatio: number = 0;
+  folderMasteryBreakdown: any[] = [];
   retentionPath: string = '';
   sparklinePath: string = '';
 
@@ -333,6 +316,7 @@ export class CommandCenterComponent implements OnInit {
     const activity = await this.db.getDailyActivity(365);
     this.dailyActivity = activity;
     this.masteryRatio = await this.db.getMasteryRatio() || 0;
+    this.folderMasteryBreakdown = await this.db.getFolderMasteryBreakdown();
     
     this.cdr.detectChanges();
   }

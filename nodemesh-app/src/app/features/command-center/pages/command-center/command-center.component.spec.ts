@@ -22,7 +22,9 @@ describe('CommandCenterComponent', () => {
     getRecentFolders: () => Promise.resolve([]),
     getDailyActivity: () => Promise.resolve([]),
     getMasteryRatio: () => Promise.resolve(0),
-    getStreak: () => Promise.resolve(0)
+    getStreak: () => Promise.resolve(0),
+    getFolderMasteryBreakdown: () => Promise.resolve([]),
+    getAllFolders: () => Promise.resolve([])
   };
 
   const mockThemeService = {
@@ -52,9 +54,9 @@ describe('CommandCenterComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debe contener los elementos clave (SUBIR PREGUNTAS, Generar Prompt, FORZAR_SPRINT)', () => {
+  it('debe contener los elementos clave (Subir Preguntas, Generar Prompt, FORZAR_SPRINT)', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('SUBIR PREGUNTAS');
+    expect(compiled.textContent).toContain('Subir Preguntas');
     expect(compiled.textContent).toContain('Generar Prompt');
     expect(compiled.textContent).toContain('FORZAR_SPRINT');
   });

@@ -264,12 +264,45 @@ export class DatabaseService {
         const allNodes = await this.db.table('nodes').toArray();
         if (allNodes.length === 0) return 0;
         
-        // Simulación: Si nextReviewDate es > 7 días en el futuro, se considera "dominado"
         const now = new Date();
-        const masteryThreshold = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-        const seniorNodes = allNodes.filter(n => n.nextReviewDate && n.nextReviewDate > masteryThreshold);
+        const masteryThreshold = new Date(now.getTime() + 21 * 24 * 60 * 60 * 1000);
+        const seniorNodes = allNodes.filter(n => {
+            if (n.intervalDays !== undefined && n.intervalDays !== null) {
+                return n.intervalDays >= 21;
+            }
+            return n.nextReviewDate && new Date(n.nextReviewDate) >= masteryThreshold;
+        });
         
-        return (seniorNodes.length / allNodes.length) * 100;
+        return Math.round((seniorNodes.length / allNodes.length) * 100);
+    }
+
+    async getFolderMasteryBreakdown(): Promise<{ folder_id: string, nombre_tema: string, mastery: number }[]> {
+        if (!this.db) throw new Error('Database not initialized');
+        const allNodes = await this.db.table('nodes').toArray();
+        const allFolders = await this.db.table('folders').toArray();
+        
+        const now = new Date();
+        const masteryThreshold = new Date(now.getTime() + 21 * 24 * 60 * 60 * 1000);
+        
+        const breakdown = allFolders.map(folder => {
+            const folderNodes = allNodes.filter(n => n.folder_id === folder.folder_id);
+            if (folderNodes.length === 0) {
+                return { folder_id: folder.folder_id, nombre_tema: folder.nombre_tema, mastery: 0 };
+            }
+            const mastered = folderNodes.filter(n => {
+                if (n.intervalDays !== undefined && n.intervalDays !== null) {
+                    return n.intervalDays >= 21;
+                }
+                return n.nextReviewDate && new Date(n.nextReviewDate) >= masteryThreshold;
+            });
+            return {
+                folder_id: folder.folder_id,
+                nombre_tema: folder.nombre_tema,
+                mastery: Math.round((mastered.length / folderNodes.length) * 100)
+            };
+        });
+        
+        return breakdown.sort((a, b) => b.mastery - a.mastery);
     }
 
     async getRetentionProfile(): Promise<{ day: number, retention: number }[]> {

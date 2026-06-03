@@ -12,12 +12,13 @@ import { FocusTargetBentoComponent } from '../../components/focus-target-bento/f
 import { CognitiveActivityMapComponent } from '../../components/cognitive-activity-map/cognitive-activity-map.component';
 import { StreakBentoComponent } from '../../components/streak-bento/streak-bento.component';
 import { TotalMasteryBentoComponent } from '../../components/total-mastery-bento/total-mastery-bento.component';
+import { PomodoroBentoComponent } from '../../components/pomodoro-bento/pomodoro-bento.component';
 import { UI_ICONS } from '../../../../shared/constants/icons.constants';
 
 @Component({
   selector: 'app-command-center',
   standalone: true,
-  imports: [CommonModule, FormsModule, LiquidGlassComponent, TestUploadComponent, PromptCompilerComponent, TriageQueueComponent, FocusTargetBentoComponent, CognitiveActivityMapComponent, StreakBentoComponent, TotalMasteryBentoComponent],
+  imports: [CommonModule, FormsModule, LiquidGlassComponent, TestUploadComponent, PromptCompilerComponent, TriageQueueComponent, FocusTargetBentoComponent, CognitiveActivityMapComponent, StreakBentoComponent, TotalMasteryBentoComponent, PomodoroBentoComponent],
   template: `
     <div class="command-center-container">
       <header class="cc-header">
@@ -98,18 +99,7 @@ import { UI_ICONS } from '../../../../shared/constants/icons.constants';
         </div>
 
         <div class="cc-card span-4 row-2 glassy-card-container">
-          <app-liquid-glass [simple]="true" [radius]="20" [depth]="2" [blur]="16" backgroundColor="var(--glass-fill)" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
-             <div class="widget-square-compact">
-               <div class="widget-header">
-                  <span class="label-micro">POMODORO_SESSION</span>
-                  <span class="clickable material-symbols-rounded size-medium" (click)="togglePomo()">{{ pomo.running ? 'pause_circle' : 'play_circle' }}</span>
-               </div>
-               <div class="pomo-body">
-                 <div class="widget-value-compact mono" style="font-size: 2.2rem; text-align: left; letter-spacing: -1px;">{{ pomoTime }}</div>
-                 <div class="meter-bar-mini"><div [style.width]="(pomo.seconds / 1500 * 100) + '%'" class="meter-fill"></div></div>
-               </div>
-             </div>
-          </app-liquid-glass>
+          <app-pomodoro-bento></app-pomodoro-bento>
         </div>
       </div>
 
@@ -290,10 +280,6 @@ export class CommandCenterComponent implements OnInit {
   injectionStatus: 'idle' | 'success' | 'error' = 'idle';
   injectionMsg = '';
 
-  // Pomodoro
-  pomoTime: string = '25:00';
-  pomo = { seconds: 1500, running: false, interval: null as any };
-
   async ngOnInit() {
     this.generateRetentionPath();
     this.generateSparkline();
@@ -340,25 +326,6 @@ export class CommandCenterComponent implements OnInit {
       p += ` L ${x} ${30 - y}`;
     }
     this.sparklinePath = p;
-  }
-
-  togglePomo() {
-    this.pomo.running = !this.pomo.running;
-    if (this.pomo.running) {
-       this.pomo.interval = setInterval(() => {
-         if (this.pomo.seconds > 0) {
-           this.pomo.seconds--;
-           const m = Math.floor(this.pomo.seconds / 60);
-           const s = this.pomo.seconds % 60;
-           this.pomoTime = `${m}:${s.toString().padStart(2, '0')}`;
-           this.cdr.detectChanges();
-         } else {
-           this.togglePomo();
-         }
-       }, 1000);
-    } else {
-      clearInterval(this.pomo.interval);
-    }
   }
 
   @HostListener('window:keydown', ['$event'])

@@ -24,42 +24,49 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
           <!-- Play/Pause Button in Top Right -->
           <div class="pomo-controls-header">
             <button *ngIf="!service.isRunning()" (click)="service.start()" class="btn-play" title="Iniciar Sesión">
-              <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+              <svg fill="currentColor" viewBox="0 0 256 256">
+                <path d="M232.4,114.49,88.32,26.35a16,16,0,0,0-16.2-.3A15.86,15.86,0,0,0,64,39.87V216.13A15.94,15.94,0,0,0,80,232a16.07,16.07,0,0,0,8.36-2.35L232.4,141.51a15.81,15.81,0,0,0,0-27ZM80,215.94V40l143.83,88Z"></path>
+              </svg>
             </button>
             <button *ngIf="service.isRunning()" (click)="service.pause()" class="btn-pause" title="Pausar Sesión">
-              <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+              <svg fill="currentColor" viewBox="0 0 256 256">
+                <path d="M200,32H160a16,16,0,0,0-16,16V208a16,16,0,0,0,16,16h40a16,16,0,0,0,16-16V48A16,16,0,0,0,200,32Zm0,176H160V48h40ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Zm0,176H56V48H96Z"></path>
+              </svg>
             </button>
           </div>
         </div>
 
-        <!-- CONFIGURATION CONTROLS -->
-        <div class="pomo-time-adjusters">
-          
-          <!-- Focus Time -->
-          <div class="adjuster-card">
-            <span class="adjuster-label font-mono">Focus (Min)</span>
-            <div class="adjuster-row">
-              <button (click)="adjustTime('focus', -1)" [disabled]="service.isRunning() || service.focusTime() <= 1" class="btn-adjust">-</button>
-              <span class="adjuster-value font-mono">{{ service.focusTime() | number:'2.0' }}</span>
-              <button (click)="adjustTime('focus', 1)" [disabled]="service.isRunning() || service.focusTime() >= 60" class="btn-adjust">+</button>
+        <!-- BODY -->
+        <div class="pomo-body">
+          <!-- CONFIGURATION CONTROLS -->
+          <div class="pomo-time-adjusters">
+            
+            <!-- Focus Time -->
+            <div class="adjuster-card" [class.active]="service.sessionType() === 'focus' && service.isActive()">
+              <span class="adjuster-label font-mono">Focus (Min)</span>
+              <div class="adjuster-row">
+                <button (click)="adjustTime('focus', -1)" [disabled]="service.isRunning() || service.focusTime() <= 1" class="btn-adjust">-</button>
+                <span class="adjuster-value font-mono">{{ service.focusTime() | number:'2.0' }}</span>
+                <button (click)="adjustTime('focus', 1)" [disabled]="service.isRunning() || service.focusTime() >= 60" class="btn-adjust">+</button>
+              </div>
             </div>
+
+            <!-- Break Time -->
+            <div class="adjuster-card" [class.active-break]="service.sessionType() === 'break' && service.isActive()">
+              <span class="adjuster-label font-mono">Break (Min)</span>
+              <div class="adjuster-row">
+                <button (click)="adjustTime('break', -1)" [disabled]="service.isRunning() || service.breakTime() <= 1" class="btn-adjust">-</button>
+                <span class="adjuster-value font-mono text-gray-400">{{ service.breakTime() | number:'2.0' }}</span>
+                <button (click)="adjustTime('break', 1)" [disabled]="service.isRunning() || service.breakTime() >= 60" class="btn-adjust">+</button>
+              </div>
+            </div>
+
           </div>
 
-          <!-- Break Time -->
-          <div class="adjuster-card">
-            <span class="adjuster-label font-mono">Break (Min)</span>
-            <div class="adjuster-row">
-              <button (click)="adjustTime('break', -1)" [disabled]="service.isRunning() || service.breakTime() <= 1" class="btn-adjust">-</button>
-              <span class="adjuster-value font-mono text-gray-400">{{ service.breakTime() | number:'2.0' }}</span>
-              <button (click)="adjustTime('break', 1)" [disabled]="service.isRunning() || service.breakTime() >= 60" class="btn-adjust">+</button>
-            </div>
+          <!-- PROGRESS BAR -->
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" [class.break]="service.sessionType() === 'break'" [style.width]="progressPercentage + '%'"></div>
           </div>
-
-        </div>
-
-        <!-- PROGRESS BAR -->
-        <div class="progress-bar-container">
-          <div class="progress-bar-fill" [style.width]="progressPercentage + '%'"></div>
         </div>
 
       </div>
@@ -70,7 +77,6 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       display: flex;
       flex-direction: column;
       height: 100%;
-      padding: 1rem 1.25rem;
       box-sizing: border-box;
       justify-content: space-between;
       overflow: hidden;
@@ -81,8 +87,20 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 0.75rem;
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       flex-shrink: 0;
+    }
+    :host-context([data-theme="light"]) .pomo-header {
+      border-bottom-color: rgba(0,0,0,0.08);
+    }
+
+    .pomo-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex: 1;
+      padding: 1.2rem;
     }
 
     .pomo-title-box {
@@ -100,10 +118,6 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       width: 22px;
       height: 22px;
       opacity: 0.8;
-      color: var(--theme-brand-neon);
-    }
-    :host-context([data-theme="light"]) .pomo-icon {
-      color: #3a7d0a;
     }
 
     .pomo-title {
@@ -173,10 +187,31 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       flex-direction: column;
       align-items: center;
       text-align: center;
+      transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
     }
     :host-context([data-theme="light"]) .adjuster-card {
       background: rgba(0, 0, 0, 0.03);
       border-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .adjuster-card.active {
+      border-color: var(--theme-brand-neon);
+      background: rgba(159, 255, 34, 0.08);
+      box-shadow: 0 0 10px rgba(159, 255, 34, 0.05);
+    }
+    :host-context([data-theme="light"]) .adjuster-card.active {
+      border-color: #3a7d0a;
+      background: rgba(58, 125, 10, 0.06);
+    }
+
+    .adjuster-card.active-break {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.08);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.05);
+    }
+    :host-context([data-theme="light"]) .adjuster-card.active-break {
+      border-color: #0284c7;
+      background: rgba(2, 132, 199, 0.06);
     }
 
     .adjuster-label {
@@ -187,6 +222,23 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       opacity: 0.5;
       font-weight: 700;
       margin-bottom: 0.25rem;
+      transition: color 0.3s ease, opacity 0.3s ease;
+    }
+
+    .adjuster-card.active .adjuster-label {
+      color: var(--theme-brand-neon);
+      opacity: 0.9;
+    }
+    :host-context([data-theme="light"]) .adjuster-card.active .adjuster-label {
+      color: #3a7d0a;
+    }
+
+    .adjuster-card.active-break .adjuster-label {
+      color: #38bdf8;
+      opacity: 0.9;
+    }
+    :host-context([data-theme="light"]) .adjuster-card.active-break .adjuster-label {
+      color: #0284c7;
     }
 
     .adjuster-row {
@@ -246,10 +298,19 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       height: 100%;
       background-color: var(--theme-brand-neon);
       border-radius: 100px;
-      transition: width 0.3s linear;
+      transition: width 0.3s linear, background-color 0.3s ease, box-shadow 0.3s ease;
       box-shadow: 0 0 5px var(--theme-brand-neon);
     }
     :host-context([data-theme="light"]) .progress-bar-fill {
+      box-shadow: none;
+    }
+
+    .progress-bar-fill.break {
+      background-color: #38bdf8;
+      box-shadow: 0 0 5px #38bdf8;
+    }
+    :host-context([data-theme="light"]) .progress-bar-fill.break {
+      background-color: #0284c7;
       box-shadow: none;
     }
   `]

@@ -74,7 +74,6 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       display: flex;
       flex-direction: column;
       height: 100%;
-      padding: 1rem 1.25rem;
       box-sizing: border-box;
       justify-content: space-between;
       overflow: hidden;
@@ -85,8 +84,12 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 0.75rem;
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       flex-shrink: 0;
+    }
+    :host-context([data-theme="light"]) .mastery-header {
+      border-bottom-color: rgba(0,0,0,0.08);
     }
 
     .mastery-title-box {
@@ -104,10 +107,6 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       width: 22px;
       height: 22px;
       opacity: 0.8;
-      color: var(--theme-brand-neon);
-    }
-    :host-context([data-theme="light"]) .mastery-icon {
-      color: #3a7d0a;
     }
 
     .mastery-title {
@@ -124,6 +123,7 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
       gap: 1rem;
       flex: 1;
       width: 100%;
+      padding: 1.2rem;
     }
 
     @media (max-width: 380px) {

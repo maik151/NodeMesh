@@ -33,7 +33,7 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
         </div>
 
         <!-- LIST -->
-        <div class="triage-list scroll-hide">
+        <div class="triage-list scroll-custom">
           <div *ngIf="dueModules.length === 0" class="empty-state">
             <p>SYSTEM_OPTIMIZED</p>
           </div>
@@ -145,12 +145,24 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
     .triage-list {
       flex: 1;
       overflow-y: auto;
-      padding: 0.5rem 0;
+      max-height: 260px;
+      padding: 0.5rem 4px 0.5rem 0;
       display: flex;
       flex-direction: column;
     }
-    .scroll-hide::-webkit-scrollbar { display: none; }
-    .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scroll-custom::-webkit-scrollbar {
+      width: 5px;
+    }
+    .scroll-custom::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .scroll-custom::-webkit-scrollbar-thumb {
+      background: var(--theme-border);
+      border-radius: 10px;
+    }
+    .scroll-custom::-webkit-scrollbar-thumb:hover {
+      background: var(--theme-brand-neon);
+    }
 
     .empty-state {
       padding: 2rem 1rem;

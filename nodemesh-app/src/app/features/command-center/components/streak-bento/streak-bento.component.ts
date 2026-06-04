@@ -136,10 +136,26 @@ import { UI_ICONS } from '../../../../shared/constants/icons.constants';
       color: #333;
     }
 
+    :host {
+      --streak-active-glow: rgba(255, 140, 0, 0.5);
+      --streak-active-glow-bright: rgba(255, 120, 0, 0.7);
+      --streak-frozen-glow: rgba(56, 189, 248, 0.4);
+      --streak-frozen-glow-bright: rgba(56, 189, 248, 0.65);
+    }
+
+    :host-context([data-theme="light"]) {
+      --streak-active-glow: rgba(200, 100, 0, 0.3);
+      --streak-active-glow-bright: rgba(220, 110, 0, 0.45);
+      --streak-frozen-glow: rgba(30, 120, 200, 0.3);
+      --streak-frozen-glow-bright: rgba(40, 140, 220, 0.45);
+    }
+
     .streak-icon {
       width: 22px;
       height: 22px;
       opacity: 0.8;
+      animation: campfireFlicker 3.5s infinite ease-in-out;
+      transform-origin: bottom center;
     }
 
     .streak-title {
@@ -201,15 +217,22 @@ import { UI_ICONS } from '../../../../shared/constants/icons.constants';
       height: 42px;
       background: transparent;
       border: none;
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .day-icon-wrapper:hover {
+      transform: scale(1.1);
     }
 
     .streak-day.active .day-icon-wrapper {
-      filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.5));
+      animation: activeFlameDance 2.5s infinite ease-in-out;
+      transform-origin: bottom center;
     }
 
     .streak-day.frozen .day-icon-wrapper {
       color: #38bdf8;
-      filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4));
+      animation: frozenCrystalFloat 4s infinite ease-in-out;
+      transform-origin: center center;
     }
 
     .streak-day.empty .day-icon-wrapper {
@@ -229,11 +252,13 @@ import { UI_ICONS } from '../../../../shared/constants/icons.constants';
       width: 52px;
       height: 52px;
       object-fit: contain;
+      transition: filter 0.3s ease;
     }
     
     .icon-custom-empty {
       width: 38px;
       height: 38px;
+      transition: transform 0.3s ease;
     }
 
     /* Empty SVG fill colors - dark mode */
@@ -246,11 +271,65 @@ import { UI_ICONS } from '../../../../shared/constants/icons.constants';
 
     :host-context([data-theme="light"]) .kpi-streak-value { color: #1e293b; }
     :host-context([data-theme="light"]) .day-label { color: #64748b; }
-    :host-context([data-theme="light"]) .streak-day.active .day-icon-wrapper {
-      filter: drop-shadow(0 0 6px rgba(200, 100, 0, 0.3));
+
+    /* Keyframes for Active Fire */
+    @keyframes activeFlameDance {
+      0% {
+        transform: scale(1) rotate(0deg);
+        filter: drop-shadow(0 0 10px var(--streak-active-glow));
+      }
+      25% {
+        transform: scale(1.04) rotate(-1.5deg);
+        filter: drop-shadow(0 0 15px var(--streak-active-glow-bright)) drop-shadow(0 0 20px rgba(251, 135, 21, 0.25));
+      }
+      50% {
+        transform: scale(0.97) rotate(1deg);
+        filter: drop-shadow(0 0 8px var(--streak-active-glow));
+      }
+      75% {
+        transform: scale(1.05) rotate(-0.5deg);
+        filter: drop-shadow(0 0 17px var(--streak-active-glow-bright)) drop-shadow(0 0 25px rgba(251, 135, 21, 0.3));
+      }
+      100% {
+        transform: scale(1) rotate(0deg);
+        filter: drop-shadow(0 0 10px var(--streak-active-glow));
+      }
     }
-    :host-context([data-theme="light"]) .streak-day.frozen .day-icon-wrapper {
-      filter: drop-shadow(0 0 6px rgba(30, 120, 200, 0.3));
+
+    /* Keyframes for Frozen Crystal Floating */
+    @keyframes frozenCrystalFloat {
+      0% {
+        transform: translateY(0px) scale(1);
+        filter: drop-shadow(0 0 8px var(--streak-frozen-glow));
+      }
+      50% {
+        transform: translateY(-4px) scale(1.04);
+        filter: drop-shadow(0 0 15px var(--streak-frozen-glow-bright)) drop-shadow(0 0 20px rgba(56, 189, 248, 0.2));
+      }
+      100% {
+        transform: translateY(0px) scale(1);
+        filter: drop-shadow(0 0 8px var(--streak-frozen-glow));
+      }
+    }
+
+    /* Keyframes for Campfire flicker */
+    @keyframes campfireFlicker {
+      0%, 100% {
+        opacity: 0.75;
+        transform: scale(1);
+      }
+      30% {
+        opacity: 0.95;
+        transform: scale(1.05) rotate(-1deg);
+      }
+      60% {
+        opacity: 0.7;
+        transform: scale(0.96) rotate(1deg);
+      }
+      80% {
+        opacity: 0.9;
+        transform: scale(1.03) rotate(-0.5deg);
+      }
     }
   `]
 })

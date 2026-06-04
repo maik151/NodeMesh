@@ -1293,6 +1293,51 @@ const TIPO_MAP: Record<string, { label: string }> = {
       color: var(--theme-text);
     }
 
+    /* Interaction & Options Light Mode Overrides */
+    :host-context([data-theme="light"]) .qs-opt-row:hover:not(:disabled) {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.05);
+    }
+    :host-context([data-theme="light"]) .qs-opt-row.is-selected {
+      background: rgba(134, 219, 0, 0.1);
+    }
+    :host-context([data-theme="light"]) .qs-mark {
+      border-color: rgba(0, 0, 0, 0.2);
+    }
+    :host-context([data-theme="light"]) .is-selected .qs-mark {
+      border-color: var(--theme-brand-neon);
+      background: var(--theme-brand-neon);
+      box-shadow: 0 0 8px rgba(134, 219, 0, 0.3);
+    }
+    :host-context([data-theme="light"]) .qs-textarea {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+      color: #0f172a;
+    }
+    :host-context([data-theme="light"]) .qs-textarea:focus {
+      background: #fff;
+      border-color: var(--theme-brand-neon);
+    }
+    :host-context([data-theme="light"]) .qs-validate-btn:disabled {
+      background: #e2e8f0 !important;
+      color: #94a3b8 !important;
+      opacity: 1;
+      filter: none;
+      box-shadow: none;
+      border: 1px solid #cbd5e1;
+    }
+    :host-context([data-theme="light"]) .qs-order-preview-panel {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    :host-context([data-theme="light"]) .qs-preview-item-expanded {
+      background: #f1f5f9;
+    }
+    :host-context([data-theme="light"]) .preview-justification {
+      border-top-color: rgba(0, 0, 0, 0.06);
+    }
+
+
 
     .fr-actions {
       display: flex;

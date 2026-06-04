@@ -1337,8 +1337,19 @@ const TIPO_MAP: Record<string, { label: string }> = {
       border-top-color: rgba(0, 0, 0, 0.06);
     }
 
-
-
+    .qs-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 2.5rem 0;
+      width: 100%;
+    }
+    :host-context([data-theme="light"]) .qs-divider {
+      background: rgba(0, 0, 0, 0.08);
+    }
+    :host-context([data-theme="light"]) ::ng-deep .qs-cloze-blank {
+      border-color: rgba(0, 0, 0, 0.25);
+      background: rgba(0, 0, 0, 0.04);
+    }
     .fr-actions {
       display: flex;
       justify-content: center;

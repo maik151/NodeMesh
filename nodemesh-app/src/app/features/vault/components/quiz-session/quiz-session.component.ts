@@ -1267,6 +1267,32 @@ const TIPO_MAP: Record<string, { label: string }> = {
     :host-context([data-theme="light"]) .fr-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
     :host-context([data-theme="light"]) .fr-btn.primary { background: var(--theme-brand-neon); color: #000; border-color: transparent; }
     :host-context([data-theme="light"]) .fr-cell-sm.badge { background: #f1f5f9; border-color: #e2e8f0; }
+    
+    /* Header Light Mode Overrides */
+    :host-context([data-theme="light"]) .qs-header {
+      background: rgba(255, 255, 255, 0.85);
+      border-bottom-color: rgba(0, 0, 0, 0.08);
+    }
+    :host-context([data-theme="light"]) .qs-widget {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    :host-context([data-theme="light"]) .qs-widget-main.model-picker:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    :host-context([data-theme="light"]) .qs-widget-prog-track {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    :host-context([data-theme="light"]) .qs-exit-btn-alt {
+      color: var(--theme-text-muted);
+    }
+    :host-context([data-theme="light"]) .qs-quiz-icon-wrap svg {
+      fill: var(--theme-text);
+    }
+    :host-context([data-theme="light"]) .qs-quiz-title-alt {
+      color: var(--theme-text);
+    }
+
 
     .fr-actions {
       display: flex;

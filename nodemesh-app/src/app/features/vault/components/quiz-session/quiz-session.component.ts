@@ -1494,12 +1494,14 @@ export class QuizSessionComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  async ngOnInit() {
+  ngOnInit(): void {
     this.layoutService.setExpanded(false);
     this.nodes = this.shuffleArray([...this.nodes]);
     this.initNodeStates();
     this.startTimer();
-    await this.loadAvailableModels();
+    this.loadAvailableModels().catch(err => {
+      console.error('[QuizSession] Error loading available models:', err);
+    });
   }
 
   async loadAvailableModels() {

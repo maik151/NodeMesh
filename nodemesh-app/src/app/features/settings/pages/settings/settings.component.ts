@@ -177,8 +177,10 @@ export class SettingsComponent implements OnInit {
   isFetching = false;
   availableModels: any[] = [];
 
-  async ngOnInit() {
-    await this.loadCurrentKey();
+  ngOnInit(): void {
+    this.loadCurrentKey().catch(err => {
+      console.error('[Settings] Error loading current key:', err);
+    });
   }
 
   async loadCurrentKey() {

@@ -781,13 +781,15 @@ export class QuizPreviewComponent implements OnChanges {
 
   private _lastQuizId: string | null = null;
 
-  async ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     const qChange = changes['quiz'];
     if (qChange && this.quiz) {
       // Solo recargar nodos si cambió el quiz_id (no al editar metadata como dificultad)
       if (this.quiz.quiz_id !== this._lastQuizId) {
         this._lastQuizId = this.quiz.quiz_id;
-        await this.loadNodes();
+        this.loadNodes().catch(err => {
+          console.error('[QuizPreview] Error in loadNodes:', err);
+        });
       } else {
         // Metadata cambió (dificultad, título) — solo actualizar auditor sin recargar
         this.auditorPersona = this.quiz.auditor_persona || null;

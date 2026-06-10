@@ -186,13 +186,18 @@ export class VaultComponent implements OnInit {
   isLoadingData = true;
   sidebarCollapsed = false;
 
-  async ngOnInit() {
-    await this.loadData();
-    this.route.queryParams.subscribe(async params => {
-      const playFolderId = params['playFolder'];
-      if (playFolderId) {
-        await this.handlePlayFolder(playFolderId);
-      }
+  ngOnInit(): void {
+    this.loadData().then(() => {
+      this.route.queryParams.subscribe(params => {
+        const playFolderId = params['playFolder'];
+        if (playFolderId) {
+          this.handlePlayFolder(playFolderId).catch(err => {
+            console.error('[Vault] Error handling play folder:', err);
+          });
+        }
+      });
+    }).catch(err => {
+      console.error('[Vault] Error in loadData:', err);
     });
   }
 
@@ -214,7 +219,7 @@ export class VaultComponent implements OnInit {
       // Logic for urgency. For now, let's pick the first one or if we have 'retencion' or 'next_review' we'd use that.
       // If we don't have explicit urgency at quiz level, we just pick the first one.
       return prev; // simplified
-    });
+    }, quizzes[0]);
     
     // Select the quiz (this opens the preview)
     this.selectQuiz(urgentQuiz);

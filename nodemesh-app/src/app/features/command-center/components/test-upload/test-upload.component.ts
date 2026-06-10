@@ -365,16 +365,21 @@ export class TestUploadComponent implements OnInit {
   isLoadingThemes = false;
   themesLoadedOnce = false;
 
-  async ngOnInit() {
-    this.availableThemes = await this.db.getRecentFolders(100);
-    this.filteredThemes = [...this.availableThemes];
+  ngOnInit(): void {
+    this.db.getRecentFolders(100).then(folders => {
+      this.availableThemes = folders;
+      this.filteredThemes = [...this.availableThemes];
 
-    if (this.initialTheme) {
-      this.uploadConfig.themeName = this.initialTheme.nombre_tema;
-      this.uploadConfig.themeId = this.initialTheme.folder_id;
-    }
+      if (this.initialTheme) {
+        this.uploadConfig.themeName = this.initialTheme.nombre_tema;
+        this.uploadConfig.themeId = this.initialTheme.folder_id;
+      }
 
-    if (this.payload) this.analyzePayload();
+      if (this.payload) this.analyzePayload();
+      this.cdr.detectChanges();
+    }).catch(err => {
+      console.error('[TestUpload] Error loading recent folders:', err);
+    });
   }
 
   onPayloadInput() { this.analyzePayload(); }

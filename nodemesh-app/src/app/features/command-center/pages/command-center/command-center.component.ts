@@ -280,10 +280,12 @@ export class CommandCenterComponent implements OnInit {
   injectionStatus: 'idle' | 'success' | 'error' = 'idle';
   injectionMsg = '';
 
-  async ngOnInit() {
+  ngOnInit(): void {
     this.generateRetentionPath();
     this.generateSparkline();
-    await this.refreshAllData();
+    this.refreshAllData().catch(err => {
+      console.error('[CommandCenter] Error in refreshAllData:', err);
+    });
   }
 
   async onUploadFinished(msg: string) {

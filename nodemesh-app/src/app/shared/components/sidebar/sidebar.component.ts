@@ -26,7 +26,7 @@ import { Subscription } from 'rxjs';
       <div class="sidebar-header">
         <div class="logo-container" [class.hidden]="!isExpanded">
           <!-- Hidden logo image for tests -->
-          <img class="logo-img" style="display: none;" [src]="(isDark$ | async) ? 'nodeMesh_white.png' : 'nodemesh_dark.png'" alt="Logo" />
+          <img class="logo-img" style="display: none;" [src]="(isDark$ | async) ? '/Images/nodeMesh_white.png' : '/Images/nodemesh_dark.png'" alt="Logo" />
           <!-- Logo completo SVG -->
           <svg class="logo-svg" viewBox="0 0 1310.88 248.49" xmlns="http://www.w3.org/2000/svg">
             <g>

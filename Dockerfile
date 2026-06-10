@@ -6,7 +6,7 @@ WORKDIR /app
 COPY nodemesh-app/package.json nodemesh-app/package-lock.json ./nodemesh-app/
 
 # Install dependencies
-RUN npm ci --prefix nodemesh-app
+RUN npm ci --prefix nodemesh-app --legacy-peer-deps
 
 # Copy the rest of the application files
 COPY nodemesh-app/ ./nodemesh-app/

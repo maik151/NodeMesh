@@ -50,18 +50,26 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
 
           <!-- ZONA DERECHA: Desglose de Dominios (Top 3) -->
           <div class="domains-breakdown">
-            <div *ngFor="let domain of topDomains" class="domain-item">
-              <div class="domain-info font-mono">
-                <span class="domain-name" [title]="domain.nombre_tema">{{ domain.nombre_tema }}</span>
-                <span class="domain-perc" [ngClass]="getProgressColorClass(domain.mastery)">{{ domain.mastery }}%</span>
-              </div>
-              <div class="progress-bar-bg">
-                <div class="progress-bar-fg" 
-                     [style.width]="domain.mastery + '%'"
-                     [ngClass]="getProgressBarClass(domain.mastery)">
+            <ng-container *ngIf="topDomains.length > 0; else emptyState">
+              <div *ngFor="let domain of topDomains" class="domain-item">
+                <div class="domain-info font-mono">
+                  <span class="domain-name" [title]="domain.nombre_tema">{{ domain.nombre_tema }}</span>
+                  <span class="domain-perc" [ngClass]="getProgressColorClass(domain.mastery)">{{ domain.mastery }}%</span>
+                </div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fg" 
+                       [style.width]="domain.mastery + '%'"
+                       [ngClass]="getProgressBarClass(domain.mastery)">
+                  </div>
                 </div>
               </div>
-            </div>
+            </ng-container>
+            <ng-template #emptyState>
+              <div class="empty-domains-state">
+                <span class="empty-text">Sin temas registrados</span>
+                <small class="empty-sub">Carga tus preguntas para ver estadísticas</small>
+              </div>
+            </ng-template>
           </div>
 
         </div>
@@ -317,6 +325,26 @@ import { LiquidGlassComponent } from '../../../../shared/components/liquid-glass
     :host-context([data-theme="light"]) .bg-muted-fill {
       background-color: #cbd5e1;
     }
+    .empty-domains-state {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      text-align: center;
+      color: var(--theme-text-muted);
+      opacity: 0.6;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .empty-domains-state .empty-text {
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .empty-domains-state .empty-sub {
+      font-size: 0.6rem;
+      opacity: 0.6;
+      margin-top: 4px;
+    }
   `]
 })
 export class TotalMasteryBentoComponent {
@@ -330,21 +358,6 @@ export class TotalMasteryBentoComponent {
 
   get topDomains() {
     const list = [...(this.folderBreakdown || [])];
-    
-    // Fallback data en caso de tener menos de 3 carpetas reales
-    const fallbacks = [
-      { folder_id: 'fb-oxford', nombre_tema: 'Oxford Test (Inglés B2)', mastery: 85 },
-      { folder_id: 'fb-prog', nombre_tema: 'Fundamentos de Programación', mastery: 45 },
-      { folder_id: 'fb-hist', nombre_tema: 'Historia del Ecuador', mastery: 12 }
-    ];
-
-    for (const fb of fallbacks) {
-      if (list.length >= 3) break;
-      if (!list.some(f => f.nombre_tema.toLowerCase() === fb.nombre_tema.toLowerCase())) {
-        list.push(fb);
-      }
-    }
-
     // Ordenar de mayor a menor mastery y tomar el top 3
     return list.sort((a, b) => b.mastery - a.mastery).slice(0, 3);
   }
